@@ -1,6 +1,14 @@
 package frc.robot.utilities.files;
 
+import static edu.wpi.first.units.Units.Amp;
+import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Inch;
+import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Pound;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volt;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -16,7 +24,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.DistanceUnit;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
 import frc.robot.Constants;
+import frc.robot.utilities.text.TextUtilities;
 
 public class JsonUtilities {
     public static String toJson(Object serializableObject) {
@@ -82,17 +95,17 @@ public class JsonUtilities {
             Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
 
             Class<?> locationClass = getInnerClass(moduleClass, "Location");
-            Class<?> driveClass = getInnerClass(moduleClass, "Drive");
-            Class<?> angleClass = getInnerClass(moduleClass, "Angle");
+            Class<?> driveClass = getInnerClass(moduleClass, "DriveMotor");
+            Class<?> angleClass = getInnerClass(moduleClass, "AngleMotor");
             Class<?> encoderClass = getInnerClass(moduleClass, "Encoder");
 
             // Get the encoder offset
-            outputMap.put("absoluteEncoderOffset", moduleClass.getDeclaredField("ABSOLUTE_ENCODER_OFFSET").get(null));
+            outputMap.put("absoluteEncoderOffset",((Angle) moduleClass.getDeclaredField("ABSOLUTE_ENCODER_OFFSET").get(null)).in(Degree));
 
             // Get location data
             Map<String, Object> location = new LinkedHashMap<String, Object>();
-            location.put("front", locationClass.getDeclaredField("FRONT").get(null));
-            location.put("left", locationClass.getDeclaredField("LEFT").get(null));
+            location.put("front", ((Distance) locationClass.getDeclaredField("FRONT").get(null)).in(Inch));
+            location.put("left", ((Distance) locationClass.getDeclaredField("LEFT").get(null)).in(Inch));
             outputMap.put("location", location);
 
             // Get drive data
@@ -137,12 +150,12 @@ public class JsonUtilities {
         try {
             Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
 
-            outputMap.put("robotMass", Constants.RobotKinematicConstants.MASS);
+            outputMap.put("robotMass", Constants.RobotKinematicConstants.MASS.in(Pound));
 
             // Get ramp rate data
             Map<String, Object> rampRate = new LinkedHashMap<String, Object>();
-            rampRate.put("angle", Constants.SwerveConstants.MotorConstants.Angle.RAMP_RATE);
-            rampRate.put("drive", Constants.SwerveConstants.MotorConstants.Drive.RAMP_RATE);
+            rampRate.put("angle", Constants.SwerveConstants.MotorConstants.Angle.RAMP_RATE.in(Second));
+            rampRate.put("drive", Constants.SwerveConstants.MotorConstants.Drive.RAMP_RATE.in(Second));
             outputMap.put("rampRate", rampRate);
 
             // Get conversion factor data
@@ -155,19 +168,19 @@ public class JsonUtilities {
             Map<String, Object> drive = new LinkedHashMap<String, Object>();
             drive.put("gearRatio", Constants.SwerveConstants.MotorConstants.Drive.GEAR_RATIO);
             drive.put("factor", Constants.SwerveConstants.MotorConstants.Drive.FACTOR);
-            drive.put("diameter", Constants.SwerveConstants.WheelConstants.DIAMETER);
+            drive.put("diameter", Constants.SwerveConstants.WheelConstants.DIAMETER.in(Inch));
 
             conversionFactors.put("angle", angle);
             conversionFactors.put("drive", drive);
             outputMap.put("conversionFactors", conversionFactors);
 
             outputMap.put("wheelGripCoefficientOfFriction", Constants.SwerveConstants.WheelConstants.WHEEL_GRIP_COF);
-            outputMap.put("optimalVoltage", Constants.SwerveConstants.MotorConstants.OPTIMAL_VOLTAGE);
+            outputMap.put("optimalVoltage", Constants.SwerveConstants.MotorConstants.OPTIMAL_VOLTAGE.in(Volt));
 
             // Get current limit data
             Map<String, Object> currentLimit = new LinkedHashMap<String, Object>();
-            currentLimit.put("angle", Constants.SwerveConstants.MotorConstants.Angle.CURRENT_LIMIT);
-            currentLimit.put("drive", Constants.SwerveConstants.MotorConstants.Drive.CURRENT_LIMIT);
+            currentLimit.put("angle", Constants.SwerveConstants.MotorConstants.Angle.CURRENT_LIMIT.in(Amp));
+            currentLimit.put("drive", Constants.SwerveConstants.MotorConstants.Drive.CURRENT_LIMIT.in(Amp));
             outputMap.put("currentLimit", currentLimit);
             
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
@@ -255,26 +268,26 @@ public class JsonUtilities {
     public static String pathPlannerToJson(Map<String, Object> currentMap, List<Class<?>> swerveModules) {
         try {
             currentMap.put("robotWidth", Constants.RobotKinematicConstants.WIDTH.in(Meter));
-            currentMap.put("robotLength", Units.feetToMeters(Constants.RobotKinematicConstants.LENGTH));
+            currentMap.put("robotLength", Constants.RobotKinematicConstants.LENGTH.in(Meter));
             currentMap.put("holonomicMode", true);
-            currentMap.put("robotMass", Units.lbsToKilograms(Constants.RobotKinematicConstants.MASS));
+            currentMap.put("robotMass", Constants.RobotKinematicConstants.MASS.in(Kilogram));
             currentMap.put("robotMOI", Constants.RobotKinematicConstants.MOI);
-            currentMap.put("maxDriveSpeed", Units.feetToMeters(Constants.RobotKinematicConstants.MAX_ACHIEVABLE_SPEED));
+            currentMap.put("maxDriveSpeed", Constants.RobotKinematicConstants.MAX_ACHIEVABLE_SPEED.in(MetersPerSecond));
             currentMap.put("driveMotorType", Constants.RobotKinematicConstants.DRIVE_MOTOR_TYPE);
-            currentMap.put("driveCurrentLimit", Constants.SwerveConstants.MotorConstants.Drive.CURRENT_LIMIT);
+            currentMap.put("driveCurrentLimit", Constants.SwerveConstants.MotorConstants.Drive.CURRENT_LIMIT.in(Amp));
             currentMap.put("wheelCOF", Constants.SwerveConstants.WheelConstants.WHEEL_GRIP_COF);
-            currentMap.put("driveWheelRadius", Units.inchesToMeters(Constants.SwerveConstants.WheelConstants.DIAMETER) / 2);
+            currentMap.put("driveWheelRadius", Constants.SwerveConstants.WheelConstants.DIAMETER.in(Meter) / 2);
             currentMap.put("driveGearing", Constants.SwerveConstants.MotorConstants.Drive.GEAR_RATIO);
-            currentMap.put("bumperOffsetX", Units.feetToMeters(Constants.RobotKinematicConstants.BumperOffset.X));
-            currentMap.put("bumperOffsetY", Units.feetToMeters(Constants.RobotKinematicConstants.BumperOffset.Y));
+            currentMap.put("bumperOffsetX", Constants.RobotKinematicConstants.BumperOffset.X.in(Meter));
+            currentMap.put("bumperOffsetY", Constants.RobotKinematicConstants.BumperOffset.Y.in(Meter));
 
             for (Class<?> moduleClass : swerveModules) {
                 String paramPrefix = TextUtilities.removeLowerCase(moduleClass.getSimpleName()).toLowerCase();
 
                 Class<?> locationClass = getInnerClass(moduleClass, "Location");
 
-                currentMap.put(paramPrefix + "ModuleX", Units.inchesToMeters((double) locationClass.getDeclaredField("FRONT").get(null)));
-                currentMap.put(paramPrefix + "ModuleY", Units.inchesToMeters((double) locationClass.getDeclaredField("LEFT").get(null)));
+                currentMap.put(paramPrefix + "ModuleX", ((Distance) locationClass.getDeclaredField("FRONT").get(null)).in(Meter)); 
+                currentMap.put(paramPrefix + "ModuleY", ((Distance) locationClass.getDeclaredField("LEFT").get(null)).in(Meter));
             }
             
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();

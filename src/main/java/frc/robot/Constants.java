@@ -13,6 +13,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 
 import static edu.wpi.first.units.Units.Amp;
@@ -24,6 +25,7 @@ import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Pound;
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volt;
 
 public final class Constants {
@@ -170,7 +172,7 @@ public final class Constants {
 	
 		public static class MotorConstants {
 			public static class Angle {
-				public static final double RAMP_RATE = 0;
+				public static final Time RAMP_RATE = Second.of(0); // Seconds
 				public static final double GEAR_RATIO = 21.4285714286;
 				public static final double FACTOR = 0;
 				public static final Current CURRENT_LIMIT = Amp.of(20.0); // Amps
@@ -185,7 +187,7 @@ public final class Constants {
 			}
 		
 			public static class Drive {
-				public static final double RAMP_RATE = 0;
+				public static final Time RAMP_RATE = Second.of(0); // Seconds
 				public static final double GEAR_RATIO = 6.75;
 				public static final double FACTOR = 0;
 				public static final Current CURRENT_LIMIT = Amp.of(40.0); // Amps
@@ -216,7 +218,7 @@ public final class Constants {
 
 		public static class WheelConstants {
 			public static final double WHEEL_GRIP_COF = 1.19;
-			public static final double DIAMETER = 4; // Inches
+			public static final Distance DIAMETER = Inch.of(4.0); // Inches
 		}
 		
 		public static final double ANGLE_JOYSTICK_RADIUS_DEADBAND = 0.5;
@@ -238,10 +240,51 @@ public final class Constants {
 		public static final String DRIVE_MOTOR_TYPE = "NEO";
 	
 		public static class BumperOffset {
-			public static final double X = 0; // Feet
-			public static final double Y = 0; // Feet
+			public static final Distance X = Feet.of(0); // Feet
+			public static final Distance Y = Feet.of(0); // Feet
 		}
 	}
+
+	public static class ElevatorConstants {
+		public static class Stage1 {
+		  public static final int ID = 3;
+		  public static final double MAX_VELOCITY = 120; // Not sure the unit
+		  public static final double MAX_ACCELERATION = 200; // Not sure the unit
+		  public static final double P = 67;
+		  public static final double I = 0;
+		  public static final double D = 1.15;
+		  public static final Voltage S = Volt.of(0.05); // Volts
+		  public static final Voltage G = Volt.of(1.36); // Volts
+		  public static final Voltage V = Volt.of(17.0); // Volts/(Meters/Second)
+		  public static final Voltage A = Volt.of(0.2); // Volts/(Meters/Second^2) 
+		  public static final Mass MASS = Pound.of(50); // Pounds
+		  public static final Distance DRUM_RADIUS = Inch.of(0.98110236); // Inches
+		  public static final double GEAR_RATIO = 18.5714;
+		  public static final Distance HARD_MAX_HEIGHT = Feet.of(2.25); // Feet
+		  public static final Distance TOLLERANCE = Feet.of(0.2); // Feet
+		}
+	
+		public static class Stage2 {
+		  public static final int ID = 2;
+		  public static final double MAX_VELOCITY = 120; // Not sure the unit
+		  public static final double MAX_ACCELERATION = 200; // Not sure the unit
+		  public static final double ABSOLUTE_ENCODER_OFFSET = 0; // Degrees
+		  public static final double P = 66;
+		  public static final double I = 0;
+		  public static final double D = 1.15;
+		  public static final Voltage S = Volt.of(0.05); // Volts
+		  public static final Voltage G = Volt.of(0.65); // Volts
+		  public static final Voltage V = Volt.of(14.52); // Volts/(Meters/Second)
+		  public static final Voltage A = Volt.of(0.04); // Volts/(Meters/Second^2) 
+		  public static final Mass MASS = Pound.of(35); // Pounds
+		  public static final Distance DRUM_RADIUS = Inch.of(0.98110236); // Inches
+		  public static final double GEAR_RATIO = 15.7143;
+		  public static final Distance HARD_MAX_HEIGHT = Feet.of(2.12); // Feet
+		  public static final Distance TOLLERANCE = Feet.of(0.2); // Feet
+		}
+	
+		public static final double ZERO_HEIGHTS_ABOVE_BASE = 0.520; // Feet
+	  }
 
 	public static class DriverConstants {
 		public static final int PORT = 0;
@@ -257,5 +300,16 @@ public final class Constants {
 		public static final double INTAKE_SPEED = -0.9; // Percent
 		public static final double OUTTAKE_SPEED = 0.9; // Percent
 		public static final double CLIMB_UP_SPEED = -1; // Percent
+	}
+
+	public static class DebugConstants {
+		public static boolean DEBUG_VISION = true;
+		public static boolean DEBUG_ELEVATOR = true;
+		public static boolean DEBUG_ARM = true;
+		public static boolean DEBUG_WRIST = true;
+		public static boolean DEBUG_INTAKE = true;
+		public static boolean DEBUG_SIMULATION = true;
+		public static boolean DEBUG_PATHFINDING = true;
+		public static boolean ANIMATE_ROBOT = true;
 	}
 }
