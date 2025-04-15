@@ -1,0 +1,41 @@
+package frc.robot.commands.elevator;
+
+import java.util.function.Supplier;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
+import frc.robot.RobotContainer;
+
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
+public class ControlElevatorBothStages extends Command {
+    private final Supplier<Double> elevatorSpeed;
+    private final double elevatorOffset = RobotContainer.elevatorSubsystem.getPivotPointOffset(true).in(Meter);
+
+    public ControlElevatorBothStages(Supplier<Double> elevatorSpeed) {
+        this.elevatorSpeed = elevatorSpeed;
+
+        addRequirements(RobotContainer.elevatorSubsystem);
+    }
+
+    @Override
+    public void initialize() {
+
+    }
+
+    @Override
+    public void execute() {
+        RobotContainer.elevatorSubsystem.setOverallHeight(Meter.of(RobotContainer.elevatorSubsystem.getStage1Setpoint().in(Meter) + RobotContainer.elevatorSubsystem.getStage2Setpoint().in(Meter) + ((elevatorSpeed.get() * Constants.DriverConstants.CONTROL_ELEVATOR_SPEED.in(MetersPerSecond)) / 50) + elevatorOffset));
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+
+    }
+}

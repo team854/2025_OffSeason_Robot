@@ -268,7 +268,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 this.stage2MaxHeight * targetRatio, 0,
                 this.stage2MaxHeight);
 
-        // Set each elevators setpoint to the calculated heights
+        // Set each elevators setpoint to the calculated heights in meters
         setStage1Setpoint(Meter.of(target1Height));
         setStage2Setpoint(Meter.of(target2Height));
     }
@@ -283,10 +283,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         stage2ElevatorSim.update(0.02);
 
         // Iterate the simulation of both motors
-        stage1MotorSim.iterate(stage1ElevatorSim.getVelocityMetersPerSecond(),
+        stage1MotorSim.iterate(stage1ElevatorSim.getVelocityMetersPerSecond() * 60,
                 RoboRioSim.getVInVoltage(), 0.02);
 
-        stage2MotorSim.iterate(stage2ElevatorSim.getVelocityMetersPerSecond(),
+        stage2MotorSim.iterate(stage2ElevatorSim.getVelocityMetersPerSecond() * 60,
                 RoboRioSim.getVInVoltage(), 0.02);
 
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(
@@ -308,6 +308,5 @@ public class ElevatorSubsystem extends SubsystemBase {
                         .calculateWithVelocities(getStage2HeightVelocity().in(MetersPerSecond), stage2Controller.getGoal().velocity),
                 -10, 10);
         stage2Motor.setVoltage(stage2VoltsOutput);
-
     }
 }

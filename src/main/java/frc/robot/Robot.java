@@ -17,87 +17,90 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends LoggedRobot  {
-  private Command autonomousCommand;
+	private Command autonomousCommand;
 
-  private final RobotContainer robotContainer;
+	private final RobotContainer robotContainer;
 
-  public Robot() {
-    // Set up advantage kit
-    Logger.recordMetadata("ProjectName", "FirebladeRobotBase");
-    Logger.addDataReceiver(new NT4Publisher());
+	public Robot() {
+		// Set up advantage kit
+		Logger.recordMetadata("ProjectName", "FirebladeRobotBase");
+		Logger.addDataReceiver(new NT4Publisher());
 
-    Logger.start();
+		Logger.start();
 
-    // Adjust loop overrun warning timeout
-    try {
-      Field watchdogField = IterativeRobotBase.class.getDeclaredField("m_watchdog");
-      watchdogField.setAccessible(true);
-      Watchdog watchdog = (Watchdog) watchdogField.get(this);
-      watchdog.setTimeout(0.2);
-    } catch (Exception e) {
-      DriverStation.reportWarning("Failed to disable loop overrun warnings.", false);
-    }
-    CommandScheduler.getInstance().setPeriod(0.2);
+		// Adjust loop overrun warning timeout
+		try {
+			Field watchdogField = IterativeRobotBase.class.getDeclaredField("m_watchdog");
+			watchdogField.setAccessible(true);
+			Watchdog watchdog = (Watchdog) watchdogField.get(this);
+			watchdog.setTimeout(0.2);
+		} catch (Exception e) {
+			DriverStation.reportWarning("Failed to disable loop overrun warnings.", false);
+		}
+		CommandScheduler.getInstance().setPeriod(0.2);
 
-    robotContainer = new RobotContainer();
-  }
+		robotContainer = new RobotContainer();
+	}
 
-  @Override
-  public void robotPeriodic() {
-    CommandScheduler.getInstance().run();
-  }
+	@Override
+	public void robotPeriodic() {
+		CommandScheduler.getInstance().run();
+	}
 
-  @Override
-  public void disabledInit() {}
+	@Override
+	public void disabledInit() {}
 
-  @Override
-  public void disabledPeriodic() {}
+	@Override
+	public void disabledPeriodic() {}
 
-  @Override
-  public void disabledExit() {}
+	@Override
+	public void disabledExit() {}
 
-  @Override
-  public void autonomousInit() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
+	@Override
+	public void autonomousInit() {
+		autonomousCommand = robotContainer.getAutonomousCommand();
 
-    if (autonomousCommand != null) {
-      autonomousCommand.schedule();
-    } else {
-      System.out.println("Canceled auto: No auto selected");
-    }
-  }
+		if (autonomousCommand != null) {
+			autonomousCommand.schedule();
+		} else {
+			System.out.println("Canceled auto: No auto selected");
+		}
+	}
 
-  @Override
-  public void autonomousPeriodic() {}
+	@Override
+	public void autonomousPeriodic() {}
 
-  @Override
-  public void autonomousExit() {
-    System.out.println("Finished autonomous");
-  }
+	@Override
+	public void autonomousExit() {
+		System.out.println("Finished autonomous");
+	}
 
-  @Override
-  public void teleopInit() {
-    if (autonomousCommand != null) {
-      autonomousCommand.cancel();
-    }
-  }
+	@Override
+	public void teleopInit() {
+		RobotContainer.elevatorSubsystem.resetStage1Setpoint();
+		RobotContainer.elevatorSubsystem.resetStage2Setpoint();
 
-  @Override
-  public void teleopPeriodic() {}
+		if (autonomousCommand != null) {
+			autonomousCommand.cancel();
+		}
+	}
 
-  @Override
-  public void teleopExit() {
-    CommandScheduler.getInstance().cancelAll();
-  }
+	@Override
+	public void teleopPeriodic() {}
 
-  @Override
-  public void testInit() {
-    CommandScheduler.getInstance().cancelAll();
-  }
+	@Override
+	public void teleopExit() {
+		CommandScheduler.getInstance().cancelAll();
+	}
 
-  @Override
-  public void testPeriodic() {}
+	@Override
+	public void testInit() {
+		CommandScheduler.getInstance().cancelAll();
+	}
 
-  @Override
-  public void testExit() {}
+	@Override
+	public void testPeriodic() {}
+
+	@Override
+	public void testExit() {}
 }
