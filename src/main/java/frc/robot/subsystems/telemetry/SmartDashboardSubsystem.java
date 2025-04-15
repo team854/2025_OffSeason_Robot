@@ -24,6 +24,10 @@ public class SmartDashboardSubsystem extends SubsystemBase {
         if (Constants.DebugConstants.DEBUG_SHOULDER) {
             sendShoulderTelemetry();
         }
+
+        if (Constants.DebugConstants.DEBUG_WRIST) {
+            sendWristTelemetry();
+        }
     }
 
     public void sendElevatorTelemetry() {
@@ -41,5 +45,11 @@ public class SmartDashboardSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Arm/Shoulder/Angle", RobotContainer.shoulderSubsystem.getShoulderAngle().in(Degree));
         SmartDashboard.putNumber("Arm/Shoulder/Setpoint", RobotContainer.shoulderSubsystem.getShoulderSetpoint().in(Degree));
         SmartDashboard.putNumber("Arm/Shoulder/Angular Velocity", RobotContainer.shoulderSubsystem.getShoulderVelocity().in(DegreesPerSecond));
+    }
+
+    public void sendWristTelemetry() {
+        SmartDashboard.putNumber("Arm/Wrist/Angle", RobotContainer.wristSubsystem.getWristAngle().in(Degree));
+        SmartDashboard.putNumber("Arm/Wrist/Setpoint", RobotContainer.wristSubsystem.getWristSetpoint().in(Degree));
+        SmartDashboard.putNumber("Arm/Wrist/Angular Velocity", RobotContainer.wristSubsystem.getWristVelocity().in(DegreesPerSecond));
     }
 }

@@ -70,7 +70,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 
 	public ShoulderSubsystem() {
 		/*
-		 * Configure motors
+		 * Configure motor
 		 */
 
 		System.out.println("Configuring shoulder motor");
@@ -168,9 +168,9 @@ public class ShoulderSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Sets the shoulder setpoint and ensures that it is within the range of motion of the arm
+	 * Sets the shoulder setpoint and ensures that it is within the range of motion of the shoulder
 	 * 
-	 * @param targetAngle The target angle of the shoulder with 0 being parallel to the ground
+	 * @param angle The target angle of the shoulder with 0 being parallel to the ground
 	 */
 	public void setShoulderSetpoint(Angle angle) {
 		shoulderController.setGoal(MathUtil.clamp(angle.in(Degree), shoulderMinAngle, shoulderMaxAngle));
@@ -181,7 +181,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 	 * @return The angular velocity of the shoulder
 	 */
 	public AngularVelocity getShoulderVelocity() {
-		// Gets the velocity in RPM and converts it to RPS
+		// Gets the angular velocity in RPM and converts it to RPS
 		return RotationsPerSecond.of(shoulderMotorAbsoluteEncoder.getVelocity() / 60);
 	}
 

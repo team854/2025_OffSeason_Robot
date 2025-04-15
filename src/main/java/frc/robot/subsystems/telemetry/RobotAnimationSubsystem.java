@@ -28,6 +28,10 @@ public class RobotAnimationSubsystem extends SubsystemBase {
             return;
         }
         
+		/*
+		 * Elevator
+		 */
+
 		// Get the heights of the elevator stages and its overall height
         double elevatorStage1Height = RobotContainer.elevatorSubsystem.getStage1Height().in(Meter);
         double elevatorStage2Height = RobotContainer.elevatorSubsystem.getStage2Height().in(Meter);
@@ -36,6 +40,10 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 		// Add the poses of the elevator stages to SmartDashboard
         SmartDashboard.putNumberArray("Elevator/Stage1/Position", PoseUtilities.convertPoseToNumbers(new Pose3d(0, 0, elevatorStage1Height, new Rotation3d())));
         SmartDashboard.putNumberArray("Elevator/Stage2/Position", PoseUtilities.convertPoseToNumbers(new Pose3d(0, 0, elevatorStage1Height + elevatorStage2Height, new Rotation3d())));
+
+		/*
+		 * Shoulder
+		 */
 
 		// Get the angle of the shoulder
 		double shoulderAngle = RobotContainer.shoulderSubsystem.getShoulderAngle().in(Radian);
@@ -53,5 +61,26 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 
 		// Add the pose of the shoulder to SmartDashboard
 		SmartDashboard.putNumberArray("Arm/Shoulder/Position", PoseUtilities.convertPoseToNumbers(shoulderPose));
+
+		/*
+		 * Wrist
+		 */
+
+		// Get the angle of the wrist
+		double wristAngle = RobotContainer.wristSubsystem.getWristAngle().in(Radian);
+
+		// Calculate the roation and the pose of the wrist
+		Rotation3d wristRotation = new Rotation3d(
+				wristAngle,
+				-shoulderAngle,
+				0);
+		
+        Pose3d wristPose = new Pose3d(
+				Constants.ArmConstants.Shoulder.CENTER_OFFSET_FOWARD.in(Meter),
+        		0.0023,
+				elevatorGroundHeight, wristRotation);
+				
+		// Add the pose of the wrist to SmartDashboard
+		SmartDashboard.putNumberArray("Arm/Wrist/Position", PoseUtilities.convertPoseToNumbers(wristPose));
     }
 }
