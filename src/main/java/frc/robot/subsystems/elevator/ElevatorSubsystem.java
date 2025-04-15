@@ -34,135 +34,143 @@ import frc.robot.RobotContainer;
 // Credit to https://www.youtube.com/watch?v=_2fPVYDrq_E for the great tutorial
 
 public class ElevatorSubsystem extends SubsystemBase {
-	/*
-	 * Constants
-	 */
-	private final double stage1MaxHeight = Constants.ElevatorConstants.Stage1.HARD_MAX_HEIGHT.in(Meter);
-	private final double stage2MaxHeight = Constants.ElevatorConstants.Stage2.HARD_MAX_HEIGHT.in(Meter);
-	private final double maxHeight = stage1MaxHeight + stage2MaxHeight;
+    /*
+     * Constants
+     */
+    private final double stage1MaxHeight = Constants.ElevatorConstants.Stage1.HARD_MAX_HEIGHT.in(Meter);
+    private final double stage2MaxHeight = Constants.ElevatorConstants.Stage2.HARD_MAX_HEIGHT.in(Meter);
+    private final double maxHeight = stage1MaxHeight + stage2MaxHeight;
 
-	/*
-	 * Motors
-	 */
-	private final SparkMax stage1Motor = new SparkMax(Constants.ElevatorConstants.Stage1.ID, MotorType.kBrushless);
-	private final RelativeEncoder stage1Encoder = stage1Motor.getEncoder();
+    /*
+     * Motors
+     */
+    private final SparkMax stage1Motor = new SparkMax(Constants.ElevatorConstants.Stage1.ID, MotorType.kBrushless);
+    private final RelativeEncoder stage1Encoder = stage1Motor.getEncoder();
 
-	private final SparkMax stage2Motor = new SparkMax(Constants.ElevatorConstants.Stage2.ID, MotorType.kBrushless);
-	private final RelativeEncoder stage2Encoder = stage2Motor.getEncoder();
+    private final SparkMax stage2Motor = new SparkMax(Constants.ElevatorConstants.Stage2.ID, MotorType.kBrushless);
+    private final RelativeEncoder stage2Encoder = stage2Motor.getEncoder();
 
-	/*
-	 * Control
-	 */
-	private final ProfiledPIDController stage1Controller;
-	private final ElevatorFeedforward stage1FeedFoward;
+    /*
+     * Control
+     */
+    private final ProfiledPIDController stage1Controller;
+    private final ElevatorFeedforward stage1FeedFoward;
 
-	private final ProfiledPIDController stage2Controller;
-	private final ElevatorFeedforward stage2FeedFoward;
+    private final ProfiledPIDController stage2Controller;
+    private final ElevatorFeedforward stage2FeedFoward;
 
-	/*
-	 * Simulation
-	 */
-	private final DCMotor stage1Gearbox = DCMotor.getNEO(1);
-	private final SparkMaxSim stage1MotorSim = new SparkMaxSim(stage1Motor, stage1Gearbox);
-	private ElevatorSim stage1ElevatorSim = null;
+    /*
+     * Simulation
+     */
+    private final DCMotor stage1Gearbox = DCMotor.getNEO(1);
+    private final SparkMaxSim stage1MotorSim = new SparkMaxSim(stage1Motor, stage1Gearbox);
+    private ElevatorSim stage1ElevatorSim = null;
 
-	private final DCMotor stage2Gearbox = DCMotor.getNEO(1);
-	private final SparkMaxSim stage2MotorSim = new SparkMaxSim(stage2Motor, stage2Gearbox);
-	private ElevatorSim stage2ElevatorSim = null;
+    private final DCMotor stage2Gearbox = DCMotor.getNEO(1);
+    private final SparkMaxSim stage2MotorSim = new SparkMaxSim(stage2Motor, stage2Gearbox);
+    private ElevatorSim stage2ElevatorSim = null;
 
-	public ElevatorSubsystem() {
+    public ElevatorSubsystem() {
 
-		/*
-		 * Configure motors
-		 */
+        /*
+         * Configure motors
+         */
 
-		System.out.println("Configuring elevator motors");
+        System.out.println("Configuring elevator motors");
 
-		// Configure stage 1 and save it to the motor
-		SparkMaxConfig stage1Config = new SparkMaxConfig();
-		stage1Config.idleMode(IdleMode.kBrake); // Brake so the stage doesn't fall
-		stage1Config.inverted(false);
+        // Configure stage 1 and save it to the motor
+        SparkMaxConfig stage1Config = new SparkMaxConfig();
+        stage1Config.idleMode(IdleMode.kBrake); // Brake so the stage doesn't fall
+        stage1Config.inverted(false);
 
-		// Configure the encoder so they automaticlly convert the motors rotation to meters
-		double stage1Conversion = (Constants.ElevatorConstants.Stage1.DRUM_RADIUS.in(Meter) * 2 * Math.PI) / Constants.ElevatorConstants.Stage1.GEAR_RATIO;
-		stage1Config.encoder.positionConversionFactor(stage1Conversion);
-		stage1Config.encoder.velocityConversionFactor(stage1Conversion);
-		stage1Motor.configure(stage1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        // Configure the encoder so they automaticlly convert the motors rotation to meters
+        double stage1Conversion = (Constants.ElevatorConstants.Stage1.DRUM_RADIUS.in(Meter) * 2 * Math.PI)
+                / Constants.ElevatorConstants.Stage1.GEAR_RATIO;
+        stage1Config.encoder.positionConversionFactor(stage1Conversion);
+        stage1Config.encoder.velocityConversionFactor(stage1Conversion);
+        stage1Motor.configure(stage1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-		// Configure stage 2 and save it to the motor
-		SparkMaxConfig stage2Config = new SparkMaxConfig();
-		stage2Config.idleMode(IdleMode.kBrake); // Brake so the stage doesn't fall
-		stage2Config.inverted(false);
-		stage2Config.absoluteEncoder.inverted(false);
+        // Configure stage 2 and save it to the motor
+        SparkMaxConfig stage2Config = new SparkMaxConfig();
+        stage2Config.idleMode(IdleMode.kBrake); // Brake so the stage doesn't fall
+        stage2Config.inverted(false);
+        stage2Config.absoluteEncoder.inverted(false);
 
-		// Configure the encoder so they automaticlly convert the motors rotation to meters
-		double stage2Conversion = (Constants.ElevatorConstants.Stage2.DRUM_RADIUS.in(Meter) * 2 * Math.PI) / Constants.ElevatorConstants.Stage2.GEAR_RATIO;
-		stage2Config.encoder.positionConversionFactor(stage2Conversion);
-		stage2Config.encoder.velocityConversionFactor(stage2Conversion);
-		stage2Motor.configure(stage2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        // Configure the encoder so they automaticlly convert the motors rotation to meters
+        double stage2Conversion = (Constants.ElevatorConstants.Stage2.DRUM_RADIUS.in(Meter) * 2 * Math.PI)
+                / Constants.ElevatorConstants.Stage2.GEAR_RATIO;
+        stage2Config.encoder.positionConversionFactor(stage2Conversion);
+        stage2Config.encoder.velocityConversionFactor(stage2Conversion);
+        stage2Motor.configure(stage2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-		/*
-		 * Configure PIDS
-		 */
+        /*
+         * Configure PIDS
+         */
 
-		// Define the trapizoid profile for the pids
-		TrapezoidProfile.Constraints stage1Constraints = new TrapezoidProfile.Constraints(
-				Constants.ElevatorConstants.Stage1.MAX_VELOCITY, Constants.ElevatorConstants.Stage1.MAX_ACCELERATION);
-		TrapezoidProfile.Constraints stage2Constraints = new TrapezoidProfile.Constraints(
-				Constants.ElevatorConstants.Stage2.MAX_VELOCITY, Constants.ElevatorConstants.Stage2.MAX_ACCELERATION);
+        // Define the trapizoid profile for the pids
+        TrapezoidProfile.Constraints stage1Constraints = new TrapezoidProfile.Constraints(
+                Constants.ElevatorConstants.Stage1.MAX_VELOCITY, Constants.ElevatorConstants.Stage1.MAX_ACCELERATION);
+        TrapezoidProfile.Constraints stage2Constraints = new TrapezoidProfile.Constraints(
+                Constants.ElevatorConstants.Stage2.MAX_VELOCITY, Constants.ElevatorConstants.Stage2.MAX_ACCELERATION);
 
-		// Initalize the motor pids
-		stage1Controller = new ProfiledPIDController(Constants.ElevatorConstants.Stage1.P,
-				Constants.ElevatorConstants.Stage1.I, Constants.ElevatorConstants.Stage1.D, stage1Constraints);
-		stage2Controller = new ProfiledPIDController(Constants.ElevatorConstants.Stage2.P,
-				Constants.ElevatorConstants.Stage2.I, Constants.ElevatorConstants.Stage2.D, stage2Constraints);
+        // Initalize the motor pids
+        stage1Controller = new ProfiledPIDController(
+                Constants.ElevatorConstants.Stage1.P,
+                Constants.ElevatorConstants.Stage1.I,
+                Constants.ElevatorConstants.Stage1.D,
+                stage1Constraints);
+        stage2Controller = new ProfiledPIDController(
+                Constants.ElevatorConstants.Stage2.P,
+                Constants.ElevatorConstants.Stage2.I,
+                Constants.ElevatorConstants.Stage2.D,
+                stage2Constraints);
 
-		// Configure feed foward
-		stage1FeedFoward = new ElevatorFeedforward(
-				Constants.ElevatorConstants.Stage1.S.in(Volt),
-				Constants.ElevatorConstants.Stage1.G.in(Volt),
-				Constants.ElevatorConstants.Stage1.V.in(Volt),
-				Constants.ElevatorConstants.Stage1.A.in(Volt));
-		stage2FeedFoward = new ElevatorFeedforward(
-				Constants.ElevatorConstants.Stage2.S.in(Volt),
-				Constants.ElevatorConstants.Stage2.G.in(Volt),
-				Constants.ElevatorConstants.Stage2.V.in(Volt),
-				Constants.ElevatorConstants.Stage2.A.in(Volt));
+        // Configure feed foward
+        stage1FeedFoward = new ElevatorFeedforward(
+                Constants.ElevatorConstants.Stage1.S.in(Volt),
+                Constants.ElevatorConstants.Stage1.G.in(Volt),
+                Constants.ElevatorConstants.Stage1.V.in(Volt),
+                Constants.ElevatorConstants.Stage1.A.in(Volt));
+        stage2FeedFoward = new ElevatorFeedforward(
+                Constants.ElevatorConstants.Stage2.S.in(Volt),
+                Constants.ElevatorConstants.Stage2.G.in(Volt),
+                Constants.ElevatorConstants.Stage2.V.in(Volt),
+                Constants.ElevatorConstants.Stage2.A.in(Volt));
 
-		/*
+        /*
          * Initalize simulation
          */
         if (Robot.isSimulation()) {
             System.out.println("Creating elevator simulations");
             stage1ElevatorSim = new ElevatorSim(
-					stage1Gearbox,
-					Constants.ElevatorConstants.Stage1.GEAR_RATIO,
+                    stage1Gearbox,
+                    Constants.ElevatorConstants.Stage1.GEAR_RATIO,
                     Constants.ElevatorConstants.Stage1.MASS.in(Kilogram),
                     Constants.ElevatorConstants.Stage1.DRUM_RADIUS.in(Meter),
-					0,
+                    0,
                     this.stage1MaxHeight,
-					true,
-					0,
-					0.02,
-					0);
+                    true,
+                    0,
+                    0.02,
+                    0);
 
             stage2ElevatorSim = new ElevatorSim(
-					stage2Gearbox,
-					Constants.ElevatorConstants.Stage2.GEAR_RATIO,
+                    stage2Gearbox,
+                    Constants.ElevatorConstants.Stage2.GEAR_RATIO,
                     Constants.ElevatorConstants.Stage2.MASS.in(Kilogram),
                     Constants.ElevatorConstants.Stage2.DRUM_RADIUS.in(Meter),
-					0,
+                    0,
                     this.stage2MaxHeight,
-					true,
-					0,
-					0.02,
-					0);
+                    true,
+                    0,
+                    0.02,
+                    0);
         }
 
-		System.out.println("Created ElevatorSubsystem");
-	}
+        System.out.println("Created ElevatorSubsystem");
+    }
 
-	public Distance getStage1Setpoint() {
+    public Distance getStage1Setpoint() {
         return Meter.of(stage1Controller.getGoal().position);
     }
 
@@ -180,10 +188,18 @@ public class ElevatorSubsystem extends SubsystemBase {
                 MathUtil.clamp(height.in(Meter), 0, this.stage2MaxHeight));
     }
 
-	public Distance getStage1Height() {
+    /**
+     * 
+     * @return The current height of stage 1 relative to its lowest position
+     */
+    public Distance getStage1Height() {
         return Meter.of(stage1Encoder.getPosition());
     }
 
+    /**
+     * 
+     * @return The current height of stage 2 relative to its lowest position
+     */
     public Distance getStage2Height() {
         return Meter.of(stage2Encoder.getPosition());
     }
@@ -196,7 +212,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         return MetersPerSecond.of(stage2Encoder.getVelocity() / 60);
     }
 
-	/**
+    /**
      * Sets the setpoint for stage 1 to the stages current height
      */
     public void resetStage1Setpoint() {
@@ -222,7 +238,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 + Constants.ArmConstants.Shoulder.STAGE_OFFSET_UP.in(Meter));
     }
 
-	/**
+    /**
      * Gets the height of both elevator stages relative to the carpet
      * 
      * @return The height of the elevator relative to the carpet in meters
@@ -273,7 +289,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         setStage2Setpoint(Meter.of(target2Height));
     }
 
-	@Override
+    @Override
     public void simulationPeriodic() {
         stage1ElevatorSim.setInput(stage1MotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
         stage2ElevatorSim.setInput(stage2MotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
@@ -289,6 +305,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         stage2MotorSim.iterate(stage2ElevatorSim.getVelocityMetersPerSecond() * 60,
                 RoboRioSim.getVInVoltage(), 0.02);
 
+        // Add the current voltage as a load to the battery
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(
                 stage1ElevatorSim.getCurrentDrawAmps() + stage2ElevatorSim.getCurrentDrawAmps()));
 
@@ -299,13 +316,15 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         double stage1VoltsOutput = MathUtil.clamp(
                 stage1Controller.calculate(getStage1Height().in(Meter)) + stage1FeedFoward
-                        .calculateWithVelocities(getStage1HeightVelocity().in(MetersPerSecond), stage1Controller.getGoal().velocity),
+                        .calculateWithVelocities(getStage1HeightVelocity().in(MetersPerSecond),
+                                stage1Controller.getGoal().velocity),
                 -10, 10);
         stage1Motor.setVoltage(stage1VoltsOutput);
 
         double stage2VoltsOutput = MathUtil.clamp(
                 stage2Controller.calculate(getStage2Height().in(Meter)) + stage2FeedFoward
-                        .calculateWithVelocities(getStage2HeightVelocity().in(MetersPerSecond), stage2Controller.getGoal().velocity),
+                        .calculateWithVelocities(getStage2HeightVelocity().in(MetersPerSecond),
+                                stage2Controller.getGoal().velocity),
                 -10, 10);
         stage2Motor.setVoltage(stage2VoltsOutput);
     }

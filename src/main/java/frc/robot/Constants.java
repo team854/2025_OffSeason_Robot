@@ -362,7 +362,7 @@ public final class Constants {
 	public static class DebugConstants {
 		public static boolean DEBUG_VISION = true;
 		public static boolean DEBUG_ELEVATOR = true;
-		public static boolean DEBUG_ARM = true;
+		public static boolean DEBUG_SHOULDER = true;
 		public static boolean DEBUG_WRIST = true;
 		public static boolean DEBUG_INTAKE = true;
 		public static boolean DEBUG_SIMULATION = true;

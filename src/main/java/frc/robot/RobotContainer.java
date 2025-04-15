@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.elevator.ControlElevatorBothStages;
+import frc.robot.subsystems.arm.ShoulderSubsystem;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.telemetry.RobotAnimationSubsystem;
@@ -19,6 +20,7 @@ public class RobotContainer {
   // Initalize public subsystems
   public static final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
   public static final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
+  public static final ShoulderSubsystem shoulderSubsystem = new ShoulderSubsystem();
   public static final RobotAnimationSubsystem robotAnimationSubsystem = new RobotAnimationSubsystem();
   public static final SmartDashboardSubsystem smartDashboardSubsystem = new SmartDashboardSubsystem();
 
@@ -43,6 +45,13 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+
+    /*
+     * Shoulder controls
+     */
+    driverController.povUpDirection().whileTrue(shoulderSubsystem.setShoulderSpeedCommand(Constants.DriverConstants.CONTROL_SHOULDER_SPEED));
+    driverController.povDownDirection().whileTrue(shoulderSubsystem.setShoulderSpeedCommand(Constants.DriverConstants.CONTROL_SHOULDER_SPEED.unaryMinus()));
+
     /*
      * Default commands
      */

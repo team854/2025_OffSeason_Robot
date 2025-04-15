@@ -1,5 +1,7 @@
 package frc.robot.subsystems.telemetry;
 
+import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
@@ -18,6 +20,10 @@ public class SmartDashboardSubsystem extends SubsystemBase {
         if (Constants.DebugConstants.DEBUG_ELEVATOR) {
             sendElevatorTelemetry();
         }
+
+        if (Constants.DebugConstants.DEBUG_SHOULDER) {
+            sendShoulderTelemetry();
+        }
     }
 
     public void sendElevatorTelemetry() {
@@ -29,5 +35,11 @@ public class SmartDashboardSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("Elevator/Stage1/Velocity", RobotContainer.elevatorSubsystem.getStage1HeightVelocity().in(MetersPerSecond));
         SmartDashboard.putNumber("Elevator/Stage2/Velocity", RobotContainer.elevatorSubsystem.getStage2HeightVelocity().in(MetersPerSecond));
+    }
+
+    public void sendShoulderTelemetry() {
+        SmartDashboard.putNumber("Arm/Shoulder/Angle", RobotContainer.shoulderSubsystem.getShoulderAngle().in(Degree));
+        SmartDashboard.putNumber("Arm/Shoulder/Setpoint", RobotContainer.shoulderSubsystem.getShoulderSetpoint().in(Degree));
+        SmartDashboard.putNumber("Arm/Shoulder/Angular Velocity", RobotContainer.shoulderSubsystem.getShoulderVelocity().in(DegreesPerSecond));
     }
 }
