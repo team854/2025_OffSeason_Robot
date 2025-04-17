@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.elevator.ControlElevatorBothStagesCommand;
@@ -74,6 +75,11 @@ public class RobotContainer {
 
 		System.out.println("Configured bindings");
 	}
+
+	public static boolean isBlueAlliance(){
+        var alliance = DriverStation.getAlliance();
+        return alliance.isPresent() ? alliance.get() != DriverStation.Alliance.Red : false;
+    }
 
 	public Command getAutonomousCommand() {
 		return Commands.print("No autonomous command configured");

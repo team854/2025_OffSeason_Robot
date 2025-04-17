@@ -4,6 +4,9 @@ import java.util.List;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.measure.Angle;
@@ -349,6 +352,43 @@ public final class Constants {
 
 		public static final Distance LENGTH = Feet.of(2.081208); // Feet
 
+	}
+
+	public static class ReefConstants {
+		public static class FieldConstants {
+			public static final int[] BLUE_ALLIANCE_REEF_TAG_IDS = {21, 22, 17, 18, 19, 20};
+			public static final int[] RED_ALLIANCE_REEF_TAG_IDS = {10, 9, 8, 7, 6, 11};
+
+			public static class L1 {
+				public static final Distance MAX_HEIGHT = Feet.of(1.50919); // Feet
+				public static final Distance SCORE_HEIGHT = Feet.of(3.3); // Feet
+				public static final Angle SCORE_ANGLE = Degree.of(-30.0); // Degrees
+				public static final Distance SCORE_OFFSET = Feet.of(0.25); // Feet
+
+			}
+
+			public static class L2 {
+				public static final Distance MAX_HEIGHT = Feet.of(2.65748); // Feet
+				public static final Angle BRANCH_ANGLE = Degree.of(35.0); // Degrees
+			}
+
+			public static class L3 {
+				public static final Distance MAX_HEIGHT = Feet.of(3.96982); // Feet
+				public static final Angle BRANCH_ANGLE = Degree.of(35.0); // Degrees
+			}
+			
+			public static class L4 {
+				public static final Distance MAX_HEIGHT = Feet.of(5.99); // Feet
+				public static final Angle BRANCH_ANGLE = Degree.of(90.0); // Degrees
+			}
+
+			public static final Distance BRANCH_LEFT_OFFSET = Feet.of(0.563040616798); // Feet
+			public static final Distance BRANCH_FOWARD_OFFSET = Feet.of(0.21141732); // Feet
+		}
+
+		public static final Angle LIFT_ANGLE = Degree.of(25.0);
+		public static final Distance CLOSE_DISTANCE = Feet.of(13.0); // Feet
+		public static final Distance SCORING_OFFSET = Feet.of(0.05); // Feet
 	}
 
 	public static class AutoConstants {
