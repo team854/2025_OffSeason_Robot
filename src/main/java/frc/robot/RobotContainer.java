@@ -6,7 +6,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.elevator.ControlElevatorBothStages;
+import frc.robot.commands.elevator.ControlElevatorBothStagesCommand;
+import frc.robot.subsystems.arm.EndEffectorSubsystem;
 import frc.robot.subsystems.arm.ShoulderSubsystem;
 import frc.robot.subsystems.arm.WristSubsystem;
 import frc.robot.subsystems.drive.SwerveSubsystem;
@@ -23,6 +24,7 @@ public class RobotContainer {
 	public static final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
 	public static final ShoulderSubsystem shoulderSubsystem = new ShoulderSubsystem();
 	public static final WristSubsystem wristSubsystem = new WristSubsystem();
+	public static final EndEffectorSubsystem endEffectorSubsystem = new EndEffectorSubsystem();
 	public static final RobotAnimationSubsystem robotAnimationSubsystem = new RobotAnimationSubsystem();
 	public static final SmartDashboardSubsystem smartDashboardSubsystem = new SmartDashboardSubsystem();
 
@@ -66,7 +68,7 @@ public class RobotContainer {
 		Command driveFieldOrientedAnglularVelocity = swerveSubsystem.driveFieldOrientedSupplier(driveAngularVelocity);
 		swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
-		elevatorSubsystem.setDefaultCommand(new ControlElevatorBothStages(() -> -driverController.getRightY()));
+		elevatorSubsystem.setDefaultCommand(new ControlElevatorBothStagesCommand(() -> -driverController.getRightY()));
 
 
 

@@ -9,11 +9,11 @@ import frc.robot.RobotContainer;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
-public class ControlElevatorBothStages extends Command {
+public class ControlElevatorBothStagesCommand extends Command {
     private final Supplier<Double> elevatorSpeed;
     private final double elevatorOffset = RobotContainer.elevatorSubsystem.getPivotPointOffset(true).in(Meter);
 
-    public ControlElevatorBothStages(Supplier<Double> elevatorSpeed) {
+    public ControlElevatorBothStagesCommand(Supplier<Double> elevatorSpeed) {
         this.elevatorSpeed = elevatorSpeed;
 
         addRequirements(RobotContainer.elevatorSubsystem);

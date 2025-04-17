@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.commands.drive.MoveToPoseCommand;
+import frc.robot.utilities.math.PoseUtilities;
 
 public class SmartDashboardSubsystem extends SubsystemBase {
     public SmartDashboardSubsystem() {
@@ -27,6 +29,10 @@ public class SmartDashboardSubsystem extends SubsystemBase {
 
         if (Constants.DebugConstants.DEBUG_WRIST) {
             sendWristTelemetry();
+        }
+
+        if (Constants.DebugConstants.DEBUG_PATHFINDING) {
+            sendPathfindingTelemetry();
         }
     }
 
@@ -51,5 +57,9 @@ public class SmartDashboardSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Arm/Wrist/Angle", RobotContainer.wristSubsystem.getWristAngle().in(Degree));
         SmartDashboard.putNumber("Arm/Wrist/Setpoint", RobotContainer.wristSubsystem.getWristSetpoint().in(Degree));
         SmartDashboard.putNumber("Arm/Wrist/Angular Velocity", RobotContainer.wristSubsystem.getWristVelocity().in(DegreesPerSecond));
+    }
+
+    public void sendPathfindingTelemetry() {
+        SmartDashboard.putNumberArray("Pathfinding/Move To Pose/Goal Pose", PoseUtilities.convertPoseToNumbers(MoveToPoseCommand.goalPose));
     }
 }

@@ -11,6 +11,7 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
@@ -22,8 +23,10 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.FeetPerSecond;
+import static edu.wpi.first.units.Units.FeetPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pound;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volt;
@@ -221,6 +224,11 @@ public final class Constants {
 			public static final Distance DIAMETER = Inch.of(4.0); // Inches
 		}
 
+		public static final LinearVelocity TRANSLATION_ZERO_THRESHOLD = FeetPerSecond.of(0.05); // Feet/Second
+		public static final AngularVelocity ROTATION_ZERO_THRESHOLD = DegreesPerSecond.of(0.05); // Degrees/Second
+		public static final Distance TRANSLATION_ACCEPTABLE_ERROR = Feet.of(0.1); // Feet
+		public static final Angle ROTATION_ACCEPTABLE_ERROR = Degree.of(2); // Degrees
+
 		public static final double ANGLE_JOYSTICK_RADIUS_DEADBAND = 0.5;
 		public static final List<String> MODULE_FILES = List.of("frontleft.json", "frontright.json", "backleft.json", "backright.json");
 		public static final String SWERVECONFIGDIR = "swerve";
@@ -231,9 +239,9 @@ public final class Constants {
 		public static final Distance WIDTH = Feet.of(2.58333333); // Feet
 		public static final Distance LENGTH = Feet.of(3.41666667); // Feet
 		public static final Distance HEIGHT_OFF_GROUND = Feet.of(0.033); // Feet
-		public static final LinearVelocity MAX_SPEED = FeetPerSecond.of(24.0); // Feet/Second
-		public static final LinearVelocity MAX_ACHIEVABLE_SPEED = FeetPerSecond.of(24.0); // Feet/Second
-		public static final LinearVelocity MAX_ACCELERATION = FeetPerSecond.of(6.5); // Feet/Second
+		public static final LinearVelocity MAX_SPEED = FeetPerSecond.of(16.0); // Feet/Second
+		public static final LinearVelocity MAX_ACHIEVABLE_SPEED = FeetPerSecond.of(14.5); // Feet/Second
+		public static final LinearAcceleration MAX_ACCELERATION = FeetPerSecondPerSecond.of(6.5); // Feet/Second
 		public static final AngularVelocity MAX_ANGULAR_VELOCITY = DegreesPerSecond.of(540); // Degrees/Second
 		public static final AngularAcceleration MAX_ANGULAR_ACCELERATION = DegreesPerSecondPerSecond.of(720); // Degrees/Second/Second
 		public static final double MOI = 6.883;
@@ -341,6 +349,13 @@ public final class Constants {
 
 		public static final Distance LENGTH = Feet.of(2.081208); // Feet
 
+	}
+
+	public static class AutoConstants {
+		public static final LinearVelocity TRANSLATION_MAX_VELOCITY = FeetPerSecond.of(10);
+		public static final LinearAcceleration TRANSLATION_MAX_ACCELERATION = FeetPerSecondPerSecond.of(2.0);
+		public static final AngularVelocity ROTATION_MAX_VELOCITY = DegreesPerSecond.of(180);
+		public static final AngularAcceleration ROTATION_MAX_ACCELERATION = DegreesPerSecondPerSecond.of(90);
 	}
 
 	public static class DriverConstants {
