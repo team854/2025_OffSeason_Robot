@@ -291,6 +291,8 @@ public final class Constants {
 			public static final double GEAR_RATIO = 15.7143;
 			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.12); // Feet
 			public static final Distance TOLLERANCE = Feet.of(0.2); // Feet
+			public static final double ABSOLUATE_ENCODER_GEAR_RATIO = 1.57143;
+
 		}
 
 		public static final Distance ZERO_HEIGHTS_ABOVE_BASE = Feet.of(0.520); // Feet

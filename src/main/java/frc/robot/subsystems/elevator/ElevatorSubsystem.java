@@ -289,6 +289,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         setStage2Setpoint(Meter.of(target2Height));
     }
 
+    public Distance getMaxHeight() {
+        return Meter.of(this.maxHeight);
+    }
+
+    public Distance getMaxGroundHeight() {
+        return getMaxHeight().plus(getPivotPointOffset(true));
+    }
+
     @Override
     public void simulationPeriodic() {
         stage1ElevatorSim.setInput(stage1MotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());

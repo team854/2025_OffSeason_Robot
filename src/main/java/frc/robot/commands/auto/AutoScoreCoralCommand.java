@@ -21,6 +21,7 @@ public class AutoScoreCoralCommand extends Command {
     @Override
 	public void initialize() {
 		this.commands = new SequentialCommandGroup();
-        FINISH ME
+        
+		// int closestTagID = Reef.getClosestReef(RobotContainer.swerveSubsystem.getPose());
     }
 }

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.elevator.ControlElevatorBothStagesCommand;
+import frc.robot.commands.testing.DemoEndEffector;
 import frc.robot.subsystems.arm.EndEffectorSubsystem;
 import frc.robot.subsystems.arm.ShoulderSubsystem;
 import frc.robot.subsystems.arm.WristSubsystem;
@@ -62,6 +63,9 @@ public class RobotContainer {
 		*/
 		driverController.povRightDirection().whileTrue(wristSubsystem.setWristSpeedCommand(Constants.DriverConstants.CONTROL_WRIST_SPEED));
 		driverController.povLeftDirection().whileTrue(wristSubsystem.setWristSpeedCommand(Constants.DriverConstants.CONTROL_WRIST_SPEED.unaryMinus()));
+
+
+		driverController.button(7).onTrue(new DemoEndEffector());
 
 		/*
 		* Default commands
