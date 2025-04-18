@@ -68,10 +68,8 @@ public class MoveToPoseCommand extends Command {
         addRequirements(RobotContainer.swerveSubsystem);
     }
 
-    public void setNewPose(Pose2d goalPose) {
+    public void setGoalPose(Pose2d goalPose) {
         MoveToPoseCommand.goalPose = goalPose;
-
-        
 
         this.translationXController.setGoal(goalPose.getX());
         this.translationYController.setGoal(goalPose.getY());
@@ -80,7 +78,7 @@ public class MoveToPoseCommand extends Command {
 
     @Override
     public void initialize() {
-        this.setNewPose(MoveToPoseCommand.goalPose);
+        this.setGoalPose(MoveToPoseCommand.goalPose);
 
         Pose2d robotPose = RobotContainer.swerveSubsystem.getPose();
 

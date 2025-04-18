@@ -4,9 +4,13 @@ import java.util.List;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.measure.Angle;
@@ -400,6 +404,37 @@ public final class Constants {
 		public static final AngularAcceleration ROTATION_MAX_ACCELERATION = DegreesPerSecondPerSecond.of(90);
 	}
 
+	public static class VisionConstants {
+		public static final Matrix<N3, N1> VISION_SINGLE_TAG_STD_DEVS = VecBuilder.fill(0.5, 0.5, 0.6); // The standard deviations of our vision estimated poses, which affect correction rate
+		public static final Matrix<N3, N1> VISION_MULTI_TAG_STD_DEVS = VecBuilder.fill(0.3, 0.3, 0.3); // The standard deviations of our vision estimated poses, which affect correction rate
+		public static final double TARGET_DISTANCE_STD_DEVS_DIVISOR = 30; // The higher this is the less that far targets increase the std devs
+		public static final double TARGET_AMBIGUITY_STD_DEVS_DIVISOR = 5; // The higher this is the less that a high average ambiguty increases the std devs
+		public static final double CUTOFF = 2.5;
+
+		public static class Limelight_4 {
+			public static final String NAME = "Limelight 4";
+			public static final boolean ENABLED = true;
+			public static final Distance FRONT_OFFSET = Feet.of(0.0); // Feet
+			public static final Distance LEFT_OFFSET = Feet.of(-1.31234); // Feet
+			public static final Distance HEIGHT_OFFSET = Feet.of(0.95276); // Feet
+			public static final Angle ROLL = Degree.of(0); // Degrees
+			public static final Angle PITCH = Degree.of(0); // Degrees
+			public static final Angle YAW = Degree.of(2); // Degrees
+			public static final Distance EFFECTIVE_RANGE = Feet.of(16.4042); // Feet
+
+			public static class CameraProperties {
+				public static final int WIDTH = 1280; // Pixels
+				public static final int HEIGHT = 800; // Pixels
+				public static final int FPS = 120;
+				public static final Angle DIAGONAL_FOV = Degree.of(91.12); // Degrees
+				public static final double AVERGAGE_PIXEL_ERROR = 0.25;
+				public static final double AVERGAGE_PIXEL_ERROR_STD_DEVS = 0.06;
+				public static final double AVERAGE_LATENCY = 15; // Miliseconds
+				public static final double AVERAGE_LATENCY_STD_DEVS = 0.1;
+			}
+		}
+	}
+
 	public static class DriverConstants {
 		public static final int PORT = 0;
 		public static final double DEADBAND = 0.1;
@@ -421,7 +456,7 @@ public final class Constants {
 		public static boolean DEBUG_ELEVATOR = true;
 		public static boolean DEBUG_SHOULDER = true;
 		public static boolean DEBUG_WRIST = true;
-		public static boolean DEBUG_INTAKE = true;
+		public static boolean DEBUG_END_EFFECTOR = true;
 		public static boolean DEBUG_SIMULATION = true;
 		public static boolean DEBUG_PATHFINDING = true;
 		public static boolean ANIMATE_ROBOT = true;

@@ -34,6 +34,10 @@ public class SmartDashboardSubsystem extends SubsystemBase {
         if (Constants.DebugConstants.DEBUG_PATHFINDING) {
             sendPathfindingTelemetry();
         }
+
+        if (Constants.DebugConstants.DEBUG_END_EFFECTOR) {
+            sendEndEffectorTelemetry();
+        }
     }
 
     public void sendElevatorTelemetry() {
@@ -61,5 +65,9 @@ public class SmartDashboardSubsystem extends SubsystemBase {
 
     public void sendPathfindingTelemetry() {
         SmartDashboard.putNumberArray("Pathfinding/Move To Pose/Goal Pose", PoseUtilities.convertPoseToNumbers(MoveToPoseCommand.goalPose));
+    }
+
+    public void sendEndEffectorTelemetry() {
+        
     }
 }

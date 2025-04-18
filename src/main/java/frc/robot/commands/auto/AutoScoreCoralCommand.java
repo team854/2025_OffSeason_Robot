@@ -3,6 +3,7 @@ package frc.robot.commands.auto;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotContainer;
+import frc.robot.utilities.field.ReefUtilities;
 
 public class AutoScoreCoralCommand extends Command {
     private final boolean right;
@@ -22,6 +23,10 @@ public class AutoScoreCoralCommand extends Command {
 	public void initialize() {
 		this.commands = new SequentialCommandGroup();
         
-		// int closestTagID = Reef.getClosestReef(RobotContainer.swerveSubsystem.getPose());
+		int closestTagID = ReefUtilities.getClosestReef(RobotContainer.swerveSubsystem.getPose());
+
+		if (closestTagID == -1) {
+			
+		}
     }
 }
