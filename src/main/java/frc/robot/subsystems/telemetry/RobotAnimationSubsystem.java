@@ -4,6 +4,9 @@ import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Radian;
 
+import org.ironmaple.simulation.SimulatedArena;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,11 +25,26 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 
     }
 
-    @Override
-    public void periodic() {
-        if (!Constants.DebugConstants.ANIMATE_ROBOT) {
+	@Override
+    public void simulationPeriodic() {
+		if (!Constants.DebugConstants.ANIMATIONS) {
             return;
         }
+
+        Logger.recordOutput("FieldSimulation/Algae", 
+            SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+        Logger.recordOutput("FieldSimulation/Coral", 
+            SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+
+	}
+
+    @Override
+    public void periodic() {
+        if (!Constants.DebugConstants.ANIMATIONS) {
+            return;
+        }
+
+		Pose3d robotPose = new Pose3d(RobotContainer.swerveSubsystem.swerveDrive.getSimulationDriveTrainPose().get());
         
 		/*
 		 * Elevator
@@ -82,5 +100,15 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 				
 		// Add the pose of the wrist to SmartDashboard
 		SmartDashboard.putNumberArray("Arm/Wrist/Position", PoseUtilities.convertPoseToNumbers(wristPose));
+
+		/*
+		 * Coral
+		 */
+
+		if (RobotContainer.endEffectorSubsystem.hasCoral()) {
+			SmartDashboard.putNumberArray("Arm/Coral/Position", PoseUtilities.convertPoseToNumbers(RobotContainer.endEffectorSubsystem.calculateCoralPose(robotPose)));
+		} else {
+			SmartDashboard.putNumberArray("Arm/Coral/Position", PoseUtilities.convertPoseToNumbers(new Pose3d(5, 5, -5, new Rotation3d())));
+		}
     }
 }

@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.elevator.ControlElevatorBothStagesCommand;
 import frc.robot.commands.testing.DemoEndEffector;
 import frc.robot.subsystems.arm.EndEffectorSubsystem;
@@ -14,6 +15,7 @@ import frc.robot.subsystems.arm.ShoulderSubsystem;
 import frc.robot.subsystems.arm.WristSubsystem;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.simulation.SimulationSubsystem;
 import frc.robot.subsystems.telemetry.RobotAnimationSubsystem;
 import frc.robot.subsystems.telemetry.SmartDashboardSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -31,6 +33,7 @@ public class RobotContainer {
 	public static final VisionSubsystem visionSubsystem = new VisionSubsystem();
 	public static final RobotAnimationSubsystem robotAnimationSubsystem = new RobotAnimationSubsystem();
 	public static final SmartDashboardSubsystem smartDashboardSubsystem = new SmartDashboardSubsystem();
+	public static SimulationSubsystem simulationSubsystem;
 
 	// Initalize driver controller
 	public static final CustomCommandXboxController driverController = new CustomCommandXboxController(
@@ -47,9 +50,13 @@ public class RobotContainer {
 			.allianceRelativeControl(false);
 
 	public RobotContainer() {
-			System.out.println("Configuring robot container");
+		System.out.println("Configuring robot container");
+		
+		if (Robot.isSimulation()) {
+			simulationSubsystem = new SimulationSubsystem();
+		}
 
-			configureBindings();
+		configureBindings();
 	}
 
 	private void configureBindings() {
@@ -66,8 +73,19 @@ public class RobotContainer {
 		driverController.povRightDirection().whileTrue(wristSubsystem.setWristSpeedCommand(Constants.DriverConstants.CONTROL_WRIST_SPEED));
 		driverController.povLeftDirection().whileTrue(wristSubsystem.setWristSpeedCommand(Constants.DriverConstants.CONTROL_WRIST_SPEED.unaryMinus()));
 
+		/*
+		* Intake coral
+		*/
+		driverController.rightTrigger(0.25).whileTrue(endEffectorSubsystem.setIntakeSpeedCommand(Constants.DriverConstants.INTAKE_SPEED));
+		driverController.leftTrigger(0.25).whileTrue(endEffectorSubsystem.setIntakeSpeedCommand(Constants.DriverConstants.OUTTAKE_SPEED));
+
 
 		driverController.button(7).onTrue(new DemoEndEffector());
+
+		/*
+		* Zero gyro
+		*/
+		driverController.button(8).onTrue(new InstantCommand(() -> RobotContainer.swerveSubsystem.zeroGyro(), RobotContainer.swerveSubsystem));
 
 		/*
 		* Default commands

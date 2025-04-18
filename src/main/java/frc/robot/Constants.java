@@ -347,8 +347,9 @@ public final class Constants {
 			public static final int ID = 6;
 
 			public static class Simulation {
-				public static final Distance WIDTH = Feet.of(0.7); // Feet
-				public static final Distance LENGTH = Feet.of(0.6); // Feet
+				public static final Distance WIDTH = Feet.of(1); // Feet
+				public static final Distance LENGTH = Feet.of(1); // Feet
+				public static final Distance HEIGHT = Feet.of(1); // Feet
 			}
 		}
 
@@ -459,6 +460,6 @@ public final class Constants {
 		public static boolean DEBUG_END_EFFECTOR = true;
 		public static boolean DEBUG_SIMULATION = true;
 		public static boolean DEBUG_PATHFINDING = true;
-		public static boolean ANIMATE_ROBOT = true;
+		public static boolean ANIMATIONS = true;
 	}
 }

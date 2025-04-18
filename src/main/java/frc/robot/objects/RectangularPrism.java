@@ -17,19 +17,29 @@ public class RectangularPrism {
     private double width;
     private double length;
     private double height;
+	private double maxDistance;
 
     public RectangularPrism(Pose3d centerPose, Distance width, Distance length, Distance height) {
         this.centerPose = centerPose;
         this.width = width.in(Meter);
         this.length = length.in(Meter);
         this.height = height.in(Meter);
+		this.maxDistance = Math.sqrt(Math.pow(this.width, 2) + Math.pow(this.length, 2) + Math.pow(this.height, 2));
     }
+
+	public Pose3d getCenterPose() {
+		return this.centerPose;
+	}
 
 	public void changeCenterPose(Pose3d centerPose) {
 		this.centerPose = centerPose;
 	}
 
     public boolean poseInside(Pose3d testPose) {
+		if (PoseUtilities.calculatePoseDistance(testPose, this.centerPose).in(Meter) > this.maxDistance) {
+			return false;
+		}
+
         Translation3d poseTranslation = testPose.getTranslation();
 
         poseTranslation = poseTranslation.minus(this.centerPose.getTranslation()).rotateBy(this.centerPose.getRotation().unaryMinus());

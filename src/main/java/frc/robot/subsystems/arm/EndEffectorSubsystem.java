@@ -3,9 +3,14 @@ package frc.robot.subsystems.arm;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Radian;
 
+import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -13,25 +18,62 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.objects.InverseKinematicState;
 import frc.robot.objects.InverseKinematicStatus;
 import frc.robot.objects.RectangularPrism;
+import frc.robot.subsystems.simulation.ClawSimulation;
 import frc.robot.utilities.math.PoseUtilities;
 
 public class EndEffectorSubsystem extends SubsystemBase {
-    private RectangularPrism Test = new RectangularPrism(new Pose3d(), Meter.of(1), Meter.of(0.5), Meter.of(0.75));
+    /*
+     * Constants
+     */
+    private final Quaternion ninetyZRotation = new Quaternion(
+            Math.cos(Units.degreesToRadians(90) / 2),
+            0,
+            0,
+            Math.sin(Units.degreesToRadians(90) / 2)
+        ); // Thanks claude 3.7 xD
 
+    /*
+     * Motor
+     */
+    private final VictorSPX intakeMotor = new WPI_VictorSPX(Constants.ArmConstants.Intake.ID);
+
+    /*
+     * Sensor
+     */
+    private final DigitalInput intakeSensor = new DigitalInput(Constants.ArmConstants.IntakeSensor.ID);
+
+    /*
+     * Simulation
+     */
+    private final boolean isSimulation = Robot.isSimulation();
+    private ClawSimulation clawSimulation;
+    
     public EndEffectorSubsystem() {
 
+        if (Robot.isSimulation()) {
+            System.out.println("Creating end effector simulation");
+            clawSimulation = new ClawSimulation(new RectangularPrism(new Pose3d(), Constants.ArmConstants.Intake.Simulation.WIDTH, Constants.ArmConstants.Intake.Simulation.LENGTH, Constants.ArmConstants.Intake.Simulation.HEIGHT), 1);
+
+            clawSimulation.setActiveStage(true);
+        }
+
+        System.out.println("Created EndEffectorSubsystem");
     }
 
-    public Pose3d calculateEndEffectorPose() {
+    public Pose3d calculateEndEffectorPose(Pose3d robotPose) {
         // Calculate where the end effector of the arm is
-        Pose3d endEffectorPose = new Pose3d(RobotContainer.swerveSubsystem.getPose())
+        Pose3d endEffectorPose = robotPose
                 .plus(new Transform3d(Constants.ArmConstants.Shoulder.CENTER_OFFSET_FOWARD.in(Meter), 0,
                         RobotContainer.elevatorSubsystem.getCarpetElevatorHeight().in(Meter),
                         new Rotation3d(RobotContainer.wristSubsystem.getWristAngle().in(Radian),
@@ -40,6 +82,19 @@ public class EndEffectorSubsystem extends SubsystemBase {
         // Add the length of the arm onto the end effector pose to get the positon at the end of the arm
         return endEffectorPose.plus(
                 new Transform3d(Constants.ArmConstants.LENGTH.in(Meter), 0, 0, new Rotation3d()));
+    }
+
+    public Pose3d calculateEndEffectorPose() {
+        return calculateEndEffectorPose(new Pose3d(RobotContainer.swerveSubsystem.getPose()));
+    }
+
+    public Pose3d calculateCoralPose(Pose3d robotPose) {
+        Pose3d endEffectorPose = calculateEndEffectorPose(robotPose);
+        return new Pose3d(endEffectorPose.getTranslation(), new Rotation3d(endEffectorPose.getRotation().getQuaternion().times(ninetyZRotation)));
+    }
+
+    public Pose3d calculateCoralPose() {
+        return calculateCoralPose(new Pose3d(RobotContainer.swerveSubsystem.getPose()));
     }
 
     /**
@@ -139,20 +194,53 @@ public class EndEffectorSubsystem extends SubsystemBase {
         return Radian.of(Math.asin(targetToPivotOffset / armLength.in(Meter)));
     }
 
+    public boolean hasCoral() {
+        if (isSimulation) {
+            return clawSimulation.getGamePieceCount() > 0;
+        } else {
+            // The intake sensor is inverted so an ON signal means there is no game peice
+            return !intakeSensor.get();
+        }
+     }
+
+    public void setIntakeSpeed(double intakeSpeed) {
+        intakeMotor.set(VictorSPXControlMode.PercentOutput, intakeSpeed);
+    }
+
+    public double getIntakeSpeedPercent() {
+        return intakeMotor.getMotorOutputPercent();
+    }
+
+    public double getIntakeAppliedVoltage() {
+        return intakeMotor.getMotorOutputVoltage();
+    }
+
+    public Command setIntakeSpeedCommand(double intakeSpeed) {
+        return new StartEndCommand(() -> setIntakeSpeed(intakeSpeed), () -> setIntakeSpeed(0), this);
+    }
+
+    public Command intakeUntil(double intakeSpeed, boolean desiredState, double timeoutSeconds) {
+        return setIntakeSpeedCommand(intakeSpeed).until(() -> hasCoral() == desiredState).withTimeout(timeoutSeconds);
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        Pose3d endEffPose = calculateEndEffectorPose(new Pose3d(RobotContainer.swerveSubsystem.swerveDrive.getSimulationDriveTrainPose().get()));
+
+        
+        clawSimulation.setActiveStage(getIntakeSpeedPercent() < -0.2);
+        clawSimulation.setPickupVolumeCenterPose(endEffPose);
+        clawSimulation.iterate();
+
+        if (getIntakeSpeedPercent() > 0.2) {
+            clawSimulation.ejectGamePiece();
+        }
+
+        SmartDashboard.putNumberArray("SIGH", clawSimulation.getPickupVolume().generateDebugWireframe());
+    }
 
     @Override
     public void periodic() {
-        Pose3d endEffPose = calculateEndEffectorPose();
-
-        Test.changeCenterPose(endEffPose);
-
-        Pose3d Point = new Pose3d(5, 5, 1, new Rotation3d());
-
-        SmartDashboard.putNumberArray("TESTBOX", Test.generateDebugWireframe());
-
-        boolean isC = Test.poseInside(Point);
-
-        SmartDashboard.putNumberArray("TESTPOINT", PoseUtilities.convertPoseToNumbers(Point));
-        SmartDashboard.putBoolean("TESTCOLLIDE", isC);
+        
     }
 }
