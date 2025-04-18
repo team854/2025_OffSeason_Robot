@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.objects.VisionEstimate;
 import frc.robot.utilities.files.FileUtilities;
 import frc.robot.utilities.files.JsonUtilities;
 import swervelib.SwerveDrive;
@@ -109,6 +110,14 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.resetOdometry(initialHolonomicPose);
     }
 
+    /**
+     * 
+     * @param visionEstimate The vision estimate to add to odometry
+     */
+    public void addVisionMeasurement(VisionEstimate visionEstimate) {
+        swerveDrive.addVisionMeasurement(visionEstimate.estimatedPose.toPose2d(), visionEstimate.timestampSeconds, visionEstimate.stdDevs);
+    }
+
     public ChassisSpeeds getRobotVelocity() {
         return swerveDrive.getRobotVelocity();
     }
@@ -133,6 +142,9 @@ public class SwerveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         swerveDrive.updateOdometry();
+
+        // Update the pose estimates from the vision subsystem right after updating the odometry
+        RobotContainer.visionSubsystem.updateVisionEstimates();
     }
 
 }

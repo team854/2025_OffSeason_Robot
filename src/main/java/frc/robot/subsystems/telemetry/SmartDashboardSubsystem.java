@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.commands.drive.MoveToPoseCommand;
+import frc.robot.objects.VisionEstimate;
+import frc.robot.subsystems.vision.VisionCamera;
 import frc.robot.utilities.math.PoseUtilities;
 
 public class SmartDashboardSubsystem extends SubsystemBase {
@@ -37,6 +39,10 @@ public class SmartDashboardSubsystem extends SubsystemBase {
 
         if (Constants.DebugConstants.DEBUG_END_EFFECTOR) {
             sendEndEffectorTelemetry();
+        }
+
+        if (Constants.DebugConstants.DEBUG_VISION) {
+            sendVisionTelemetry();
         }
     }
 
@@ -69,5 +75,28 @@ public class SmartDashboardSubsystem extends SubsystemBase {
 
     public void sendEndEffectorTelemetry() {
         
+    }
+
+    public void sendVisionTelemetry() {
+        for (int index = 0; index < RobotContainer.visionSubsystem.visionCameras.length; index++) {
+            // Retrive the camera and the estimate from the vision subsystem
+			VisionCamera camera = RobotContainer.visionSubsystem.visionCameras[index];
+            VisionEstimate estimate = RobotContainer.visionSubsystem.visionEstimates[index];
+
+            // Construct the path prefix
+            String prefixString = "PhotonVision/" + camera.getCameraName();
+
+            SmartDashboard.putNumberArray(prefixString + "/Estimate Std Devs",
+                estimate.stdDevs.getData());
+
+            SmartDashboard.putNumberArray(prefixString + "/Estimate Robot Pose",
+                PoseUtilities.convertPoseToNumbers(estimate.estimatedPose));
+
+            SmartDashboard.putNumber(prefixString + "/Estimate Timestamp",
+                estimate.timestampSeconds);
+
+            SmartDashboard.putNumberArray(prefixString + "/Camera Pose",
+                PoseUtilities.convertPoseToNumbers(camera.getCameraPose()));
+        }
     }
 }

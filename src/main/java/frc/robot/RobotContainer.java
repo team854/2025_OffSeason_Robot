@@ -16,6 +16,7 @@ import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.telemetry.RobotAnimationSubsystem;
 import frc.robot.subsystems.telemetry.SmartDashboardSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.utilities.controls.CustomCommandXboxController;
 import swervelib.SwerveInputStream;
 
@@ -27,6 +28,7 @@ public class RobotContainer {
 	public static final ShoulderSubsystem shoulderSubsystem = new ShoulderSubsystem();
 	public static final WristSubsystem wristSubsystem = new WristSubsystem();
 	public static final EndEffectorSubsystem endEffectorSubsystem = new EndEffectorSubsystem();
+	public static final VisionSubsystem visionSubsystem = new VisionSubsystem();
 	public static final RobotAnimationSubsystem robotAnimationSubsystem = new RobotAnimationSubsystem();
 	public static final SmartDashboardSubsystem smartDashboardSubsystem = new SmartDashboardSubsystem();
 

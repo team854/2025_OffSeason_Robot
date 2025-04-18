@@ -40,7 +40,7 @@ public class DemoEndEffector extends Command {
         InverseKinematicState fullRobotTargetState = RobotContainer.endEffectorSubsystem
 					.calculateInverseKinematicState(newPose, Meter.of(0));
 
-        pathCommand.setNewPose(fullRobotTargetState.chassisPose());
+        pathCommand.setGoalPose(fullRobotTargetState.chassisPose());
 
         pathCommand.execute(); 
 

@@ -419,7 +419,7 @@ public final class Constants {
 			public static final Distance HEIGHT_OFFSET = Feet.of(0.95276); // Feet
 			public static final Angle ROLL = Degree.of(0); // Degrees
 			public static final Angle PITCH = Degree.of(0); // Degrees
-			public static final Angle YAW = Degree.of(2); // Degrees
+			public static final Angle YAW = Degree.of(0); // Degrees
 			public static final Distance EFFECTIVE_RANGE = Feet.of(16.4042); // Feet
 
 			public static class CameraProperties {
