@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.commands.auto.AutoScoreCoralCommand;
 import frc.robot.commands.elevator.ControlElevatorBothStagesCommand;
 import frc.robot.commands.testing.DemoEndEffector;
 import frc.robot.subsystems.arm.EndEffectorSubsystem;
@@ -20,6 +21,7 @@ import frc.robot.subsystems.telemetry.RobotAnimationSubsystem;
 import frc.robot.subsystems.telemetry.SmartDashboardSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.utilities.controls.CustomCommandXboxController;
+import frc.robot.utilities.controls.RumbleUtilities;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
@@ -81,6 +83,20 @@ public class RobotContainer {
 
 
 		driverController.button(7).onTrue(new DemoEndEffector());
+
+		/* 
+		* Auto score coral on the reef
+		*/
+
+		driverController.twoButtonTrigger(4, 5).onTrue(new AutoScoreCoralCommand(false, 0, true));
+		driverController.twoButtonTrigger(2, 5).onTrue(new AutoScoreCoralCommand(false, 1, true));
+		driverController.twoButtonTrigger(1, 5).onTrue(new AutoScoreCoralCommand(false, 2, true));
+		driverController.twoButtonTrigger(3, 5).onTrue(new AutoScoreCoralCommand(false, 3, true));
+
+		driverController.twoButtonTrigger(4, 6).onTrue(new AutoScoreCoralCommand(true, 0, true));
+		driverController.twoButtonTrigger(2, 6).onTrue(new AutoScoreCoralCommand(true, 1, true));
+		driverController.twoButtonTrigger(1, 6).onTrue(new AutoScoreCoralCommand(true, 2, true));
+		driverController.twoButtonTrigger(3, 6).onTrue(new AutoScoreCoralCommand(true, 3, true));
 
 		/*
 		* Zero gyro

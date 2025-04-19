@@ -21,11 +21,15 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
@@ -178,6 +182,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return Meter.of(stage2Controller.getGoal().position);
     }
 
+	public Distance getOverallSetpoint() {
+		return getStage1Setpoint().plus(getStage2Height()).plus(getPivotPointOffset(true));
+	}
+
     public void setStage1Setpoint(Distance height) {
         stage1Controller.setGoal(
                 MathUtil.clamp(height.in(Meter), 0, this.stage1MaxHeight));
@@ -243,7 +251,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * 
      * @return The height of the elevator relative to the carpet in meters
      */
-    public Distance getCarpetElevatorHeight() {
+    public Distance getOverallHeight() {
         return getStage1Height().plus(getStage2Height()).plus(getPivotPointOffset(true));
     }
 
@@ -253,7 +261,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * @param height The target height from the ground in meters
      * @return Whether the target height is posible
      */
-    public boolean checkGlobalHeightPossible(Distance height) {
+    public boolean checkOverallHeightPossible(Distance height) {
 
         // Because the elevator even at its lowest is a little bit off the ground its base height has to be subtracted from the overall height to get the local height
         double elevatorLocalHeight = (height.minus(getPivotPointOffset(true))).in(Meter);
@@ -288,6 +296,25 @@ public class ElevatorSubsystem extends SubsystemBase {
         setStage1Setpoint(Meter.of(target1Height));
         setStage2Setpoint(Meter.of(target2Height));
     }
+
+	/**
+     * Sets the overall height of the elevator by moving both stages
+     * 
+     * @param targetHeight The target height of the elevator relative to the ground in meters
+     */
+    public Command setOverallHeightCommand(Distance targetHeight) {
+		return runOnce(() -> setOverallHeight(targetHeight));
+	}
+
+	public Command gotoOverallHeightCommand(Distance targetHeight) {
+		return new FunctionalCommand(
+			() -> setOverallHeight(targetHeight),
+			() -> {},
+			(interrupted) -> {},
+			() -> getOverallHeight().isNear(getOverallSetpoint(), Constants.ElevatorConstants.TOLLERANCE),
+			this
+		).withTimeout(7);
+	}
 
     public Distance getMaxHeight() {
         return Meter.of(this.maxHeight);

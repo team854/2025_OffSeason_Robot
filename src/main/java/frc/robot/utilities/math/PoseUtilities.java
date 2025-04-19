@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.units.measure.Distance;
 
-public class PoseUtilities {
+public final class PoseUtilities {
     public static double[] convertPoseToNumbers(Pose3d pose) {
         return new double[] {
             pose.getX(),

@@ -27,7 +27,7 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 
 	@Override
     public void simulationPeriodic() {
-		if (!Constants.DebugConstants.ANIMATIONS) {
+		if (!Constants.TelemetryConstants.ANIMATIONS) {
             return;
         }
 
@@ -40,7 +40,7 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (!Constants.DebugConstants.ANIMATIONS) {
+        if (!Constants.TelemetryConstants.ANIMATIONS) {
             return;
         }
 
@@ -106,9 +106,9 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 		 */
 
 		if (RobotContainer.endEffectorSubsystem.hasCoral()) {
-			SmartDashboard.putNumberArray("Arm/Coral/Position", PoseUtilities.convertPoseToNumbers(RobotContainer.endEffectorSubsystem.calculateCoralPose(robotPose)));
+			SmartDashboard.putNumberArray("Arm/Intake/Coral/Position", PoseUtilities.convertPoseToNumbers(RobotContainer.endEffectorSubsystem.calculateCoralPose(robotPose)));
 		} else {
-			SmartDashboard.putNumberArray("Arm/Coral/Position", PoseUtilities.convertPoseToNumbers(new Pose3d(5, 5, -5, new Rotation3d())));
+			SmartDashboard.putNumberArray("Arm/Intake/Coral/Position", PoseUtilities.convertPoseToNumbers(new Pose3d(5, 5, -5, new Rotation3d())));
 		}
     }
 }

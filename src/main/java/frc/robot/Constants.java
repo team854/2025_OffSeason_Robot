@@ -276,7 +276,7 @@ public final class Constants {
 			public static final Distance DRUM_RADIUS = Inch.of(0.98110236); // Inches
 			public static final double GEAR_RATIO = 18.5714;
 			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.25); // Feet
-			public static final Distance TOLLERANCE = Feet.of(0.2); // Feet
+			
 		}
 
 		public static class Stage2 {
@@ -294,11 +294,10 @@ public final class Constants {
 			public static final Distance DRUM_RADIUS = Inch.of(0.98110236); // Inches
 			public static final double GEAR_RATIO = 15.7143;
 			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.12); // Feet
-			public static final Distance TOLLERANCE = Feet.of(0.2); // Feet
 			public static final double ABSOLUATE_ENCODER_GEAR_RATIO = 1.57143;
 
 		}
-
+		public static final Distance TOLLERANCE = Feet.of(0.2); // Feet
 		public static final Distance ZERO_HEIGHTS_ABOVE_BASE = Feet.of(0.520); // Feet
 	}
 
@@ -348,8 +347,9 @@ public final class Constants {
 
 			public static class Simulation {
 				public static final Distance WIDTH = Feet.of(1); // Feet
-				public static final Distance LENGTH = Feet.of(1); // Feet
-				public static final Distance HEIGHT = Feet.of(1); // Feet
+				public static final Distance LENGTH = Feet.of(0.8); // Feet
+				public static final Distance HEIGHT = Feet.of(0.8); // Feet
+				public static final LinearVelocity OUTTAKE_VELOCITY = FeetPerSecond.of(0.984252); // Feet/Second
 			}
 		}
 
@@ -452,14 +452,14 @@ public final class Constants {
 		public static final double CLIMB_UP_SPEED = -1; // Percent
 	}
 
-	public static class DebugConstants {
-		public static boolean DEBUG_VISION = true;
-		public static boolean DEBUG_ELEVATOR = true;
-		public static boolean DEBUG_SHOULDER = true;
-		public static boolean DEBUG_WRIST = true;
-		public static boolean DEBUG_END_EFFECTOR = true;
-		public static boolean DEBUG_SIMULATION = true;
-		public static boolean DEBUG_PATHFINDING = true;
+	public static class TelemetryConstants {
+		public static boolean VISION_TELEMETRY = true;
+		public static boolean ELEVATOR_TELEMETRY = true;
+		public static boolean SHOULDER_TELEMETRY = true;
+		public static boolean WRIST_TELEMETRY = true;
+		public static boolean END_EFFECTOR_TELEMETRY = true;
+		public static boolean SIMULATION_TELEMETRY = true;
+		public static boolean PATHFINDING_TELEMETRY = true;
 		public static boolean ANIMATIONS = true;
 	}
 }

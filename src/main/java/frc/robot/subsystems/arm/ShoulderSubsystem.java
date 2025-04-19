@@ -29,10 +29,12 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -196,6 +198,16 @@ public class ShoulderSubsystem extends SubsystemBase {
 
 	public Command setShoulderAngleCommand(Angle angle) {
 		return runOnce(() -> setShoulderSetpoint(angle));
+	}
+
+	public Command gotoShoulderAngleCommand(Angle angle) {
+		return new FunctionalCommand(
+			() -> setShoulderSetpoint(angle),
+			() -> {},
+			(interrupted) -> {},
+			() -> getShoulderAngle().isNear(getShoulderSetpoint(), Constants.ArmConstants.Shoulder.TOLLERANCE),
+			this
+		).withTimeout(7);
 	}
 
 	public Command setShoulderSpeedCommand(AngularVelocity shoulderSpeed) {

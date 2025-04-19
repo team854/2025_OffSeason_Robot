@@ -21,27 +21,27 @@ public class SmartDashboardSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (Constants.DebugConstants.DEBUG_ELEVATOR) {
+        if (Constants.TelemetryConstants.ELEVATOR_TELEMETRY) {
             sendElevatorTelemetry();
         }
 
-        if (Constants.DebugConstants.DEBUG_SHOULDER) {
+        if (Constants.TelemetryConstants.SHOULDER_TELEMETRY) {
             sendShoulderTelemetry();
         }
 
-        if (Constants.DebugConstants.DEBUG_WRIST) {
+        if (Constants.TelemetryConstants.WRIST_TELEMETRY) {
             sendWristTelemetry();
         }
 
-        if (Constants.DebugConstants.DEBUG_PATHFINDING) {
+        if (Constants.TelemetryConstants.PATHFINDING_TELEMETRY) {
             sendPathfindingTelemetry();
         }
 
-        if (Constants.DebugConstants.DEBUG_END_EFFECTOR) {
+        if (Constants.TelemetryConstants.END_EFFECTOR_TELEMETRY) {
             sendEndEffectorTelemetry();
         }
 
-        if (Constants.DebugConstants.DEBUG_VISION) {
+        if (Constants.TelemetryConstants.VISION_TELEMETRY) {
             sendVisionTelemetry();
         }
     }
@@ -70,11 +70,12 @@ public class SmartDashboardSubsystem extends SubsystemBase {
     }
 
     public void sendPathfindingTelemetry() {
-        SmartDashboard.putNumberArray("Pathfinding/Move To Pose/Goal Pose", PoseUtilities.convertPoseToNumbers(MoveToPoseCommand.goalPose));
+        SmartDashboard.putNumberArray("Pathfinding/Move To Pose/Goal Pose", PoseUtilities.convertPoseToNumbers(MoveToPoseCommand.globalGoalPose));
     }
 
     public void sendEndEffectorTelemetry() {
-        
+        SmartDashboard.putBoolean("Arm/Intake/Has Coral", RobotContainer.endEffectorSubsystem.hasCoral());
+        SmartDashboard.putNumber("Arm/Intake/Motor Percent", RobotContainer.endEffectorSubsystem.getIntakeSpeedPercent());
     }
 
     public void sendVisionTelemetry() {

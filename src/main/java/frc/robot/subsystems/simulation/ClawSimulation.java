@@ -1,6 +1,7 @@
 package frc.robot.subsystems.simulation;
 
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radian;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.objects.RectangularPrism;
 import frc.robot.utilities.math.PoseUtilities;
@@ -79,22 +81,32 @@ public class ClawSimulation {
         return this.gamePieceCount;
     }
 
-    private Translation3d getCoralShootDirection(Pose3d coralPose, double speed) {
-        Translation3d shootTranslation = new Translation3d(0, -speed, 0).rotateBy(coralPose.getRotation());
-        return shootTranslation;
-    }
-
-    public void ejectGamePiece() {
+    public boolean ejectGamePiece() {
+        // Make sure that there is a game piece to outtake
         if (this.gamePieceCount > 0) {
-            Pose3d robotPose = new Pose3d(RobotContainer.swerveSubsystem.swerveDrive.getSimulationDriveTrainPose().get());
+            Pose3d coralPose = getPiecePose();
 
-            Pose3d coralPose = RobotContainer.endEffectorSubsystem.calculateCoralPose(robotPose);
+            // Calculate the direction to shoot the coral at the specified speed
+            Translation3d shootTranslation = new Translation3d(0, -Constants.ArmConstants.Intake.Simulation.OUTTAKE_VELOCITY.in(MetersPerSecond), 0).rotateBy(coralPose.getRotation());
+
             SimulatedArena.getInstance()
                     .addGamePieceProjectile(new CoralFlightSim(ReefscapeCoralOnField.REEFSCAPE_CORAL_INFO,
-                            coralPose.getTranslation(), getCoralShootDirection(coralPose, 0.3),
+                            coralPose.getTranslation(), shootTranslation,
                             coralPose.getRotation()));
             this.gamePieceCount--;
+            return true;
         }
+        return false;
+    }
+
+    /**
+     * 
+     * @return The pose of the piece when its being held by the claw
+     */
+    private Pose3d getPiecePose() {
+        Pose3d clawPose = this.pickupVolume.getCenterPose();
+
+        return new Pose3d(clawPose.getTranslation(), new Rotation3d(clawPose.getRotation().getQuaternion().times(ninetyZRotation)));
     }
 
     /**
@@ -108,11 +120,16 @@ public class ClawSimulation {
         Quaternion pieceQuaternion = piecePose.getRotation().getQuaternion();
 
         Translation3d pieceForward = new Translation3d(1, 0, 0).rotateBy(new Rotation3d(pieceQuaternion.toRotationVector()));
+
+        // Compute the dot product of both translation vectors
+        // Using the quaternion to compute the dot product doesn't product the expected result
         double rotationDotProduct = (clawNinety.getX() * pieceForward.getX()) + 
                                     (clawNinety.getY() * pieceForward.getY()) + 
                                     (clawNinety.getZ() * pieceForward.getZ());
 
-        return 1 - Math.abs(rotationDotProduct) < 0.1;
+        // The dot product is 1 or -1 if they are perfectly aligned
+        // 1 - the absolute of the dot product is how close it is to 1 or -1
+        return 1 - Math.abs(rotationDotProduct) < 0.15;
     }
 
     private record PickupCandidate(
@@ -130,9 +147,7 @@ public class ClawSimulation {
         }
 
         Pose3d clawPose = this.pickupVolume.getCenterPose();
-        Rotation3d clawRotation = clawPose.getRotation();
-        Quaternion clawQuaternion = clawRotation.getQuaternion().times(ninetyZRotation);
-        Translation3d clawNinety = new Translation3d(1, 0, 0).rotateBy(new Rotation3d(clawQuaternion.toRotationVector()));
+        Translation3d clawNinety = new Translation3d(1, 0, 0).rotateBy(getPiecePose().getRotation());
 
         // Closest pickup candidate
         double lowestDistance = Double.MAX_VALUE;
@@ -146,9 +161,12 @@ public class ClawSimulation {
 
             Pose3d gamePiecePose = gamePiece.getPose3d();
             if (this.pickupVolume.poseInside(gamePiecePose)) {
+                // Calculate how far the center of the coral is from the center of the pickup volume
                 double pieceDistance = PoseUtilities.calculatePoseDistance(gamePiecePose, clawPose).in(Meter);
 
                 if (pieceDistance < lowestDistance) {
+
+                    // Check if the claw and the piece are aligned with eachother
                     if (checkAlignment(gamePiecePose, clawNinety)) {
                         lowestDistance = pieceDistance;
                         lowestPiece = new PickupCandidate(gamePiecePose, gamePiece);
@@ -165,9 +183,12 @@ public class ClawSimulation {
 
             Pose3d gamePiecePose = gamePiece.getPose3d();
             if (this.pickupVolume.poseInside(gamePiecePose)) {
+                // Calculate how far the center of the coral is from the center of the pickup volume
                 double pieceDistance = PoseUtilities.calculatePoseDistance(gamePiecePose, clawPose).in(Meter);
 
                 if (pieceDistance < lowestDistance) {
+
+                    // Check if the claw and the piece are aligned with eachother
                     if (checkAlignment(gamePiecePose, clawNinety)) {
                         lowestDistance = pieceDistance;
                         lowestPiece = new PickupCandidate(gamePiecePose, gamePiece);
@@ -181,12 +202,14 @@ public class ClawSimulation {
         }
 
         if (lowestPiece.objectReference instanceof GamePieceOnFieldSimulation) {
+            // If its a field piece it remove notify it that it is being intaked then remove it
             GamePieceOnFieldSimulation gamePiece = (GamePieceOnFieldSimulation) lowestPiece.objectReference;
             gamePiece.onIntake(this.targetedGamePieceType);
             arena.removeGamePiece(gamePiece);
             this.gamePieceCount++;
 
         } else if (lowestPiece.objectReference instanceof GamePieceProjectile) {
+            // If its a projectile just remove it from the field
             GamePieceProjectile gamePiece = (GamePieceProjectile) lowestPiece.objectReference;
             arena.removeProjectile(gamePiece);
             this.gamePieceCount++;

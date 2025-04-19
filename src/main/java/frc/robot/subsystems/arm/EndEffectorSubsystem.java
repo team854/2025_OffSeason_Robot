@@ -75,7 +75,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
         // Calculate where the end effector of the arm is
         Pose3d endEffectorPose = robotPose
                 .plus(new Transform3d(Constants.ArmConstants.Shoulder.CENTER_OFFSET_FOWARD.in(Meter), 0,
-                        RobotContainer.elevatorSubsystem.getCarpetElevatorHeight().in(Meter),
+                        RobotContainer.elevatorSubsystem.getOverallHeight().in(Meter),
                         new Rotation3d(RobotContainer.wristSubsystem.getWristAngle().in(Radian),
                                 -RobotContainer.shoulderSubsystem.getShoulderAngle().in(Radian), 0)));
 
@@ -132,7 +132,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
         double elevatorTargetHeight = endEffectorTarget.getZ() - verticalDistance;
 
         // For some locations the limits on the elevators height prevent it from achiving an optimal angle
-        if (!RobotContainer.elevatorSubsystem.checkGlobalHeightPossible(Meter.of(elevatorTargetHeight))) {
+        if (!RobotContainer.elevatorSubsystem.checkOverallHeightPossible(Meter.of(elevatorTargetHeight))) {
             targetStatus = InverseKinematicStatus.CLOSE;
 
             System.out.println("Invalid elevator height for auto score trying backup method 2");
@@ -225,13 +225,15 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
+        // Calculate the end effector pose using the actual pose from the simulation
         Pose3d endEffPose = calculateEndEffectorPose(new Pose3d(RobotContainer.swerveSubsystem.swerveDrive.getSimulationDriveTrainPose().get()));
 
-        
+        // Iterate on the claw simulatioh
         clawSimulation.setActiveStage(getIntakeSpeedPercent() < -0.2);
         clawSimulation.setPickupVolumeCenterPose(endEffPose);
         clawSimulation.iterate();
 
+        // If its outtaking then try to eject the coral
         if (getIntakeSpeedPercent() > 0.2) {
             clawSimulation.ejectGamePiece();
         }

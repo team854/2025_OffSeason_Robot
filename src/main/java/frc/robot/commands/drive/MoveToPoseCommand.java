@@ -25,7 +25,7 @@ public class MoveToPoseCommand extends Command {
     /*
      * Public variable
      */
-    public static Pose2d goalPose = new Pose2d();
+    public static Pose2d globalGoalPose = new Pose2d();
 
     /*
      * Control
@@ -33,6 +33,7 @@ public class MoveToPoseCommand extends Command {
     private final ProfiledPIDController translationXController;
     private final ProfiledPIDController translationYController;
     private final PIDController headingController;
+    private final Pose2d goalPose;
     private final boolean endAtPose;
 
     /**
@@ -41,7 +42,7 @@ public class MoveToPoseCommand extends Command {
      * @param endAtPose If the command should end once the robot has reached the goal pose
      */
     public MoveToPoseCommand(Pose2d goalPose, boolean endAtPose) {
-        MoveToPoseCommand.goalPose = goalPose;
+        this.goalPose = goalPose;
         this.endAtPose = endAtPose;
         
         TrapezoidProfile.Constraints translatioConstraints = new TrapezoidProfile.Constraints(maxVelocity, Constants.AutoConstants.TRANSLATION_MAX_ACCELERATION.in(MetersPerSecondPerSecond));
@@ -69,7 +70,7 @@ public class MoveToPoseCommand extends Command {
     }
 
     public void setGoalPose(Pose2d goalPose) {
-        MoveToPoseCommand.goalPose = goalPose;
+        MoveToPoseCommand.globalGoalPose = goalPose;
 
         this.translationXController.setGoal(goalPose.getX());
         this.translationYController.setGoal(goalPose.getY());
@@ -78,7 +79,7 @@ public class MoveToPoseCommand extends Command {
 
     @Override
     public void initialize() {
-        this.setGoalPose(MoveToPoseCommand.goalPose);
+        this.setGoalPose(this.goalPose);
 
         Pose2d robotPose = RobotContainer.swerveSubsystem.getPose();
 
@@ -95,7 +96,7 @@ public class MoveToPoseCommand extends Command {
         this.headingController
                 .setTolerance(Constants.SwerveConstants.ROTATION_ACCEPTABLE_ERROR.in(Radian));
         
-        System.out.println("Moving to pose: " + MoveToPoseCommand.goalPose.toString());
+        System.out.println("Moving to pose: " + MoveToPoseCommand.globalGoalPose.toString());
     }
 
     @Override
@@ -117,8 +118,8 @@ public class MoveToPoseCommand extends Command {
             return false;
         }
 
-        return this.translationXController.atSetpoint()
-                && this.translationYController.atSetpoint()
+        return this.translationXController.atGoal()
+                && this.translationYController.atGoal()
                 && this.headingController.atSetpoint()
                 && Math.abs(RobotContainer.swerveSubsystem.getRobotVelocity().omegaRadiansPerSecond) < Constants.SwerveConstants.ROTATION_ZERO_THRESHOLD.in(RadiansPerSecond)
                 && RobotContainer.swerveSubsystem.convertChassisSpeed(RobotContainer.swerveSubsystem
