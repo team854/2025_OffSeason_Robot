@@ -113,7 +113,8 @@ public class AutoScoreCoralCommand extends Command {
 						new MoveToPoseCommand(robotTargetState.chassisPose(), true),
 						RobotContainer.shoulderSubsystem.gotoShoulderAngleCommand(robotTargetState.shoulderAngle()),
 						new ParallelCommandGroup(
-							new MoveToPoseCommand(pullBackPose, true),
+							// There is no need to pull back if its L1
+							new MoveToPoseCommand((this.branchIndex != 0) ? pullBackPose : robotTargetState.chassisPose(), true),
 							RobotContainer.endEffectorSubsystem.intakeUntil(Constants.DriverConstants.OUTTAKE_SPEED, false, 5)
 						));
 

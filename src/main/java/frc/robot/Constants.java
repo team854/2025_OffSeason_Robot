@@ -369,7 +369,7 @@ public final class Constants {
 		public static class GroundIntake {
 			public static final Distance ELEVATOR_GROUND_HEIGHT = Meter.of(0); // Feet
 			public static final Angle WRIST_ANGLE = Degree.of(0.0); // Degrees
-			public static final Angle SHOULDER_ANGLE = Degree.of(-33.0); // Degrees
+			public static final Angle SHOULDER_ANGLE = Degree.of(-34.0); // Degrees
 		}
 	}
 
@@ -412,10 +412,10 @@ public final class Constants {
 	}
 
 	public static class AutoConstants {
-		public static final LinearVelocity TRANSLATION_MAX_VELOCITY = FeetPerSecond.of(10);
-		public static final LinearAcceleration TRANSLATION_MAX_ACCELERATION = FeetPerSecondPerSecond.of(2.0);
-		public static final AngularVelocity ROTATION_MAX_VELOCITY = DegreesPerSecond.of(180);
-		public static final AngularAcceleration ROTATION_MAX_ACCELERATION = DegreesPerSecondPerSecond.of(90);
+		public static final LinearVelocity TRANSLATION_MAX_VELOCITY = FeetPerSecond.of(10.0);
+		public static final LinearAcceleration TRANSLATION_MAX_ACCELERATION = FeetPerSecondPerSecond.of(3.0);
+		public static final AngularVelocity ROTATION_MAX_VELOCITY = DegreesPerSecond.of(180.0);
+		public static final AngularAcceleration ROTATION_MAX_ACCELERATION = DegreesPerSecondPerSecond.of(45.0);
 	}
 
 	public static class VisionConstants {
@@ -451,7 +451,7 @@ public final class Constants {
 
 	public static class SimulationConstants {
 		public static class StartingSpawnCoral {
-		  public static final boolean ENABLED = false;
+		  public static final boolean ENABLED = true;
 		  public static final int SPAWN_COUNT = 24;
 		  public static final Distance SPAWN_X = Feet.of(5); // Feet
 		  public static final Distance SPAWN_Y = Feet.of(5); // Feet
@@ -473,11 +473,11 @@ public final class Constants {
 
 	public static class DriverConstants {
 		public static final int PORT = 0;
-		public static final double DEADBAND = 0.15;
+		public static final double DEADBAND = 0.12;
 		public static final double TRANSLATION_SCALE = 1;
 		public static final double ROTATION_SCALE = 0.7;
-		public static final double LEFT_JOYSTICK_EXPONENT = 1.5;
-		public static final double RIGHT_JOYSTICK_EXPONENT = 1.5;
+		public static final double LEFT_JOYSTICK_EXPONENT = 1.7;
+		public static final double RIGHT_JOYSTICK_EXPONENT = 1.7;
 		public static final double TRIGGER_EXPONENT = 1;
 		public static final LinearVelocity CONTROL_ELEVATOR_SPEED = FeetPerSecond.of(1); // Feet/Second
 		public static final AngularVelocity CONTROL_SHOULDER_SPEED = DegreesPerSecond.of(50); // Degrees/Second
