@@ -223,6 +223,10 @@ public class EndEffectorSubsystem extends SubsystemBase {
         return setIntakeSpeedCommand(intakeSpeed).until(() -> hasCoral() == desiredState).withTimeout(timeoutSeconds);
     }
 
+    public ClawSimulation getClawSimulation() {
+        return clawSimulation;
+    }
+
     @Override
     public void simulationPeriodic() {
         // Calculate the end effector pose using the actual pose from the simulation

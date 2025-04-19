@@ -65,6 +65,8 @@ public class ReefUtilities {
 
     public static Distance getBranchHeight(int branchLevel) {
         switch (branchLevel) {
+            case 0:
+                return Constants.ReefConstants.FieldConstants.L1.MAX_HEIGHT;
             case 1:
                 return Constants.ReefConstants.FieldConstants.L2.MAX_HEIGHT;
             case 2:
@@ -79,6 +81,8 @@ public class ReefUtilities {
 
     public static Angle getBranchAngle(int branchLevel) {
         switch (branchLevel) {
+            case 0:
+                return Constants.ReefConstants.FieldConstants.L1.BRANCH_ANGLE;
             case 1:
                 return Constants.ReefConstants.FieldConstants.L2.BRANCH_ANGLE;
             case 2:
@@ -88,6 +92,22 @@ public class ReefUtilities {
             default:
                 System.err.println("Unknown branch level " + branchLevel + ". Returning default of L3");
                 return Constants.ReefConstants.FieldConstants.L3.BRANCH_ANGLE;
+        }
+    }
+
+    public static Angle getWristAngle(int branchLevel) {
+        switch (branchLevel) {
+            case 0:
+                return Constants.ReefConstants.FieldConstants.L1.WRIST_ANGLE;
+            case 1:
+                return Constants.ReefConstants.FieldConstants.L2.WRIST_ANGLE;
+            case 2:
+                return Constants.ReefConstants.FieldConstants.L3.WRIST_ANGLE;
+            case 3:
+                return Constants.ReefConstants.FieldConstants.L4.WRIST_ANGLE;
+            default:
+                System.err.println("Unknown branch level " + branchLevel + ". Returning default of L3");
+                return Constants.ReefConstants.FieldConstants.L3.WRIST_ANGLE;
         }
     }
 }

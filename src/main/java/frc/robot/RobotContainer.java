@@ -10,10 +10,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.auto.AutoScoreCoralCommand;
 import frc.robot.commands.elevator.ControlElevatorBothStagesCommand;
+import frc.robot.commands.setpoints.GroundPickupConfigurationCommand;
 import frc.robot.commands.testing.DemoEndEffector;
 import frc.robot.subsystems.arm.EndEffectorSubsystem;
 import frc.robot.subsystems.arm.ShoulderSubsystem;
 import frc.robot.subsystems.arm.WristSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.simulation.SimulationSubsystem;
@@ -32,6 +34,7 @@ public class RobotContainer {
 	public static final ShoulderSubsystem shoulderSubsystem = new ShoulderSubsystem();
 	public static final WristSubsystem wristSubsystem = new WristSubsystem();
 	public static final EndEffectorSubsystem endEffectorSubsystem = new EndEffectorSubsystem();
+	public static final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
 	public static final VisionSubsystem visionSubsystem = new VisionSubsystem();
 	public static final RobotAnimationSubsystem robotAnimationSubsystem = new RobotAnimationSubsystem();
 	public static final SmartDashboardSubsystem smartDashboardSubsystem = new SmartDashboardSubsystem();
@@ -82,12 +85,11 @@ public class RobotContainer {
 		driverController.leftTrigger(0.25).whileTrue(endEffectorSubsystem.setIntakeSpeedCommand(Constants.DriverConstants.OUTTAKE_SPEED));
 
 
-		driverController.button(7).onTrue(new DemoEndEffector());
+		// driverController.button(7).onTrue(new DemoEndEffector());
 
 		/* 
 		* Auto score coral on the reef
 		*/
-
 		driverController.twoButtonTrigger(4, 5).onTrue(new AutoScoreCoralCommand(false, 0, true));
 		driverController.twoButtonTrigger(2, 5).onTrue(new AutoScoreCoralCommand(false, 1, true));
 		driverController.twoButtonTrigger(1, 5).onTrue(new AutoScoreCoralCommand(false, 2, true));
@@ -97,6 +99,17 @@ public class RobotContainer {
 		driverController.twoButtonTrigger(2, 6).onTrue(new AutoScoreCoralCommand(true, 1, true));
 		driverController.twoButtonTrigger(1, 6).onTrue(new AutoScoreCoralCommand(true, 2, true));
 		driverController.twoButtonTrigger(3, 6).onTrue(new AutoScoreCoralCommand(true, 3, true));
+
+		/*
+		* Ground pickup setpoint
+		*/
+		driverController.button(9).onTrue(new GroundPickupConfigurationCommand());
+
+
+		/*
+		* Climb commands
+		*/
+		driverController.button(7).whileTrue(RobotContainer.climbSubsystem.climbUp(Constants.DriverConstants.CLIMB_UP_SPEED));
 
 		/*
 		* Zero gyro

@@ -3,3 +3,4 @@
  * Allow starting with a coral
  * Add the coral stations
  * Test the auto score
+ * Add pathplanner / someform of pathfinding

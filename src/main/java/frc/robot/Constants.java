@@ -361,32 +361,45 @@ public final class Constants {
 
 	}
 
+	public static class ClimbConstants {
+		public static final int ID = 7;
+	}
+
+	public static class SetpointConstants {
+		public static class GroundIntake {
+			public static final Distance ELEVATOR_GROUND_HEIGHT = Meter.of(0); // Feet
+			public static final Angle WRIST_ANGLE = Degree.of(0.0); // Degrees
+			public static final Angle SHOULDER_ANGLE = Degree.of(-33.0); // Degrees
+		}
+	}
+
 	public static class ReefConstants {
 		public static class FieldConstants {
 			public static final int[] BLUE_ALLIANCE_REEF_TAG_IDS = {21, 22, 17, 18, 19, 20};
 			public static final int[] RED_ALLIANCE_REEF_TAG_IDS = {10, 9, 8, 7, 6, 11};
 
 			public static class L1 {
-				public static final Distance MAX_HEIGHT = Feet.of(1.50919); // Feet
-				public static final Distance SCORE_HEIGHT = Feet.of(3.3); // Feet
-				public static final Angle SCORE_ANGLE = Degree.of(-30.0); // Degrees
-				public static final Distance SCORE_OFFSET = Feet.of(0.25); // Feet
-
+				public static final Distance MAX_HEIGHT = Feet.of(2); // Feet
+				public static final Angle BRANCH_ANGLE = Degree.of(-30.0); // Degrees
+				public static final Angle WRIST_ANGLE = Degree.of(0); // Degrees
 			}
 
 			public static class L2 {
 				public static final Distance MAX_HEIGHT = Feet.of(2.65748); // Feet
 				public static final Angle BRANCH_ANGLE = Degree.of(35.0); // Degrees
+				public static final Angle WRIST_ANGLE = Degree.of(90); // Degrees
 			}
 
 			public static class L3 {
 				public static final Distance MAX_HEIGHT = Feet.of(3.96982); // Feet
 				public static final Angle BRANCH_ANGLE = Degree.of(35.0); // Degrees
+				public static final Angle WRIST_ANGLE = Degree.of(90); // Degrees
 			}
 			
 			public static class L4 {
 				public static final Distance MAX_HEIGHT = Feet.of(5.99); // Feet
 				public static final Angle BRANCH_ANGLE = Degree.of(90.0); // Degrees
+				public static final Angle WRIST_ANGLE = Degree.of(90); // Degrees
 			}
 
 			public static final Distance BRANCH_LEFT_OFFSET = Feet.of(0.563040616798); // Feet
@@ -436,9 +449,31 @@ public final class Constants {
 		}
 	}
 
+	public static class SimulationConstants {
+		public static class StartingSpawnCoral {
+		  public static final boolean ENABLED = false;
+		  public static final int SPAWN_COUNT = 24;
+		  public static final Distance SPAWN_X = Feet.of(5); // Feet
+		  public static final Distance SPAWN_Y = Feet.of(5); // Feet
+		  public static final Distance SPAWN_RADIUS = Feet.of(3); // Feet
+		}
+	
+		public static class CoralStations {
+		  public static final boolean ENABLED = true;
+		  public static final Distance FOWARD_OFFSET = Feet.of(-0.4); // Feet
+		  public static final Distance VERTICAL_OFFSET = Feet.of(-1.49); // Feet
+		  public static final Distance WIDTH = Feet.of(6.354); // Feet
+		  public static final Distance LENGTH = Feet.of(1.5); // Feet
+		  public static final Distance HEIGHT = Feet.of(0.8); // Feet
+		  public static final Angle YAW = Degree.of(45); // Degrees
+		}
+	
+		public static final boolean ASSUME_START_WITH_CORAL = true;
+	  }
+
 	public static class DriverConstants {
 		public static final int PORT = 0;
-		public static final double DEADBAND = 0.1;
+		public static final double DEADBAND = 0.15;
 		public static final double TRANSLATION_SCALE = 1;
 		public static final double ROTATION_SCALE = 0.7;
 		public static final double LEFT_JOYSTICK_EXPONENT = 1.5;

@@ -55,65 +55,71 @@ public class AutoScoreCoralCommand extends Command {
 
 			Pose3d tagPose = TagUtilities.getTagPose(closestTagID, true);
 
-			if (branchIndex != 0) {
-				// Calculate the pose of the branch
-				Pose2d branchOffset = ReefUtilities.getBranchPose(tagPose.toPose2d(), this.right);
-				Pose3d branchPose = new Pose3d(
-						branchOffset.getX(),
-						branchOffset.getY(),
-						ReefUtilities.getBranchHeight(branchIndex).in(Meter),
-						new Rotation3d(
-								0,
-								ReefUtilities.getBranchAngle(branchIndex).in(Radian),
-								branchOffset.getRotation().getRadians()));
+			// Calculate the pose of the branch
+			Pose2d branchOffset = ReefUtilities.getBranchPose(tagPose.toPose2d(), this.right);
+			Pose3d branchPose = new Pose3d(
+					branchOffset.getX(),
+					branchOffset.getY(),
+					ReefUtilities.getBranchHeight(branchIndex).in(Meter),
+					new Rotation3d(
+							0,
+							ReefUtilities.getBranchAngle(branchIndex).in(Radian),
+							branchOffset.getRotation().getRadians()));
 
-				// Calculate the scoring angle (perpendicular to the branch angle)
-				// Then calculate the new end effector pose
-				Angle scoringAngle = AngleUtilities.getPerpendicularAngle(branchPose.getRotation().getMeasureY()).unaryMinus();
-				Pose3d endEffectorPose = new Pose3d(branchPose.getTranslation(),
-						new Rotation3d(0, scoringAngle.in(Radian), branchPose.getRotation().getZ()));
+			// Calculate the scoring angle (perpendicular to the branch angle unless its L1) 
+			// Then calculate the new end effector pose
+			Angle scoringAngle = branchPose.getRotation().getMeasureY();
+			if (this.branchIndex != 0) {
+				scoringAngle = AngleUtilities.getPerpendicularAngle(branchPose.getRotation().getMeasureY()).unaryMinus();
+			}
+			Pose3d endEffectorPose = new Pose3d(branchPose.getTranslation(),
+					new Rotation3d(0, scoringAngle.in(Radian), branchPose.getRotation().getZ()));
 
-				// Calculate the minium distance bettween the robot center and the branch
-				Distance minimumRobotDistance = (Constants.RobotKinematicConstants.LENGTH.div(2))
-						.plus(Constants.ReefConstants.FieldConstants.BRANCH_FOWARD_OFFSET);
+			// Calculate the minium distance bettween the robot center and the branch
+			Distance minimumRobotDistance = (Constants.RobotKinematicConstants.LENGTH.div(2))
+					.plus(Constants.ReefConstants.FieldConstants.BRANCH_FOWARD_OFFSET);
 
-				System.out.println(minimumRobotDistance + " HUH");
+			// Using inverse kinematics compute the robots pose
+			InverseKinematicState robotTargetState = RobotContainer.endEffectorSubsystem
+					.calculateInverseKinematicState(endEffectorPose, minimumRobotDistance);
 
-				// Using inverse kinematics compute the robots pose
-				InverseKinematicState robotTargetState = RobotContainer.endEffectorSubsystem
-						.calculateInverseKinematicState(endEffectorPose, Meter.of(0));
+			if (robotTargetState.status() != InverseKinematicStatus.INVALID) {
 
-				if (robotTargetState.status() != InverseKinematicStatus.INVALID) {
+				// The pose to go to that is a bit away so the arm and elevator have time to move into position
+				Pose2d intermediatePose = robotTargetState.chassisPose()
+						.plus(new Transform2d(-0.5, 0, Rotation2d.fromDegrees(0)));
 
-					// The pose to go to that is a bit away so the arm and elevator have time to move into position
-					Pose2d intermediatePose = robotTargetState.chassisPose()
-							.plus(new Transform2d(-0.5, 0, Rotation2d.fromDegrees(0)));
+				// The pose to go to when the robot is pulling away from the branch 
+				Pose2d pullBackPose = robotTargetState.chassisPose()
+						.plus(new Transform2d(-0.2, 0, Rotation2d.fromDegrees(0)));
 
-					// The pose to go to when the robot is pulling away from the branch 
-					Pose2d pullBackPose = robotTargetState.chassisPose()
-							.plus(new Transform2d(-0.2, 0, Rotation2d.fromDegrees(0)));
+				// Get the angle the wrist needs to be at to score
+				Angle wristAngle = ReefUtilities.getWristAngle(this.branchIndex);
 
-					this.commands.addCommands(
-							new MoveToPoseCommand(intermediatePose, false)
-									.withDeadline(new ParallelCommandGroup(RobotContainer.elevatorSubsystem
-											.gotoOverallHeightCommand(
-													robotTargetState.elevatorHeight()),
-											RobotContainer.shoulderSubsystem.gotoShoulderAngleCommand(robotTargetState.shoulderAngle().plus(Constants.ReefConstants.LIFT_ANGLE)),
-											RobotContainer.wristSubsystem.gotoWristAngleCommand(Degree.of(90)))),
-							new MoveToPoseCommand(robotTargetState.chassisPose(), true),
-							RobotContainer.shoulderSubsystem.gotoShoulderAngleCommand(robotTargetState.shoulderAngle()),
-							new ParallelCommandGroup(
-								new MoveToPoseCommand(pullBackPose, true),
-								RobotContainer.endEffectorSubsystem.intakeUntil(Constants.DriverConstants.OUTTAKE_SPEED, false, 5)
-							));
-
-				} else {
-					System.err.println("Nan value target detected in auto score");
-					RumbleUtilities.rumbleCommandFailed();
+				// Get the shoulder approch angle
+				Angle approchAngle = robotTargetState.shoulderAngle();
+				if (this.branchIndex != 0) {
+					// Add the lift angle when its not L1 so it clears the branchs before it puts the coral on it
+					approchAngle = approchAngle.plus(Constants.ReefConstants.LIFT_ANGLE);
 				}
 
-			} else {
+				this.commands.addCommands(
+						new MoveToPoseCommand(intermediatePose, false)
+								.withDeadline(new ParallelCommandGroup(RobotContainer.elevatorSubsystem
+										.gotoOverallHeightCommand(
+												robotTargetState.elevatorHeight()),
+										RobotContainer.shoulderSubsystem.gotoShoulderAngleCommand(approchAngle),
+										RobotContainer.wristSubsystem.gotoWristAngleCommand(wristAngle))),
+						new MoveToPoseCommand(robotTargetState.chassisPose(), true),
+						RobotContainer.shoulderSubsystem.gotoShoulderAngleCommand(robotTargetState.shoulderAngle()),
+						new ParallelCommandGroup(
+							new MoveToPoseCommand(pullBackPose, true),
+							RobotContainer.endEffectorSubsystem.intakeUntil(Constants.DriverConstants.OUTTAKE_SPEED, false, 5)
+						));
 
+			} else {
+				System.err.println("Nan value target detected in auto score");
+				RumbleUtilities.rumbleCommandFailed();
 			}
 
 		} else {
@@ -141,6 +147,6 @@ public class AutoScoreCoralCommand extends Command {
 	@Override
 	public void end(boolean interrupted) {
 		System.out.println("Scoring command finished");
-		RobotContainer.driverController.setRumbleSecondsCommand(RumbleType.kBothRumble, 0.5, 0.05).schedule();
+		RumbleUtilities.rumbleCommandFullControlGiven();
 	}
 }
