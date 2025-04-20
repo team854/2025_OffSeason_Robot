@@ -66,6 +66,7 @@ public class RectangularPrism {
                 Math.abs(poseTranslation.getZ()) < (this.height / 2);
     }
  
+	// The implementation of this was written by claude 3.7 then heavily rewritten by me to make it acully work
 	public boolean checkOverlap(RectangularPrism testRect) {
 		Translation3d centerPointDiff = testRect.centerPose.getTranslation().minus(this.centerPose.getTranslation());
 

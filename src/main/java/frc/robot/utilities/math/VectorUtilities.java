@@ -13,6 +13,10 @@ public final class VectorUtilities {
         return (a.getX() * b.getX()) + (a.getY() * b.getY()) + (a.getZ() * b.getZ());
     }
 
+    public static double normalizedDotProduct(Translation3d a, Translation3d b) {
+        return 1 - Math.abs(dotProduct(a, b));
+    }
+
     /**
      * Calculates the cross product of two {@link Translation3d}
      * @param a The first {@link Translation3d}

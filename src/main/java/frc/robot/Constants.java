@@ -346,10 +346,10 @@ public final class Constants {
 			public static final int ID = 6;
 
 			public static class Simulation {
-				public static final Distance WIDTH = Feet.of(0.9); // Feet
+				public static final Distance WIDTH = Feet.of(0.95); // Feet
 				public static final Distance LENGTH = Feet.of(0.7); // Feet
-				public static final Distance HEIGHT = Feet.of(0.6); // Feet
-				public static final LinearVelocity OUTTAKE_VELOCITY = FeetPerSecond.of(0.984252); // Feet/Second
+				public static final Distance HEIGHT = Feet.of(0.65); // Feet
+				public static final LinearVelocity OUTTAKE_VELOCITY = FeetPerSecond.of(1); // Feet/Second
 			}
 		}
 
@@ -472,12 +472,16 @@ public final class Constants {
 	
 		public static class CoralStations {
 		  public static final boolean ENABLED = true;
-		  public static final Distance FOWARD_OFFSET = Feet.of(-0.4); // Feet
+		  public static final Distance FOWARD_OFFSET = Feet.of(-0.2); // Feet
 		  public static final Distance VERTICAL_OFFSET = Feet.of(-1.49); // Feet
 		  public static final Distance WIDTH = Feet.of(6.354); // Feet
-		  public static final Distance LENGTH = Feet.of(1.25); // Feet
-		  public static final Distance HEIGHT = Feet.of(0.8); // Feet
-		  public static final Angle YAW = Degree.of(45); // Degrees
+		  public static final Distance LENGTH = Feet.of(0.5); // Feet
+		  public static final Distance HEIGHT = Feet.of(0.7); // Feet
+		  public static final Angle RAMP_ANGLE = Degree.of(35.0); // Degree
+		  public static final LinearVelocity SPAWN_VELOCITY = FeetPerSecond.of(3);
+		  public static final double ANGLE_DIFFERENCE_THRESHOLD = 0.05;
+		  public static final Angle WRIST_DIFFERENCE_THRESHOLD = Degree.of(20); // Degree
+		  public static final Time IN_ZONE_TIME = Second.of(0.5); // Second
 		}
 	
 		public static final boolean ASSUME_START_WITH_CORAL = true;

@@ -26,6 +26,7 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.objects.RectangularPrism;
 import frc.robot.utilities.math.PoseUtilities;
+import frc.robot.utilities.math.VectorUtilities;
 
 public class ClawSimulation {
 
@@ -123,13 +124,11 @@ public class ClawSimulation {
 
         // Compute the dot product of both translation vectors
         // Using the quaternion to compute the dot product doesn't product the expected result
-        double rotationDotProduct = (clawNinety.getX() * pieceForward.getX()) + 
-                                    (clawNinety.getY() * pieceForward.getY()) + 
-                                    (clawNinety.getZ() * pieceForward.getZ());
+        double rotationNormalizedDotProduct = VectorUtilities.normalizedDotProduct(clawNinety, pieceForward);
 
         // The dot product is 1 or -1 if they are perfectly aligned
         // 1 - the absolute of the dot product is how close it is to 1 or -1
-        return 1 - Math.abs(rotationDotProduct) < 0.15;
+        return rotationNormalizedDotProduct < 0.125;
     }
 
     private record PickupCandidate(
