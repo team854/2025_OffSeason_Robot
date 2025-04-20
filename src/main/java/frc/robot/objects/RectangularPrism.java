@@ -102,10 +102,10 @@ public class RectangularPrism {
 			}
 		}
 
-		// This helps handle edge edge collsions
+		// This helps handle edge to edge collsions
 		for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-				Translation3d crossAxis = VectorUtilities.crossProduct(shapeAxis[i], shapeAxis[j + 3]);
+            for (int j = 3; j < 6; j++) {
+				Translation3d crossAxis = VectorUtilities.crossProduct(shapeAxis[i], shapeAxis[j]);
 
 				double crossMagnitude = crossAxis.getDistance(new Translation3d());
 
