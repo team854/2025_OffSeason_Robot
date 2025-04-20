@@ -110,7 +110,7 @@ public class ClawSimulation {
     }
 
     /**
-     * Checks if the piece and the claw are aligned (Credit to claude 3.7)
+     * Checks if the piece and the claw are aligned (Credit to claude 3.7)(I only asked it for the dot product cause I didn't know about the cross product (oops))
      * 
      * @param piecePose The pose of the game piece
      * @param clawQuaternion The quaternion of the claw rotated by 90 degrees in the z axis

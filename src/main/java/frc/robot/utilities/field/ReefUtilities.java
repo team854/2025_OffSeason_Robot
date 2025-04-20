@@ -11,7 +11,7 @@ import edu.wpi.first.units.measure.Distance;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
-public class ReefUtilities {
+public final class ReefUtilities {
 
     /**
      * 

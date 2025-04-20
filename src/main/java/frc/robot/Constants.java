@@ -346,9 +346,9 @@ public final class Constants {
 			public static final int ID = 6;
 
 			public static class Simulation {
-				public static final Distance WIDTH = Feet.of(1); // Feet
-				public static final Distance LENGTH = Feet.of(0.8); // Feet
-				public static final Distance HEIGHT = Feet.of(0.8); // Feet
+				public static final Distance WIDTH = Feet.of(0.9); // Feet
+				public static final Distance LENGTH = Feet.of(0.7); // Feet
+				public static final Distance HEIGHT = Feet.of(0.6); // Feet
 				public static final LinearVelocity OUTTAKE_VELOCITY = FeetPerSecond.of(0.984252); // Feet/Second
 			}
 		}
@@ -411,6 +411,18 @@ public final class Constants {
 		public static final Distance SCORING_OFFSET = Feet.of(0.05); // Feet
 	}
 
+	public static class CoralStationConstants {
+		public static class FieldConstants {
+		  public static final int[] BLUE_ALLIANCE_CORAL_STATION_TAG_IDS = {13, 12}; // Left, Right
+		  public static final int[] RED_ALLIANCE_CORAL_STATION_TAG_IDS = {1, 2}; // Left, Right
+		}
+	
+		public static final double RIGHT_OFFSET = -2; // Feet (For the right alliance coral station)
+		public static final double FOWARD_OFFSET = -0.15; // Feet
+		public static final double VERTICAL_OFFSET = 3.25; // Feet (From the carpet)
+		public static final double PICK_UP_ANGLE = 45; // Degrees
+	  }
+
 	public static class AutoConstants {
 		public static final LinearVelocity TRANSLATION_MAX_VELOCITY = FeetPerSecond.of(10.0);
 		public static final LinearAcceleration TRANSLATION_MAX_ACCELERATION = FeetPerSecondPerSecond.of(3.0);
@@ -463,7 +475,7 @@ public final class Constants {
 		  public static final Distance FOWARD_OFFSET = Feet.of(-0.4); // Feet
 		  public static final Distance VERTICAL_OFFSET = Feet.of(-1.49); // Feet
 		  public static final Distance WIDTH = Feet.of(6.354); // Feet
-		  public static final Distance LENGTH = Feet.of(1.5); // Feet
+		  public static final Distance LENGTH = Feet.of(1.25); // Feet
 		  public static final Distance HEIGHT = Feet.of(0.8); // Feet
 		  public static final Angle YAW = Degree.of(45); // Degrees
 		}

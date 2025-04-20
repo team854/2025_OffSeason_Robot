@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 
-public class TagUtilities {
+public final class TagUtilities {
     /**
      * Gets the pose of an april tag
      * 
