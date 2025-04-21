@@ -9,9 +9,11 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.utilities.math.PoseUtilities;
 
@@ -20,6 +22,7 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 	 * Constants
 	 */
 	private final double pivotPointOffset = RobotContainer.elevatorSubsystem.getPivotPointOffset(false).in(Meter);
+	private final boolean isSimulation = Robot.isSimulation();
 
     public RobotAnimationSubsystem() {
 
@@ -106,7 +109,13 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 		 */
 
 		if (RobotContainer.endEffectorSubsystem.hasCoral()) {
-			SmartDashboard.putNumberArray("Arm/Intake/Coral/Position", PoseUtilities.convertPoseToNumbers(RobotContainer.endEffectorSubsystem.calculateCoralPose(robotPose)));
+			Pose3d coralPose = RobotContainer.endEffectorSubsystem.calculateCoralPose(robotPose);
+
+			if (isSimulation) {
+				coralPose = coralPose.transformBy(new Transform3d(RobotContainer.endEffectorSubsystem.getClawSimulation().getCoralOffset().in(Meter), 0, 0, new Rotation3d()));
+			}
+
+			SmartDashboard.putNumberArray("Arm/Intake/Coral/Position", PoseUtilities.convertPoseToNumbers(coralPose));
 		} else {
 			SmartDashboard.putNumberArray("Arm/Intake/Coral/Position", PoseUtilities.convertPoseToNumbers(new Pose3d(5, 5, -5, new Rotation3d())));
 		}

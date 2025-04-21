@@ -98,7 +98,7 @@ public class CoralFlightSim extends ReefscapeCoralOnFly {
                                 ,
                         getPositionAtTime(super.launchedTimer.get()).getZ()),
                 new Pose2d(
-                        getPositionAtTime(launchedTimer.get()).toTranslation2d(), initialLaunchingVelocityMPS.getAngle()),
+                        getPositionAtTime(launchedTimer.get()).toTranslation2d(), Rotation2d.fromRadians(gamePieceRotation.getZ())),
                 super.initialLaunchingVelocityMPS));
     }
 }

@@ -90,6 +90,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     public Pose3d calculateCoralPose(Pose3d robotPose) {
         Pose3d endEffectorPose = calculateEndEffectorPose(robotPose);
+        
         return new Pose3d(endEffectorPose.getTranslation(), new Rotation3d(endEffectorPose.getRotation().getQuaternion().times(ninetyZRotation)));
     }
 

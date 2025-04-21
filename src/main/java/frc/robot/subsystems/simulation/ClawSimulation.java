@@ -18,9 +18,11 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Unit;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -43,6 +45,7 @@ public class ClawSimulation {
 
     private final int gamePieceCapacity;
     private int gamePieceCount;
+    private double gamePieceOffset;
 
     private boolean active;
 
@@ -56,6 +59,8 @@ public class ClawSimulation {
 
         this.gamePieceCount = 0;
         this.active = false;
+
+        this.gamePieceOffset = 0;
     }
 
     public void setActiveStage(boolean active) {
@@ -102,12 +107,16 @@ public class ClawSimulation {
 
     /**
      * 
-     * @return The pose of the piece when its being held by the claw
+     * @return The pose of the piece when its being held by the claw including the coral offset
      */
-    private Pose3d getPiecePose() {
+    public Pose3d getPiecePose() {
         Pose3d clawPose = this.pickupVolume.getCenterPose();
 
-        return new Pose3d(clawPose.getTranslation(), new Rotation3d(clawPose.getRotation().getQuaternion().times(ninetyZRotation)));
+        Pose3d coralPose = new Pose3d(clawPose.getTranslation(), new Rotation3d(clawPose.getRotation().getQuaternion().times(ninetyZRotation)));
+
+        coralPose = coralPose.transformBy(new Transform3d(this.gamePieceOffset, 0, 0, new Rotation3d()));
+
+        return coralPose;
     }
 
     /**
@@ -129,6 +138,10 @@ public class ClawSimulation {
         // The dot product is 1 or -1 if they are perfectly aligned
         // 1 - the absolute of the dot product is how close it is to 1 or -1
         return rotationNormalizedDotProduct < 0.125;
+    }
+
+    public Distance getCoralOffset() {
+        return Meter.of(this.gamePieceOffset);
     }
 
     private record PickupCandidate(
@@ -200,6 +213,13 @@ public class ClawSimulation {
             return;
         }
 
+        // Calculate the offset of the piece relative to the claw
+        Translation3d pieceTranslation = lowestPiece.piecePose.getTranslation();
+
+        pieceTranslation = pieceTranslation.minus(clawPose.getTranslation()).rotateBy(clawPose.getRotation().unaryMinus());
+
+        this.gamePieceOffset = pieceTranslation.getY();
+
         if (lowestPiece.objectReference instanceof GamePieceOnFieldSimulation) {
             // If its a field piece it remove notify it that it is being intaked then remove it
             GamePieceOnFieldSimulation gamePiece = (GamePieceOnFieldSimulation) lowestPiece.objectReference;
@@ -214,4 +234,6 @@ public class ClawSimulation {
             this.gamePieceCount++;
         }
     }
+
+
 }

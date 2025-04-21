@@ -348,7 +348,7 @@ public final class Constants {
 			public static final int ID = 6;
 
 			public static class Simulation {
-				public static final Distance WIDTH = Feet.of(0.95); // Feet
+				public static final Distance WIDTH = Feet.of(1.05); // Feet
 				public static final Distance LENGTH = Feet.of(0.7); // Feet
 				public static final Distance HEIGHT = Feet.of(0.65); // Feet
 				public static final LinearVelocity OUTTAKE_VELOCITY = FeetPerSecond.of(1); // Feet/Second
@@ -426,8 +426,8 @@ public final class Constants {
 	  }
 
 	public static class AutoConstants {
-		public static final LinearVelocity TRANSLATION_MAX_VELOCITY = FeetPerSecond.of(10.0);
-		public static final LinearAcceleration TRANSLATION_MAX_ACCELERATION = FeetPerSecondPerSecond.of(3.0);
+		public static final LinearVelocity TRANSLATION_MAX_VELOCITY = FeetPerSecond.of(12.0);
+		public static final LinearAcceleration TRANSLATION_MAX_ACCELERATION = FeetPerSecondPerSecond.of(4.0);
 		public static final AngularVelocity ROTATION_MAX_VELOCITY = DegreesPerSecond.of(180.0);
 		public static final AngularAcceleration ROTATION_MAX_ACCELERATION = DegreesPerSecondPerSecond.of(45.0);
 	}
