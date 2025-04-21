@@ -39,7 +39,7 @@ public final class ReefUtilities {
         for (int tagID : tagPoses) {
             Pose2d tagPose = TagUtilities.getTagPose(tagID).toPose2d();
 
-            // Compute the distance bettween the robot and the tag is 2d space
+            // Compute the distance bettween the robot and the tag in 2d space
             double tagDistance = tagPose.getTranslation().getDistance(pose.getTranslation());
             if (tagDistance < Constants.ReefConstants.CLOSE_DISTANCE.in(Meter) && tagDistance < lowestTagDistance) {
                 lowestTagDistance = tagDistance;

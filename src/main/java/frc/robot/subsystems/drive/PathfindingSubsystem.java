@@ -1,5 +1,10 @@
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+
 import java.util.List;
 import java.util.Map;
 
@@ -8,12 +13,17 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.utilities.files.FileUtilities;
 import frc.robot.utilities.files.JsonUtilities;
+import frc.robot.utilities.pathfinding.LocalADStarAK;
 
 public class PathfindingSubsystem extends SubsystemBase {
     public RobotConfig pathPlannerConfig;
@@ -77,6 +87,18 @@ public class PathfindingSubsystem extends SubsystemBase {
                 RobotContainer.swerveSubsystem // Reference to this subsystem to set requirements
         );
 
+        Pathfinding.setPathfinder(new LocalADStarAK());
+        PathPlannerLogging.setLogActivePathCallback((activePath) -> {
+            RobotContainer.smartDashboardSubsystem.pathplannerPathTelemetryCallback(activePath);
+        });
+
         PathfindingCommand.warmupCommand().schedule();
+    }
+
+    public PathConstraints getPathConstraints() {
+        return new PathConstraints(Constants.AutoConstants.TRANSLATION_MAX_VELOCITY.in(MetersPerSecond),
+                Constants.AutoConstants.TRANSLATION_MAX_ACCELERATION.in(MetersPerSecondPerSecond),
+                Constants.AutoConstants.ROTATION_MAX_VELOCITY.in(RadiansPerSecond),
+                Constants.AutoConstants.ROTATION_MAX_ACCELERATION.in(RadiansPerSecondPerSecond));
     }
 }

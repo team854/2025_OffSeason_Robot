@@ -236,7 +236,7 @@ public final class Constants {
 		public static final Distance TRANSLATION_ACCEPTABLE_ERROR = Feet.of(0.1); // Feet
 		public static final Angle ROTATION_ACCEPTABLE_ERROR = Degree.of(2); // Degrees
 
-		public static final boolean ENABLE_FEED_FOWARD = true; // Controls if feed foward should be enabled in the auto
+		public static final boolean ENABLE_FEED_FOWARD = false; // Controls if feed foward should be enabled in the auto
 
 		public static final double ANGLE_JOYSTICK_RADIUS_DEADBAND = 0.5;
 		public static final List<String> MODULE_FILES = List.of("frontleft.json", "frontright.json", "backleft.json", "backright.json");
@@ -381,7 +381,7 @@ public final class Constants {
 			public static final int[] RED_ALLIANCE_REEF_TAG_IDS = {10, 9, 8, 7, 6, 11};
 
 			public static class L1 {
-				public static final Distance MAX_HEIGHT = Feet.of(2); // Feet
+				public static final Distance MAX_HEIGHT = Feet.of(1.9); // Feet
 				public static final Angle BRANCH_ANGLE = Degree.of(-30.0); // Degrees
 				public static final Angle WRIST_ANGLE = Degree.of(0); // Degrees
 			}
@@ -419,15 +419,15 @@ public final class Constants {
 		  public static final int[] RED_ALLIANCE_CORAL_STATION_TAG_IDS = {1, 2}; // Left, Right
 		}
 	
-		public static final double RIGHT_OFFSET = -2; // Feet (For the right alliance coral station)
-		public static final double FOWARD_OFFSET = -0.15; // Feet
-		public static final double VERTICAL_OFFSET = 3.25; // Feet (From the carpet)
-		public static final double PICK_UP_ANGLE = 45; // Degrees
+		public static final Distance RIGHT_OFFSET = Feet.of(-2.0); // Feet (For the right alliance coral station)
+		public static final Distance FOWARD_OFFSET = Feet.of(-0.15); // Feet
+		public static final Distance VERTICAL_OFFSET = Feet.of(3.25); // Feet (From the carpet)
+		public static final Angle PICK_UP_ANGLE = Degree.of(45.0); // Degrees
 	  }
 
 	public static class AutoConstants {
 		public static final LinearVelocity TRANSLATION_MAX_VELOCITY = FeetPerSecond.of(12.0);
-		public static final LinearAcceleration TRANSLATION_MAX_ACCELERATION = FeetPerSecondPerSecond.of(4.0);
+		public static final LinearAcceleration TRANSLATION_MAX_ACCELERATION = FeetPerSecondPerSecond.of(7.0);
 		public static final AngularVelocity ROTATION_MAX_VELOCITY = DegreesPerSecond.of(180.0);
 		public static final AngularAcceleration ROTATION_MAX_ACCELERATION = DegreesPerSecondPerSecond.of(45.0);
 	}

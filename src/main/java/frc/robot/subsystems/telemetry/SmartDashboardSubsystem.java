@@ -5,11 +5,15 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import java.util.List;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.commands.drive.MoveToPoseCommand;
+import frc.robot.commands.drive.PathfindToPoseCommand;
 import frc.robot.objects.VisionEstimate;
 import frc.robot.subsystems.vision.VisionCamera;
 import frc.robot.utilities.math.PoseUtilities;
@@ -71,6 +75,12 @@ public class SmartDashboardSubsystem extends SubsystemBase {
 
     public void sendPathfindingTelemetry() {
         SmartDashboard.putNumberArray("Pathfinding/Move To Pose/Goal Pose", PoseUtilities.convertPoseToNumbers(MoveToPoseCommand.globalGoalPose));
+
+        SmartDashboard.putNumberArray("Pathfinding/Pathfind To Pose/Goal Pose", PoseUtilities.convertPoseToNumbers(PathfindToPoseCommand.globalGoalPose));
+    }
+
+    public void pathplannerPathTelemetryCallback(List<Pose2d> activePath) {
+        SmartDashboard.putNumberArray("Pathfinding/Pathfind To Pose/Active Path", PoseUtilities.convertPoseArrayToNumbers(activePath.toArray(new Pose2d[0])));
     }
 
     public void sendEndEffectorTelemetry() {

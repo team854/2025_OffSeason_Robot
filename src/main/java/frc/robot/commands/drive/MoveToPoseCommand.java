@@ -21,6 +21,7 @@ public class MoveToPoseCommand extends Command {
      * Constants
      */
     private final double maxVelocity = Constants.AutoConstants.TRANSLATION_MAX_VELOCITY.in(MetersPerSecond);
+    private final double maxAngularVelocity = Constants.AutoConstants.ROTATION_MAX_VELOCITY.in(RadiansPerSecond);
 
     /*
      * Public variable
@@ -105,8 +106,8 @@ public class MoveToPoseCommand extends Command {
         double translationX = MathUtil.clamp(this.translationXController.calculate(robotPose.getX()), -maxVelocity, maxVelocity);
         double translationY = MathUtil.clamp(this.translationYController.calculate(robotPose.getY()), -maxVelocity, maxVelocity);
 
-        double heading = this.headingController
-                .calculate(RobotContainer.swerveSubsystem.swerveDrive.getOdometryHeading().getRadians());
+        double heading = MathUtil.clamp(this.headingController
+                .calculate(RobotContainer.swerveSubsystem.swerveDrive.getOdometryHeading().getRadians()), -maxAngularVelocity, maxAngularVelocity);
 
         RobotContainer.swerveSubsystem.swerveDrive
                 .driveFieldOriented(new ChassisSpeeds(translationX, translationY, heading / 1.5));

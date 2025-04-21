@@ -155,13 +155,6 @@ public class RectangularPrism {
 			topLeftFront, topRightFront, topRightBack, topLeftBack, topLeftFront, bottomLeftFront, bottomRightFront, topRightFront, bottomRightFront, bottomRightBack, topRightBack, bottomRightBack, bottomLeftBack, topLeftBack, bottomLeftBack, bottomLeftFront
 		};
 
-		List<Double> outputArray = new ArrayList<>();
-		for (Pose3d pose : outputPoses) {
-			double[] poseDoubleList = PoseUtilities.convertPoseToNumbers(pose);
-			for (double num : poseDoubleList) {
-				outputArray.add(num);
-			}
-		}
-		return outputArray.toArray(new Double[0]);
+		return PoseUtilities.convertPoseArrayToNumbers(outputPoses);
 	}
 }

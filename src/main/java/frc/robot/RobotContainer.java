@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.commands.auto.AutoPickupCoralStation;
 import frc.robot.commands.auto.AutoScoreCoralCommand;
 import frc.robot.commands.elevator.ControlElevatorBothStagesCommand;
 import frc.robot.commands.setpoints.GroundPickupConfigurationCommand;
@@ -16,6 +17,7 @@ import frc.robot.subsystems.arm.EndEffectorSubsystem;
 import frc.robot.subsystems.arm.ShoulderSubsystem;
 import frc.robot.subsystems.arm.WristSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.drive.PathfindingSubsystem;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.simulation.SimulationSubsystem;
@@ -36,6 +38,7 @@ public class RobotContainer {
 	public static final EndEffectorSubsystem endEffectorSubsystem = new EndEffectorSubsystem();
 	public static final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
 	public static final VisionSubsystem visionSubsystem = new VisionSubsystem();
+	public static final PathfindingSubsystem pathfindingSubsystem = new PathfindingSubsystem();
 	public static final RobotAnimationSubsystem robotAnimationSubsystem = new RobotAnimationSubsystem();
 	public static final SmartDashboardSubsystem smartDashboardSubsystem = new SmartDashboardSubsystem();
 	public static SimulationSubsystem simulationSubsystem;
@@ -105,6 +108,10 @@ public class RobotContainer {
 		*/
 		driverController.button(9).onTrue(new GroundPickupConfigurationCommand());
 
+		/*
+		* Auto coral station pickup
+		*/
+		driverController.button(10).onTrue(new AutoPickupCoralStation(true));
 
 		/*
 		* Climb commands
