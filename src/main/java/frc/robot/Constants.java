@@ -236,6 +236,8 @@ public final class Constants {
 		public static final Distance TRANSLATION_ACCEPTABLE_ERROR = Feet.of(0.1); // Feet
 		public static final Angle ROTATION_ACCEPTABLE_ERROR = Degree.of(2); // Degrees
 
+		public static final boolean ENABLE_FEED_FOWARD = true; // Controls if feed foward should be enabled in the auto
+
 		public static final double ANGLE_JOYSTICK_RADIUS_DEADBAND = 0.5;
 		public static final List<String> MODULE_FILES = List.of("frontleft.json", "frontright.json", "backleft.json", "backright.json");
 		public static final String SWERVECONFIGDIR = "swerve";
@@ -463,7 +465,7 @@ public final class Constants {
 
 	public static class SimulationConstants {
 		public static class StartingSpawnCoral {
-		  public static final boolean ENABLED = true;
+		  public static final boolean ENABLED = false;
 		  public static final int SPAWN_COUNT = 24;
 		  public static final Distance SPAWN_X = Feet.of(5); // Feet
 		  public static final Distance SPAWN_Y = Feet.of(5); // Feet

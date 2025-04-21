@@ -111,6 +111,7 @@ public class CoralStationSimulation {
 
         if (inZoneTimer.isRunning()) {
 
+            // Check to make sure a coral hasn't already been dispensed and it has been a certain number of seconds
             if (this.inZoneCount == 1 && inZoneTimer.hasElapsed(Constants.SimulationConstants.CoralStations.IN_ZONE_TIME.in(Second))) {
                 Pose3d finalCoralSpawnPose = offsetCoralSpawnPoint(endEffPose);
 

@@ -73,7 +73,6 @@ public class SimulationSubsystem extends SubsystemBase {
     }
 
     private void setupCoralStations() {
-
         List<CoralStationSimulation> tempCoralStations = new ArrayList<>();
 
         int[] coralStationTagIDs = RobotContainer.isBlueAlliance()
@@ -106,6 +105,7 @@ public class SimulationSubsystem extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
         if (Constants.SimulationConstants.CoralStations.ENABLED) {
+            // Itterate on each coral stations simulation
             for (CoralStationSimulation coralStation : coralStationArray) {
                 coralStation.iterate();
             }

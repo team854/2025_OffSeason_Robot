@@ -137,6 +137,7 @@ public class VisionSubsystem extends SubsystemBase {
                 continue;
             }
 
+            // Add 1 to the valid targets and add to the total ambiguity and distance
             validTargets++;
             averageAmbiguity += target.getPoseAmbiguity();
             averageDistance += targetPose
@@ -149,10 +150,13 @@ public class VisionSubsystem extends SubsystemBase {
         averageDistance /= validTargets;
         averageAmbiguity /= validTargets;
 
+        // If there is more then one target the measurement is probably more reliable
         if (validTargets > 1) {
             stdDevs = Constants.VisionConstants.VISION_MULTI_TAG_STD_DEVS;
         }
 
+        // If there is only one target and its outside of the cameras effective range
+        // disregard the pose estimate
         if (validTargets == 1 && averageDistance > camera.getEffectiveRange().in(Meter)) {
             stdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         } else {
@@ -187,6 +191,7 @@ public class VisionSubsystem extends SubsystemBase {
 			// Update the estimatedPose's std devs
 			estimatedPose.stdDevs = updateEstimateStdDevs(estimatedPose, camera);
 
+            // Add the vision mesurement to the swerve simulation
 			RobotContainer.swerveSubsystem.addVisionMeasurement(estimatedPose);
 
 			visionEstimates[index] = estimatedPose;
