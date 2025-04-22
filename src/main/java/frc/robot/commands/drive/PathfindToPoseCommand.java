@@ -27,22 +27,22 @@ public class PathfindToPoseCommand extends Command {
         System.out.println("Pathfinding to pose: " + this.goalPose.toString());
 
         PathfindToPoseCommand.globalGoalPose = this.goalPose;
-        pathfindCommand = AutoBuilder.pathfindToPose(this.goalPose, RobotContainer.pathfindingSubsystem.getPathConstraints(), goalEndSpeed);
-        pathfindCommand.initialize();
+        this.pathfindCommand = AutoBuilder.pathfindToPose(this.goalPose, RobotContainer.pathfindingSubsystem.getPathConstraints(), goalEndSpeed);
+        this.pathfindCommand.initialize();
     }
 
     @Override
     public void execute() {
-        pathfindCommand.execute();
+        this.pathfindCommand.execute();
     }
 
     @Override
     public boolean isFinished() {
-        return pathfindCommand.isFinished();
+        return this.pathfindCommand.isFinished();
     }
 
     @Override
     public void end(boolean interrupted) {
-        pathfindCommand.end(interrupted);
+        this.pathfindCommand.end(interrupted);
     }
 }

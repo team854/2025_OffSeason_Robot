@@ -215,9 +215,9 @@ public final class Constants {
 		}
 
 		public static class TranslationPID {
-			public static final double P = 7;
+			public static final double P = 6;
 			public static final double I = 0;
-			public static final double D = 0.1;
+			public static final double D = 0.15;
 		}
 
 		public static class HeadingPID {
@@ -430,6 +430,8 @@ public final class Constants {
 		public static final LinearAcceleration TRANSLATION_MAX_ACCELERATION = FeetPerSecondPerSecond.of(7.0);
 		public static final AngularVelocity ROTATION_MAX_VELOCITY = DegreesPerSecond.of(180.0);
 		public static final AngularAcceleration ROTATION_MAX_ACCELERATION = DegreesPerSecondPerSecond.of(45.0);
+		public static final double TRANSLATION_FEEDFOWARD_DIVISOR = 3.5;
+		public static final double ROTATION_FEEDFOWARD_DIVISOR = 4;
 	}
 
 	public static class VisionConstants {

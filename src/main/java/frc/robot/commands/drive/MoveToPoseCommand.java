@@ -36,6 +36,9 @@ public class MoveToPoseCommand extends Command {
     private final PIDController headingController;
     private final Pose2d goalPose;
     private final boolean endAtPose;
+    private double translationX;
+    private double translationY;
+	private double heading;
 
     /**
      * 
@@ -97,20 +100,37 @@ public class MoveToPoseCommand extends Command {
         this.headingController
                 .setTolerance(Constants.SwerveConstants.ROTATION_ACCEPTABLE_ERROR.in(Radian));
         
+        // Set the starting translation and heading values
+        this.translationX = 0;
+        this.translationY = 0;
+		this.heading = 0;
+
         System.out.println("Moving to pose: " + MoveToPoseCommand.globalGoalPose.toString());
     }
 
     @Override
     public void execute() {
-        Pose2d robotPose = RobotContainer.swerveSubsystem.getPose();
-        double translationX = MathUtil.clamp(this.translationXController.calculate(robotPose.getX()), -maxVelocity, maxVelocity);
-        double translationY = MathUtil.clamp(this.translationYController.calculate(robotPose.getY()), -maxVelocity, maxVelocity);
+		Pose2d robotPose = RobotContainer.swerveSubsystem.getPose();
 
-        double heading = MathUtil.clamp(this.headingController
+		// Save the old translations and heading 
+		double oldTranslationX = this.translationX;
+		double oldTranslationY = this.translationY;
+		double oldHeading = this.heading;
+
+		// Calculate the new translation and heading values
+        this.translationX = MathUtil.clamp(this.translationXController.calculate(robotPose.getX()), -maxVelocity, maxVelocity);
+        this.translationY = MathUtil.clamp(this.translationYController.calculate(robotPose.getY()), -maxVelocity, maxVelocity);
+		this.heading = MathUtil.clamp(this.headingController
                 .calculate(RobotContainer.swerveSubsystem.swerveDrive.getOdometryHeading().getRadians()), -maxAngularVelocity, maxAngularVelocity);
 
+		// Calculate the delta in bettween the old and new translation and then divide it by a constant
+		double finalTranslationX = this.translationX + ((this.translationX - oldTranslationX) / Constants.AutoConstants.TRANSLATION_FEEDFOWARD_DIVISOR);
+		double finalTranslationY = this.translationY + ((this.translationY - oldTranslationY) / Constants.AutoConstants.TRANSLATION_FEEDFOWARD_DIVISOR);
+		double finalHeading = this.heading + ((this.heading - oldHeading) / Constants.AutoConstants.ROTATION_FEEDFOWARD_DIVISOR);
+        
+
         RobotContainer.swerveSubsystem.swerveDrive
-                .driveFieldOriented(new ChassisSpeeds(translationX, translationY, heading / 1.5));
+                .driveFieldOriented(new ChassisSpeeds(finalTranslationX, finalTranslationY, finalHeading / 1.5));
     }
 
     @Override
@@ -122,9 +142,7 @@ public class MoveToPoseCommand extends Command {
         return this.translationXController.atGoal()
                 && this.translationYController.atGoal()
                 && this.headingController.atSetpoint()
-                && Math.abs(RobotContainer.swerveSubsystem.getRobotVelocity().omegaRadiansPerSecond) < Constants.SwerveConstants.ROTATION_ZERO_THRESHOLD.in(RadiansPerSecond)
-                && RobotContainer.swerveSubsystem.convertChassisSpeed(RobotContainer.swerveSubsystem
-                        .getRobotVelocity()).in(MetersPerSecond) < Constants.SwerveConstants.TRANSLATION_ZERO_THRESHOLD.in(MetersPerSecond);
+                && RobotContainer.swerveSubsystem.isStopped();
     }
 
     @Override
