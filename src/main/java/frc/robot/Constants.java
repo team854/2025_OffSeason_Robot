@@ -429,8 +429,8 @@ public final class Constants {
 		public static final LinearVelocity TRANSLATION_MAX_VELOCITY = FeetPerSecond.of(12.0);
 		public static final LinearAcceleration TRANSLATION_MAX_ACCELERATION = FeetPerSecondPerSecond.of(7.0);
 		public static final AngularVelocity ROTATION_MAX_VELOCITY = DegreesPerSecond.of(180.0);
-		public static final AngularAcceleration ROTATION_MAX_ACCELERATION = DegreesPerSecondPerSecond.of(45.0);
-		public static final double TRANSLATION_FEEDFOWARD_DIVISOR = 3.5;
+		public static final AngularAcceleration ROTATION_MAX_ACCELERATION = DegreesPerSecondPerSecond.of(180.0);
+		public static final double TRANSLATION_FEEDFOWARD_DIVISOR = 2;
 		public static final double ROTATION_FEEDFOWARD_DIVISOR = 4;
 	}
 

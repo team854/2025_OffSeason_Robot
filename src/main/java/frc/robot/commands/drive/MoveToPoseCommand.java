@@ -5,13 +5,16 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -31,14 +34,12 @@ public class MoveToPoseCommand extends Command {
     /*
      * Control
      */
-    private final ProfiledPIDController translationXController;
-    private final ProfiledPIDController translationYController;
-    private final PIDController headingController;
-    private final Pose2d goalPose;
+    private final ProfiledPIDController translationController;
+    private final ProfiledPIDController headingController;
     private final boolean endAtPose;
-    private double translationX;
-    private double translationY;
-	private double heading;
+    private Pose2d goalPose;
+    private double oldTranslationSpeed;
+    private double oldHeadingSpeed;
 
     /**
      * 
@@ -50,24 +51,21 @@ public class MoveToPoseCommand extends Command {
         this.endAtPose = endAtPose;
         
         TrapezoidProfile.Constraints translatioConstraints = new TrapezoidProfile.Constraints(maxVelocity, Constants.AutoConstants.TRANSLATION_MAX_ACCELERATION.in(MetersPerSecondPerSecond));
+        TrapezoidProfile.Constraints headingConstraints = new TrapezoidProfile.Constraints(Constants.AutoConstants.ROTATION_MAX_VELOCITY.in(RadiansPerSecond), Constants.AutoConstants.ROTATION_MAX_ACCELERATION.in(RadiansPerSecondPerSecond));
         
-        // Configure the translation pids
-        this.translationXController = new ProfiledPIDController(
-                Constants.SwerveConstants.TranslationPID.P,
-                Constants.SwerveConstants.TranslationPID.I,
-                Constants.SwerveConstants.TranslationPID.D,
-                translatioConstraints);
-        this.translationYController = new ProfiledPIDController(
+        // Configure the translation pid
+        this.translationController = new ProfiledPIDController(
                 Constants.SwerveConstants.TranslationPID.P,
                 Constants.SwerveConstants.TranslationPID.I,
                 Constants.SwerveConstants.TranslationPID.D,
                 translatioConstraints);
 
         // Configure the heading pid and enable continuous input
-        this.headingController = new PIDController(
+        this.headingController = new ProfiledPIDController(
                 Constants.SwerveConstants.HeadingPID.P,
                 Constants.SwerveConstants.HeadingPID.I,
-                Constants.SwerveConstants.HeadingPID.D);
+                Constants.SwerveConstants.HeadingPID.D,
+                headingConstraints);
         this.headingController.enableContinuousInput(-Math.PI, Math.PI);
 
         addRequirements(RobotContainer.swerveSubsystem);
@@ -75,10 +73,19 @@ public class MoveToPoseCommand extends Command {
 
     public void setGoalPose(Pose2d goalPose) {
         MoveToPoseCommand.globalGoalPose = goalPose;
+        this.goalPose = goalPose;
 
-        this.translationXController.setGoal(goalPose.getX());
-        this.translationYController.setGoal(goalPose.getY());
-	this.headingController.setSetpoint(goalPose.getRotation().getRadians());
+        this.translationController.setGoal(0);
+
+        this.headingController.setGoal(goalPose.getRotation().getRadians());
+    }
+    
+    private Distance getTargetDistance(Pose2d robotPose) {
+        return Meter.of(robotPose.getTranslation().getDistance(this.goalPose.getTranslation()));
+    }
+
+    private Distance getTargetDistance(Translation2d robotPose) {
+        return Meter.of(robotPose.getDistance(this.goalPose.getTranslation()));
     }
 
     @Override
@@ -88,22 +95,19 @@ public class MoveToPoseCommand extends Command {
         Pose2d robotPose = RobotContainer.swerveSubsystem.getPose();
 
         // Reset the pids
-        this.translationXController.reset(robotPose.getX());
-        this.translationYController.reset(robotPose.getY());
-        this.headingController.reset();
+        this.translationController.reset(getTargetDistance(robotPose).in(Meter));
+        this.headingController.reset(robotPose.getRotation().getRadians());
 
         // Set the tolerance of the pids
-        this.translationXController
-                .setTolerance(Constants.SwerveConstants.TRANSLATION_ACCEPTABLE_ERROR.in(Meter));
-        this.translationYController
+        this.translationController
                 .setTolerance(Constants.SwerveConstants.TRANSLATION_ACCEPTABLE_ERROR.in(Meter));
         this.headingController
                 .setTolerance(Constants.SwerveConstants.ROTATION_ACCEPTABLE_ERROR.in(Radian));
-        
-        // Set the starting translation and heading values
-        this.translationX = 0;
-        this.translationY = 0;
-		this.heading = 0;
+
+        ChassisSpeeds curentSpeeds = RobotContainer.swerveSubsystem.swerveDrive.getFieldVelocity();
+
+        this.oldTranslationSpeed = new Translation2d(curentSpeeds.vxMetersPerSecond, curentSpeeds.vyMetersPerSecond).getNorm();
+        this.oldHeadingSpeed = curentSpeeds.omegaRadiansPerSecond;
 
         System.out.println("Moving to pose: " + MoveToPoseCommand.globalGoalPose.toString());
     }
@@ -112,25 +116,26 @@ public class MoveToPoseCommand extends Command {
     public void execute() {
 		Pose2d robotPose = RobotContainer.swerveSubsystem.getPose();
 
-		// Save the old translations and heading 
-		double oldTranslationX = this.translationX;
-		double oldTranslationY = this.translationY;
-		double oldHeading = this.heading;
+        Distance targetDistance = getTargetDistance(robotPose);
 
-		// Calculate the new translation and heading values
-        this.translationX = MathUtil.clamp(this.translationXController.calculate(robotPose.getX()), -maxVelocity, maxVelocity);
-        this.translationY = MathUtil.clamp(this.translationYController.calculate(robotPose.getY()), -maxVelocity, maxVelocity);
-		this.heading = MathUtil.clamp(this.headingController
-                .calculate(RobotContainer.swerveSubsystem.swerveDrive.getOdometryHeading().getRadians()), -maxAngularVelocity, maxAngularVelocity);
+        double rotationDifference = Math.atan2(this.goalPose.getY() - robotPose.getY(), this.goalPose.getX() - robotPose.getX());
 
-		// Calculate the delta in bettween the old and new translation and then divide it by a constant
-		double finalTranslationX = this.translationX + ((this.translationX - oldTranslationX) / Constants.AutoConstants.TRANSLATION_FEEDFOWARD_DIVISOR);
-		double finalTranslationY = this.translationY + ((this.translationY - oldTranslationY) / Constants.AutoConstants.TRANSLATION_FEEDFOWARD_DIVISOR);
-		double finalHeading = this.heading + ((this.heading - oldHeading) / Constants.AutoConstants.ROTATION_FEEDFOWARD_DIVISOR);
+        double targetTranslation = -this.translationController.calculate(targetDistance.in(Meter), 0);
+        double heading = this.headingController
+                .calculate(RobotContainer.swerveSubsystem.swerveDrive.getOdometryHeading().getRadians());
+        
+        double translationDelta = (targetTranslation - this.oldTranslationSpeed) / Constants.AutoConstants.TRANSLATION_FEEDFOWARD_DIVISOR;
+        double headingDelta = (heading - this.oldHeadingSpeed) / Constants.AutoConstants.ROTATION_FEEDFOWARD_DIVISOR;
+
+        double translationX = (targetTranslation + translationDelta) * Math.cos(rotationDifference);
+        double translationY = (targetTranslation + translationDelta) * Math.sin(rotationDifference);
         
 
         RobotContainer.swerveSubsystem.swerveDrive
-                .driveFieldOriented(new ChassisSpeeds(finalTranslationX, finalTranslationY, finalHeading / 1.5));
+                .driveFieldOriented(new ChassisSpeeds(translationX, translationY, heading + headingDelta));
+
+        this.oldTranslationSpeed = targetTranslation;
+        this.oldHeadingSpeed = heading;
     }
 
     @Override
@@ -139,8 +144,7 @@ public class MoveToPoseCommand extends Command {
             return false;
         }
 
-        return this.translationXController.atGoal()
-                && this.translationYController.atGoal()
+        return this.translationController.atGoal()
                 && this.headingController.atSetpoint()
                 && RobotContainer.swerveSubsystem.isStopped();
     }
