@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -111,6 +112,7 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 		if (RobotContainer.endEffectorSubsystem.hasCoral()) {
 			Pose3d coralPose = RobotContainer.endEffectorSubsystem.calculateCoralPose(robotPose);
 
+			// If its in simulation the left right offset should be displayed
 			if (isSimulation) {
 				coralPose = coralPose.transformBy(new Transform3d(RobotContainer.endEffectorSubsystem.getClawSimulation().getCoralOffset().in(Meter), 0, 0, new Rotation3d()));
 			}

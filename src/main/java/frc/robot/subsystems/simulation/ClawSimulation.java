@@ -216,9 +216,24 @@ public class ClawSimulation {
         // Calculate the offset of the piece relative to the claw
         Translation3d pieceTranslation = lowestPiece.piecePose.getTranslation();
 
-        pieceTranslation = pieceTranslation.minus(clawPose.getTranslation()).rotateBy(clawPose.getRotation().unaryMinus());
+        // Calculate a pose for the back of the claw
+        Pose3d backClawPose = clawPose.transformBy(new Transform3d(-0.08, 0, 0, new Rotation3d()));
 
-        this.gamePieceOffset = pieceTranslation.getY();
+        // Calcualte the differnce bettween the back of the claw and the piece independant of rotation
+        Translation3d rawPieceDiff = backClawPose.getTranslation().minus(pieceTranslation);
+
+        // Calculate the difference in the required angle to point to the piece andthe angle of the claw
+        double localAngleToPiece = Math.atan2(rawPieceDiff.getZ(), Math.hypot(rawPieceDiff.getX(), rawPieceDiff.getY())) - backClawPose.getRotation().getY();
+
+        // If its too high its unlikly that the piece would acully be able to be picked up
+        if (Math.abs(localAngleToPiece) > Units.degreesToRadians(30)) {
+            return;
+        }
+
+        // Calcualte the differnce bettween the claw and the piece while taking into account rotation
+        Translation3d pieceDiff = pieceTranslation.minus(clawPose.getTranslation()).rotateBy(clawPose.getRotation().unaryMinus());
+
+        this.gamePieceOffset = pieceDiff.getY();
 
         if (lowestPiece.objectReference instanceof GamePieceOnFieldSimulation) {
             // If its a field piece it remove notify it that it is being intaked then remove it
