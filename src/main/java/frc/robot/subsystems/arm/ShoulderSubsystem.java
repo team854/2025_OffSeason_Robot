@@ -170,6 +170,15 @@ public class ShoulderSubsystem extends SubsystemBase {
 	}
 
 	/**
+	 * 
+	 * @return The current angular velocity of the shoulder setpoint
+	 */
+	public AngularVelocity getShoulderSetpointVelocity() {
+		// Gets the goal of the shoulder controller (goal behaves better then setpoint for some reason)
+		return DegreesPerSecond.of(shoulderController.getGoal().velocity);
+	}
+
+	/**
 	 * Sets the shoulder setpoint and ensures that it is within the range of motion of the shoulder
 	 * 
 	 * @param angle The target angle of the shoulder with 0 being parallel to the ground
@@ -246,7 +255,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 						+ shoulderFeedFoward.calculateWithVelocities(
 								getShoulderAngle().in(Radian),
 								getShoulderVelocity().in(RadiansPerSecond),
-								Units.degreesToRadians(shoulderController.getSetpoint().velocity)),
+								Units.degreesToRadians(shoulderController.getGoal().velocity)),
 						-10, 10);
 		shoulderMotor.setVoltage(shoulderVoltsOutput);
 	}

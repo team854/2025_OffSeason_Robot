@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -27,6 +28,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
@@ -361,7 +363,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         // Get the robot pose, overall elevator height, and shoulder angle
         Pose3d robotPose = new Pose3d(RobotContainer.swerveSubsystem.getPose());
         Distance currentOverallSetpoint = getOverallSetpoint();
-        Angle currentShoulderSetpoint = RobotContainer.shoulderSubsystem.getShoulderSetpoint();
+        
+        // Look ahead 1 second to help compensate for the time required to move the elevator
+        AngularVelocity currentShoulderSetpointVelocity = RobotContainer.shoulderSubsystem.getShoulderSetpointVelocity();
+        Angle currentShoulderSetpoint = RobotContainer.shoulderSubsystem.getShoulderSetpoint().plus(Degree.of(currentShoulderSetpointVelocity.in(DegreesPerSecond)));
 
         // Calculate the end effector pose once the arm reaches its targets
         Pose3d endEffectorPose = RobotContainer.endEffectorSubsystem.calculateEndEffectorPose(robotPose, currentOverallSetpoint, currentShoulderSetpoint, RobotContainer.wristSubsystem.getWristAngle());
