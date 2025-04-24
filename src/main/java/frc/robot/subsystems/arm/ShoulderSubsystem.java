@@ -30,6 +30,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -56,6 +57,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 	private final SparkMax shoulderMotor = new SparkMax(Constants.ArmConstants.Shoulder.ID, MotorType.kBrushless);
 	private final RelativeEncoder shoulderMotorEncoder = shoulderMotor.getEncoder();
 	private final AbsoluteEncoder shoulderMotorAbsoluteEncoder = shoulderMotor.getAbsoluteEncoder();
+	private double shoulderMotorTargetVoltage = 0;
 
 	/*
 	 * Control
@@ -137,8 +139,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 			shoulderArmSim = new SingleJointedArmSim(shoulderGearbox, Constants.ArmConstants.Shoulder.GEAR_RATIO,
 					SingleJointedArmSim.estimateMOI(
 							Constants.ArmConstants.LENGTH.in(Meter),
-							Constants.ArmConstants.Shoulder.MASS.in(Kilogram)
-									+ Constants.ArmConstants.Wrist.MASS.in(Kilogram)),
+							Constants.ArmConstants.Shoulder.MASS.in(Kilogram)),
 					Constants.ArmConstants.LENGTH.in(Meter),
 					Constants.ArmConstants.Shoulder.MIN_ANGLE.in(Radian),
 					Constants.ArmConstants.Shoulder.MAX_ANGLE.in(Radian),
@@ -194,6 +195,10 @@ public class ShoulderSubsystem extends SubsystemBase {
 	public AngularVelocity getShoulderVelocity() {
 		// Gets the angular velocity in RPM and converts it to RPS
 		return RotationsPerSecond.of(shoulderMotorAbsoluteEncoder.getVelocity() / 60);
+	}
+
+	public Voltage getShoulderMotorVoltage() {
+		return Volt.of(this.shoulderMotorTargetVoltage);
 	}
 
 	/**
@@ -257,6 +262,8 @@ public class ShoulderSubsystem extends SubsystemBase {
 								getShoulderVelocity().in(RadiansPerSecond),
 								Units.degreesToRadians(shoulderController.getGoal().velocity)),
 						-10, 10);
+		
+		this.shoulderMotorTargetVoltage = shoulderVoltsOutput;
 		shoulderMotor.setVoltage(shoulderVoltsOutput);
 	}
 }

@@ -31,6 +31,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -60,9 +61,11 @@ public class ElevatorSubsystem extends SubsystemBase {
      */
     private final SparkMax stage1Motor = new SparkMax(Constants.ElevatorConstants.Stage1.ID, MotorType.kBrushless);
     private final RelativeEncoder stage1Encoder = stage1Motor.getEncoder();
+    private double stage1MotorTargetVoltage = 0;
 
     private final SparkMax stage2Motor = new SparkMax(Constants.ElevatorConstants.Stage2.ID, MotorType.kBrushless);
     private final RelativeEncoder stage2Encoder = stage2Motor.getEncoder();
+    private double stage2MotorTargetVoltage = 0;
 
     /*
      * Control
@@ -334,6 +337,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         return getMaxHeight().plus(getPivotPointOffset(true));
     }
 
+    public Voltage getStage1MotorVoltage() {
+		return Volt.of(this.stage1MotorTargetVoltage);
+	}
+
+    public Voltage getStage2MotorVoltage() {
+		return Volt.of(this.stage2MotorTargetVoltage);
+	}
+
     @Override
     public void simulationPeriodic() {
         stage1ElevatorSim.setInput(stage1MotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
@@ -398,6 +409,8 @@ public class ElevatorSubsystem extends SubsystemBase {
                         .calculateWithVelocities(getStage1HeightVelocity().in(MetersPerSecond),
                                 stage1Controller.getGoal().velocity),
                 -10, 10);
+
+        this.stage1MotorTargetVoltage = stage1VoltsOutput;
         stage1Motor.setVoltage(stage1VoltsOutput);
 
         double stage2VoltsOutput = MathUtil.clamp(
@@ -405,6 +418,8 @@ public class ElevatorSubsystem extends SubsystemBase {
                         .calculateWithVelocities(getStage2HeightVelocity().in(MetersPerSecond),
                                 stage2Controller.getGoal().velocity),
                 -10, 10);
+
+        this.stage2MotorTargetVoltage = stage2VoltsOutput;
         stage2Motor.setVoltage(stage2VoltsOutput);
     }
 }

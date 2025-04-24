@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volt;
 
 import java.util.List;
 
@@ -71,12 +72,16 @@ public class SmartDashboardSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Elevator/Stage2/Velocity", RobotContainer.elevatorSubsystem.getStage2HeightVelocity().in(MetersPerSecond));
 
         SmartDashboard.putNumberArray("Elevator/Lower Effector Limit", ArmSafteyUtilities.generateDebugLine());
+
+        SmartDashboard.putNumber("Elevator/Stage1/Target Voltage", RobotContainer.elevatorSubsystem.getStage1MotorVoltage().in(Volt));
+        SmartDashboard.putNumber("Elevator/Stage2/Target Voltage", RobotContainer.elevatorSubsystem.getStage2MotorVoltage().in(Volt));
     }
 
     public void sendShoulderTelemetry() {
         SmartDashboard.putNumber("Arm/Shoulder/Angle", RobotContainer.shoulderSubsystem.getShoulderAngle().in(Degree));
         SmartDashboard.putNumber("Arm/Shoulder/Setpoint", RobotContainer.shoulderSubsystem.getShoulderSetpoint().in(Degree));
         SmartDashboard.putNumber("Arm/Shoulder/Angular Velocity", RobotContainer.shoulderSubsystem.getShoulderVelocity().in(DegreesPerSecond));
+        SmartDashboard.putNumber("Arm/Shoulder/Target Voltage", RobotContainer.shoulderSubsystem.getShoulderMotorVoltage().in(Volt));
     }
 
     public void sendWristTelemetry() {
