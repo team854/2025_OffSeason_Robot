@@ -384,11 +384,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         if (currentOverallSetpoint.in(Meter) < eleavtorMinimumHeight) {
             setOverallHeight(Meter.of(eleavtorMinimumHeight));
         }
-
-        SmartDashboard.putNumberArray("FEWWFEW", PoseUtilities.convertPoseToNumbers(robotPose.transformBy(new Transform3d(effectorOffset.getX(), 0, minimumHeight, new Rotation3d()))));
-
-        SmartDashboard.putNumberArray("WEFEFW", ArmSafteyUtilities.generateDebugLine());
-
+        
         double stage1VoltsOutput = MathUtil.clamp(
                 stage1Controller.calculate(getStage1Height().in(Meter)) + stage1FeedFoward
                         .calculateWithVelocities(getStage1HeightVelocity().in(MetersPerSecond),
