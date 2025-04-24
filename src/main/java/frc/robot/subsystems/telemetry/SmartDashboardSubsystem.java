@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -15,8 +16,10 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.drive.MoveToPoseCommand;
 import frc.robot.commands.drive.PathfindToPoseCommand;
 import frc.robot.objects.VisionEstimate;
+import frc.robot.subsystems.simulation.CoralStationSimulation;
 import frc.robot.subsystems.vision.VisionCamera;
 import frc.robot.utilities.math.PoseUtilities;
+import frc.robot.utilities.saftey.ArmSafteyUtilities;
 
 public class SmartDashboardSubsystem extends SubsystemBase {
     public SmartDashboardSubsystem() {
@@ -50,6 +53,13 @@ public class SmartDashboardSubsystem extends SubsystemBase {
         }
     }
 
+    @Override
+    public void simulationPeriodic() {
+        if (Constants.TelemetryConstants.SIMULATION_TELEMETRY) {
+            sendSimulationTelemetry();
+        }
+    }
+
     public void sendElevatorTelemetry() {
         SmartDashboard.putNumber("Elevator/Stage1/Setpoint", RobotContainer.elevatorSubsystem.getStage1Setpoint().in(Meter));
         SmartDashboard.putNumber("Elevator/Stage2/Setpoint", RobotContainer.elevatorSubsystem.getStage2Setpoint().in(Meter));
@@ -59,6 +69,8 @@ public class SmartDashboardSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("Elevator/Stage1/Velocity", RobotContainer.elevatorSubsystem.getStage1HeightVelocity().in(MetersPerSecond));
         SmartDashboard.putNumber("Elevator/Stage2/Velocity", RobotContainer.elevatorSubsystem.getStage2HeightVelocity().in(MetersPerSecond));
+
+        SmartDashboard.putNumberArray("Elevator/Lower Effector Limit", ArmSafteyUtilities.generateDebugLine());
     }
 
     public void sendShoulderTelemetry() {
@@ -86,6 +98,9 @@ public class SmartDashboardSubsystem extends SubsystemBase {
     public void sendEndEffectorTelemetry() {
         SmartDashboard.putBoolean("Arm/Intake/Has Coral", RobotContainer.endEffectorSubsystem.hasCoral());
         SmartDashboard.putNumber("Arm/Intake/Motor Percent", RobotContainer.endEffectorSubsystem.getIntakeSpeedPercent());
+
+        Pose3d endEffectorPose = RobotContainer.endEffectorSubsystem.calculateEndEffectorPose();
+        SmartDashboard.putNumberArray("Arm/End Effector Pose", PoseUtilities.convertPoseToNumbers(endEffectorPose));
     }
 
     public void sendVisionTelemetry() {
@@ -108,6 +123,15 @@ public class SmartDashboardSubsystem extends SubsystemBase {
 
             SmartDashboard.putNumberArray(prefixString + "/Camera Pose",
                 PoseUtilities.convertPoseToNumbers(camera.getCameraPose()));
+        }
+    }
+
+    public void sendSimulationTelemetry() {
+        SmartDashboard.putNumberArray("Simulation/End Effector/Pickup Volume", RobotContainer.endEffectorSubsystem.getClawSimulation().getPickupVolume().generateDebugWireframe());
+
+        CoralStationSimulation[] coralStationArray = RobotContainer.simulationSubsystem.getCoralStations();
+        for (int index = 0; index < coralStationArray.length; index++) {
+            SmartDashboard.putNumberArray("Simulation/Coral Stations/Station " + index, coralStationArray[index].getSpawnVolume().generateDebugWireframe());
         }
     }
 }

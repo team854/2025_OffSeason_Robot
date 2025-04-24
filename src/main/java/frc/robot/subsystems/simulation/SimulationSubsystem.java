@@ -102,6 +102,10 @@ public class SimulationSubsystem extends SubsystemBase {
         coralStationArray = tempCoralStations.toArray(new CoralStationSimulation[0]);
     }
 
+    public CoralStationSimulation[] getCoralStations() {
+        return coralStationArray;
+    }
+
     @Override
     public void simulationPeriodic() {
         if (Constants.SimulationConstants.CoralStations.ENABLED) {

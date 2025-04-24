@@ -356,20 +356,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     }
 
-
-
-    @Override
-    public void periodic() {
-        // Get the robot pose, overall elevator height, and shoulder angle
-        Pose3d robotPose = new Pose3d(RobotContainer.swerveSubsystem.getPose());
-        Distance currentOverallSetpoint = getOverallSetpoint();
+    private Distance getElevatorMinimumHeight(Pose3d robotPose, Distance elevatorHeightSetpoint) {
         
         // Look ahead 1 second to help compensate for the time required to move the elevator
         AngularVelocity currentShoulderSetpointVelocity = RobotContainer.shoulderSubsystem.getShoulderSetpointVelocity();
         Angle currentShoulderSetpoint = RobotContainer.shoulderSubsystem.getShoulderSetpoint().plus(Degree.of(currentShoulderSetpointVelocity.in(DegreesPerSecond)));
 
         // Calculate the end effector pose once the arm reaches its targets
-        Pose3d endEffectorPose = RobotContainer.endEffectorSubsystem.calculateEndEffectorPose(robotPose, currentOverallSetpoint, currentShoulderSetpoint, RobotContainer.wristSubsystem.getWristAngle());
+        Pose3d endEffectorPose = RobotContainer.endEffectorSubsystem.calculateEndEffectorPose(robotPose, elevatorHeightSetpoint, currentShoulderSetpoint, RobotContainer.wristSubsystem.getWristAngle());
         
         // Get the offset bettween the end effector and the center of the robot
         Translation3d effectorOffset = endEffectorPose.getTranslation().minus(robotPose.getTranslation()).rotateBy(robotPose.getRotation().unaryMinus());
@@ -380,11 +374,25 @@ public class ElevatorSubsystem extends SubsystemBase {
         // Calculate the minium height of the elevator by calculating the height of the elevator when at the set angle then adding the minimum height if the end effector
         double eleavtorMinimumHeight = (-Math.sin(currentShoulderSetpoint.in(Radian)) * Constants.ArmConstants.LENGTH.in(Meter)) + minimumHeight;
 
+        return Meter.of(eleavtorMinimumHeight);
+    }
+
+
+    @Override
+    public void periodic() {
+        // Get the robot pose, overall elevator height, and shoulder angle
+        Pose3d robotPose = new Pose3d(RobotContainer.swerveSubsystem.getPose());
+        
+        // Get the overall hieght of the elevator setpoint
+        Distance currentOverallSetpoint = getOverallSetpoint();
+
+        double eleavtorMinimumHeight = getElevatorMinimumHeight(robotPose, currentOverallSetpoint).in(Meter);
+
         // If the overall height of the elevator is less then the calculated minimum elevator height then override the overall height
         if (currentOverallSetpoint.in(Meter) < eleavtorMinimumHeight) {
             setOverallHeight(Meter.of(eleavtorMinimumHeight));
         }
-        
+
         double stage1VoltsOutput = MathUtil.clamp(
                 stage1Controller.calculate(getStage1Height().in(Meter)) + stage1FeedFoward
                         .calculateWithVelocities(getStage1HeightVelocity().in(MetersPerSecond),

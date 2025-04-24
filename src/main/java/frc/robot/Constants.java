@@ -517,6 +517,7 @@ public final class Constants {
 		public static boolean END_EFFECTOR_TELEMETRY = true;
 		public static boolean SIMULATION_TELEMETRY = true;
 		public static boolean PATHFINDING_TELEMETRY = true;
+		public static boolean DEBUG = true;
 		public static boolean ANIMATIONS = true;
 	}
 }

@@ -36,9 +36,7 @@ public final class ArmSafteyUtilities {
         return Constants.ArmConstants.MINIMUM_HEIGHT_IN_BUMPER;
     }
 
-    public static Double[] generateDebugLine() {
-        Pose3d robotPose = new Pose3d(RobotContainer.swerveSubsystem.getPose());
-
+    public static Double[] generateDebugLine(Pose3d robotPose) {
         List<Pose3d> outputPoses = new ArrayList<>();
 
         for (double offset = 0; offset < 1; offset+=0.025) {
@@ -46,5 +44,10 @@ public final class ArmSafteyUtilities {
         }
 
         return PoseUtilities.convertPoseArrayToNumbers(outputPoses.toArray(new Pose3d[0]));
+    }
+
+    public static Double[] generateDebugLine() {
+        Pose3d robotPose = new Pose3d(RobotContainer.swerveSubsystem.getPose());
+        return generateDebugLine(robotPose);
     }
 }

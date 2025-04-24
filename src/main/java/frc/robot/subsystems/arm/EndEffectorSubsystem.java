@@ -235,19 +235,17 @@ public class EndEffectorSubsystem extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
         // Calculate the end effector pose using the actual pose from the simulation
-        Pose3d endEffPose = calculateEndEffectorPose(new Pose3d(RobotContainer.swerveSubsystem.swerveDrive.getSimulationDriveTrainPose().get()));
+        Pose3d endEffectorPose = calculateEndEffectorPose(new Pose3d(RobotContainer.swerveSubsystem.swerveDrive.getSimulationDriveTrainPose().get()));
 
         // Iterate on the claw simulatioh
         clawSimulation.setActiveStage(getIntakeSpeedPercent() < -0.2);
-        clawSimulation.setPickupVolumeCenterPose(endEffPose);
+        clawSimulation.setPickupVolumeCenterPose(endEffectorPose);
         clawSimulation.iterate();
 
         // If its outtaking then try to eject the coral
         if (getIntakeSpeedPercent() > 0.2) {
             clawSimulation.ejectGamePiece();
         }
-
-        SmartDashboard.putNumberArray("SIGH", clawSimulation.getPickupVolume().generateDebugWireframe());
     }
 
     @Override
