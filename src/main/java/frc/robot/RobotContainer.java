@@ -93,15 +93,15 @@ public class RobotContainer {
 		/* 
 		* Auto score coral on the reef
 		*/
-		driverController.twoButtonTrigger(4, 5).onTrue(new AutoScoreCoralCommand(false, 0, true));
-		driverController.twoButtonTrigger(2, 5).onTrue(new AutoScoreCoralCommand(false, 1, true));
-		driverController.twoButtonTrigger(1, 5).onTrue(new AutoScoreCoralCommand(false, 2, true));
-		driverController.twoButtonTrigger(3, 5).onTrue(new AutoScoreCoralCommand(false, 3, true));
+		driverController.multiButtonTrigger(4, 5).onTrue(new AutoScoreCoralCommand(false, 0, true));
+		driverController.multiButtonTrigger(2, 5).onTrue(new AutoScoreCoralCommand(false, 1, true));
+		driverController.multiButtonTrigger(1, 5).onTrue(new AutoScoreCoralCommand(false, 2, true));
+		driverController.multiButtonTrigger(3, 5).onTrue(new AutoScoreCoralCommand(false, 3, true));
 
-		driverController.twoButtonTrigger(4, 6).onTrue(new AutoScoreCoralCommand(true, 0, true));
-		driverController.twoButtonTrigger(2, 6).onTrue(new AutoScoreCoralCommand(true, 1, true));
-		driverController.twoButtonTrigger(1, 6).onTrue(new AutoScoreCoralCommand(true, 2, true));
-		driverController.twoButtonTrigger(3, 6).onTrue(new AutoScoreCoralCommand(true, 3, true));
+		driverController.multiButtonTrigger(4, 6).onTrue(new AutoScoreCoralCommand(true, 0, true));
+		driverController.multiButtonTrigger(2, 6).onTrue(new AutoScoreCoralCommand(true, 1, true));
+		driverController.multiButtonTrigger(1, 6).onTrue(new AutoScoreCoralCommand(true, 2, true));
+		driverController.multiButtonTrigger(3, 6).onTrue(new AutoScoreCoralCommand(true, 3, true));
 
 		/*
 		* Ground pickup setpoint

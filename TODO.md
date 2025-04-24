@@ -7,3 +7,4 @@
  * Add a system to cap the max acceleration while driving
  * Make the piece animation system so it uses a part in the robot so it remains perfectly siyned with the robots movement
  * Make the auto score smoother (jolt when transitioning mid movement)  DONE
+ * Add safty limits so you can't clip the arm into the robots body (irl and in sim)

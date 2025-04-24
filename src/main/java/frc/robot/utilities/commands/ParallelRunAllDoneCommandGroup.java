@@ -78,11 +78,7 @@ public class ParallelRunAllDoneCommandGroup extends Command {
     public final void end(boolean interrupted) {
         if (interrupted) {
             for (Map.Entry<Command, Boolean> commandRunning : m_commands.entrySet()) {
-                if (commandRunning.getValue()) {
-                        commandRunning.getKey().end(true);
-                } else {
-                        commandRunning.getKey().end(false);
-                }
+                commandRunning.getKey().end(commandRunning.getValue());
             }
         }
     }

@@ -1,5 +1,7 @@
 package frc.robot.utilities.controls;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -114,8 +116,13 @@ public class CustomCommandXboxController extends CommandXboxController {
         return Commands.repeatingSequence(setRumbleSecondsCommand(type, strength, secondsOn), Commands.waitSeconds(secondsOff)).withTimeout((secondsOn + secondsOff) * loops);
     }
 
-    public Trigger twoButtonTrigger(int button1, int button2) {
-        return new TwoButtonTrigger(new JoystickButton(super.getHID(), button1), new JoystickButton(super.getHID(), button2));
+    public Trigger multiButtonTrigger(int... buttonIDs) {
+        List<JoystickButton> joystickButtons = new ArrayList<>();
+        for (int buttonID : buttonIDs) {
+            joystickButtons.add(new JoystickButton(super.getHID(), buttonID));
+        }
+
+        return new MultiButtonTrigger(joystickButtons.toArray(new JoystickButton[0]));
     }
 
     private double applyExponent(double value, double exponent) {

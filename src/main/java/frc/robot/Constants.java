@@ -359,6 +359,8 @@ public final class Constants {
 			public static final int ID = 0;
 		}
 
+		public static final Distance MINIMUM_HEIGHT_IN_BUMPER = Feet.of(0.7); // Feet
+		public static final Angle OUT_BUMPER_ANGLE = Degree.of(-37); // Degree
 		public static final Distance LENGTH = Feet.of(2.081208); // Feet
 
 	}

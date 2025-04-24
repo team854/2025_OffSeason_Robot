@@ -71,17 +71,21 @@ public class EndEffectorSubsystem extends SubsystemBase {
         System.out.println("Created EndEffectorSubsystem");
     }
 
-    public Pose3d calculateEndEffectorPose(Pose3d robotPose) {
+    public Pose3d calculateEndEffectorPose(Pose3d robotPose, Distance elevatorOverallHeight, Angle shoulderAngle, Angle wristAngle) {
         // Calculate where the end effector of the arm is
         Pose3d endEffectorPose = robotPose
                 .plus(new Transform3d(Constants.ArmConstants.Shoulder.CENTER_OFFSET_FOWARD.in(Meter), 0,
-                        RobotContainer.elevatorSubsystem.getOverallHeight().in(Meter),
-                        new Rotation3d(RobotContainer.wristSubsystem.getWristAngle().in(Radian),
-                                -RobotContainer.shoulderSubsystem.getShoulderAngle().in(Radian), 0)));
+                        elevatorOverallHeight.in(Meter),
+                        new Rotation3d(wristAngle.in(Radian),
+                                -shoulderAngle.in(Radian), 0)));
 
         // Add the length of the arm onto the end effector pose to get the positon at the end of the arm
         return endEffectorPose.plus(
                 new Transform3d(Constants.ArmConstants.LENGTH.in(Meter), 0, 0, new Rotation3d()));
+    }
+
+    public Pose3d calculateEndEffectorPose(Pose3d robotPose) {
+        return calculateEndEffectorPose(robotPose, RobotContainer.elevatorSubsystem.getOverallHeight(), RobotContainer.shoulderSubsystem.getShoulderAngle(), RobotContainer.wristSubsystem.getWristAngle());
     }
 
     public Pose3d calculateEndEffectorPose() {

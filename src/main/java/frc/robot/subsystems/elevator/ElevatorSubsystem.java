@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.Volt;
 
 import com.revrobotics.AbsoluteEncoder;
@@ -19,6 +20,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
@@ -27,6 +32,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -34,6 +40,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.utilities.math.PoseUtilities;
+import frc.robot.utilities.saftey.ArmSafteyUtilities;
 
 // Credit to https://www.youtube.com/watch?v=_2fPVYDrq_E for the great tutorial
 
@@ -346,8 +354,35 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     }
 
+
+
     @Override
     public void periodic() {
+        // Get the robot pose, overall elevator height, and shoulder angle
+        Pose3d robotPose = new Pose3d(RobotContainer.swerveSubsystem.getPose());
+        Distance currentOverallSetpoint = getOverallSetpoint();
+        Angle currentShoulderSetpoint = RobotContainer.shoulderSubsystem.getShoulderSetpoint();
+
+        // Calculate the end effector pose once the arm reaches its targets
+        Pose3d endEffectorPose = RobotContainer.endEffectorSubsystem.calculateEndEffectorPose(robotPose, currentOverallSetpoint, currentShoulderSetpoint, RobotContainer.wristSubsystem.getWristAngle());
+        
+        // Get the offset bettween the end effector and the center of the robot
+        Translation3d effectorOffset = endEffectorPose.getTranslation().minus(robotPose.getTranslation()).rotateBy(robotPose.getRotation().unaryMinus());
+
+        // Get the minimum elevator height at that offset on the arm
+        double minimumHeight = ArmSafteyUtilities.getMinimumEndEffecotrHeight(effectorOffset.getMeasureX()).in(Meter);
+
+        // Calculate the minium height of the elevator by calculating the height of the elevator when at the set angle then adding the minimum height if the end effector
+        double eleavtorMinimumHeight = (-Math.sin(currentShoulderSetpoint.in(Radian)) * Constants.ArmConstants.LENGTH.in(Meter)) + minimumHeight;
+
+        // If the overall height of the elevator is less then the calculated minimum elevator height then override the overall height
+        if (currentOverallSetpoint.in(Meter) < eleavtorMinimumHeight) {
+            setOverallHeight(Meter.of(eleavtorMinimumHeight));
+        }
+
+        SmartDashboard.putNumberArray("FEWWFEW", PoseUtilities.convertPoseToNumbers(robotPose.transformBy(new Transform3d(effectorOffset.getX(), 0, minimumHeight, new Rotation3d()))));
+
+        SmartDashboard.putNumberArray("WEFEFW", ArmSafteyUtilities.generateDebugLine());
 
         double stage1VoltsOutput = MathUtil.clamp(
                 stage1Controller.calculate(getStage1Height().in(Meter)) + stage1FeedFoward
