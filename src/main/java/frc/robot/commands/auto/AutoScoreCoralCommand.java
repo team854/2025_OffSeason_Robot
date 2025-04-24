@@ -21,6 +21,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.drive.MoveToPoseCommand;
 import frc.robot.objects.InverseKinematicState;
 import frc.robot.objects.InverseKinematicStatus;
+import frc.robot.utilities.commands.ParallelRunAllDoneCommandGroup;
 import frc.robot.utilities.controls.RumbleUtilities;
 import frc.robot.utilities.field.ReefUtilities;
 import frc.robot.utilities.field.TagUtilities;
@@ -121,12 +122,13 @@ public class AutoScoreCoralCommand extends Command {
 		}
 
 		this.commands.addCommands(
-				new MoveToPoseCommand(intermediatePose, false)
-						.withDeadline(new ParallelCommandGroup(RobotContainer.elevatorSubsystem
+				new ParallelRunAllDoneCommandGroup(
+					new MoveToPoseCommand(intermediatePose, true),
+					RobotContainer.elevatorSubsystem
 								.gotoOverallHeightCommand(
 										robotTargetState.elevatorHeight()),
 								RobotContainer.shoulderSubsystem.gotoShoulderAngleCommand(approchAngle),
-								RobotContainer.wristSubsystem.gotoWristAngleCommand(wristAngle))),
+								RobotContainer.wristSubsystem.gotoWristAngleCommand(wristAngle)),
 				new MoveToPoseCommand(robotTargetState.chassisPose(), true),
 				RobotContainer.shoulderSubsystem.gotoShoulderAngleCommand(robotTargetState.shoulderAngle()),
 				new ParallelCommandGroup(

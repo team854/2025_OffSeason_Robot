@@ -148,7 +148,7 @@ public class MoveToPoseCommand extends Command {
         }
 
         return this.translationController.atGoal()
-                && this.headingController.atSetpoint()
+                && this.headingController.atGoal()
                 && RobotContainer.swerveSubsystem.isStopped();
     }
 
