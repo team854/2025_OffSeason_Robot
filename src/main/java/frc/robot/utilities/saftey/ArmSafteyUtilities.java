@@ -26,7 +26,8 @@ public final class ArmSafteyUtilities {
     public static Distance getMinimumEndEffecotrHeight(Distance X) {
         double meterX = X.in(Meter);
 
-        double halfBumperWidth = (Constants.RobotKinematicConstants.LENGTH.in(Meter) / 2) + 0.015;
+        // Calculate the bumper width and add an offset to it
+        double halfBumperWidth = (Constants.RobotKinematicConstants.LENGTH.in(Meter) / 2) + Constants.ArmConstants.OUT_BUMPER_OFFSET.in(Meter);
 
         if (meterX > halfBumperWidth) {
             double angleHeight = (meterX - halfBumperWidth) * Math.tan(Constants.ArmConstants.OUT_BUMPER_ANGLE.in(Radian));

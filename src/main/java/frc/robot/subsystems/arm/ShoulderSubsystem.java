@@ -48,7 +48,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 	 */
 	// This value gets added on to the absolute encoder position to correct for the push back and to bring 0 to horizontal
 	private final double shoulderPushBackHorizontal = Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_PUSH_BACK
-			.in(Degree) + 90;
+			.in(Degree) - Constants.ArmConstants.Shoulder.MIN_ANGLE.in(Degree);
 	private final double shoulderMaxAngle = Constants.ArmConstants.Shoulder.MAX_ANGLE.in(Degree);
 	private final double shoulderMinAngle = Constants.ArmConstants.Shoulder.MIN_ANGLE.in(Degree);
 	/*

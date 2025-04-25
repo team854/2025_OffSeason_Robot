@@ -27,6 +27,10 @@ public class SmartDashboardSubsystem extends SubsystemBase {
 
     }
 
+    public void initalize() {
+        SmartDashboard.putData("Auto Chooser", RobotContainer.autoChooser);
+    }
+
     @Override
     public void periodic() {
         if (Constants.TelemetryConstants.ELEVATOR_TELEMETRY) {

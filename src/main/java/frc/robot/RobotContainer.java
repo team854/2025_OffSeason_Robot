@@ -4,7 +4,10 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -57,6 +60,9 @@ public class RobotContainer {
 			.scaleTranslation(Constants.DriverConstants.TRANSLATION_SCALE)
 			.allianceRelativeControl(false);
 
+	// Auto chooser
+	public static SendableChooser<Command> autoChooser;
+
 	public RobotContainer() {
 		System.out.println("Configuring robot container");
 		
@@ -64,7 +70,17 @@ public class RobotContainer {
 			simulationSubsystem = new SimulationSubsystem();
 		}
 
+		configureAutoChooser();
+
 		configureBindings();
+
+		smartDashboardSubsystem.initalize();
+	}
+
+	private void configureAutoChooser() {
+		autoChooser = AutoBuilder.buildAutoChooser();
+
+		System.out.println("Setup auto chooser");
 	}
 
 	private void configureBindings() {
@@ -142,6 +158,6 @@ public class RobotContainer {
     }
 
 	public Command getAutonomousCommand() {
-		return Commands.print("No autonomous command configured");
+		return autoChooser.getSelected();
 	}
 }
