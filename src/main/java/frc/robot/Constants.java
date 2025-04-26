@@ -499,8 +499,8 @@ public final class Constants {
 		public static final double DEADBAND = 0.12;
 		public static final double TRANSLATION_SCALE = 1;
 		public static final double ROTATION_SCALE = 0.7;
-		public static final double LEFT_JOYSTICK_EXPONENT = 1.7;
-		public static final double RIGHT_JOYSTICK_EXPONENT = 1.7;
+		public static final double LEFT_JOYSTICK_EXPONENT = 1.25;
+		public static final double RIGHT_JOYSTICK_EXPONENT = 1.25;
 		public static final double TRIGGER_EXPONENT = 1;
 		public static final LinearVelocity CONTROL_ELEVATOR_SPEED = FeetPerSecond.of(1); // Feet/Second
 		public static final AngularVelocity CONTROL_SHOULDER_SPEED = DegreesPerSecond.of(50); // Degrees/Second
