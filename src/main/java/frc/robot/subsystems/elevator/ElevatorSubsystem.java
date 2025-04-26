@@ -367,14 +367,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     }
 
-    private Distance getElevatorMinimumHeight(Pose3d robotPose, Distance elevatorHeightSetpoint) {
-        
-        // Look ahead 1 second to help compensate for the time required to move the elevator
-        AngularVelocity currentShoulderSetpointVelocity = RobotContainer.shoulderSubsystem.getShoulderSetpointVelocity();
-        Angle currentShoulderSetpoint = RobotContainer.shoulderSubsystem.getShoulderSetpoint().plus(Degree.of(currentShoulderSetpointVelocity.in(DegreesPerSecond)));
+    private Distance getElevatorMinimumHeight(Pose3d robotPose, Angle shoulderSetpointAngle, Distance elevatorHeightSetpoint) {
 
         // Calculate the end effector pose once the arm reaches its targets
-        Pose3d endEffectorPose = RobotContainer.endEffectorSubsystem.calculateEndEffectorPose(robotPose, elevatorHeightSetpoint, currentShoulderSetpoint, RobotContainer.wristSubsystem.getWristAngle());
+        Pose3d endEffectorPose = RobotContainer.endEffectorSubsystem.calculateEndEffectorPose(robotPose, elevatorHeightSetpoint, shoulderSetpointAngle, RobotContainer.wristSubsystem.getWristAngle());
         
         // Get the offset bettween the end effector and the center of the robot
         Translation3d effectorOffset = endEffectorPose.getTranslation().minus(robotPose.getTranslation()).rotateBy(robotPose.getRotation().unaryMinus());
@@ -383,7 +379,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         double minimumHeight = ArmSafteyUtilities.getMinimumEndEffecotrHeight(effectorOffset.getMeasureX()).in(Meter);
 
         // Calculate the minium height of the elevator by calculating the height of the elevator when at the set angle then adding the minimum height if the end effector
-        double eleavtorMinimumHeight = (-Math.sin(currentShoulderSetpoint.in(Radian)) * Constants.ArmConstants.LENGTH.in(Meter)) + minimumHeight;
+        double eleavtorMinimumHeight = (-Math.sin(shoulderSetpointAngle.in(Radian)) * Constants.ArmConstants.LENGTH.in(Meter)) + minimumHeight;
 
         return Meter.of(eleavtorMinimumHeight);
     }
@@ -394,10 +390,17 @@ public class ElevatorSubsystem extends SubsystemBase {
         // Get the robot pose, overall elevator height, and shoulder angle
         Pose3d robotPose = new Pose3d(RobotContainer.swerveSubsystem.getPose());
         
+        // Look ahead 1 second to help compensate for the time required to move the elevator
+        AngularVelocity currentShoulderSetpointVelocity = RobotContainer.shoulderSubsystem.getShoulderSetpointVelocity();
+        Angle currentShoulderSetpoint = RobotContainer.shoulderSubsystem.getShoulderSetpoint();
+        Angle currentShoulderSetpointLookAhead = currentShoulderSetpoint.plus(Degree.of(currentShoulderSetpointVelocity.in(DegreesPerSecond))).times(1.1);
+        
         // Get the overall hieght of the elevator setpoint
         Distance currentOverallSetpoint = getOverallSetpoint();
 
-        double eleavtorMinimumHeight = getElevatorMinimumHeight(robotPose, currentOverallSetpoint).in(Meter);
+        // Compute it twice with and without the look ahead and use which ever is higher so its safer
+        double eleavtorMinimumHeight = Math.max(getElevatorMinimumHeight(robotPose, currentShoulderSetpoint, currentOverallSetpoint).in(Meter), 
+                                                getElevatorMinimumHeight(robotPose, currentShoulderSetpointLookAhead, currentOverallSetpoint).in(Meter));
 
         // If the overall height of the elevator is less then the calculated minimum elevator height then override the overall height
         if (currentOverallSetpoint.in(Meter) < eleavtorMinimumHeight) {

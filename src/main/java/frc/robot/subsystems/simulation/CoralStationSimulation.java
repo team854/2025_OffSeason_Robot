@@ -99,7 +99,7 @@ public class CoralStationSimulation {
         double directionalDiff = VectorUtilities.normalizedDotProduct(endEffRotationalVector, this.launchVector);
 
         // Get the rotation of the wrist
-        double wristRotation = Math.abs(RobotContainer.wristSubsystem.getWristAngle().in(Degree));
+        double wristRotation = Math.min(Math.abs(RobotContainer.wristSubsystem.getWristAngle().in(Degree)) % 180, 180 - (Math.abs(RobotContainer.wristSubsystem.getWristAngle().in(Degree)) % 180));
     
         if (directionalDiff > Constants.SimulationConstants.CoralStations.ANGLE_DIFFERENCE_THRESHOLD
                  || wristRotation > Constants.SimulationConstants.CoralStations.WRIST_DIFFERENCE_THRESHOLD.in(Degree)) {

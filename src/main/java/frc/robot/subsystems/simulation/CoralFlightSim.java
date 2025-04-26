@@ -41,7 +41,7 @@ public class CoralFlightSim extends ReefscapeCoralOnFly {
             Radians.of(0)
 );
 		
-		// Written by claude 2.7 with a bit of cleanup
+		// Written by claude 3.7 with a bit of cleanup
 		try {
 			// For each final field, use reflection to make it accessible and set the value
 			Field infoField = GamePieceProjectile.class.getDeclaredField("info");

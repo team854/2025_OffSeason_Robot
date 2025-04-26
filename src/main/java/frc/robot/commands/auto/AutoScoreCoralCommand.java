@@ -11,8 +11,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -26,7 +24,6 @@ import frc.robot.utilities.controls.RumbleUtilities;
 import frc.robot.utilities.field.ReefUtilities;
 import frc.robot.utilities.field.TagUtilities;
 import frc.robot.utilities.math.AngleUtilities;
-import frc.robot.utilities.math.PoseUtilities;
 
 public class AutoScoreCoralCommand extends Command {
 	private final boolean right;

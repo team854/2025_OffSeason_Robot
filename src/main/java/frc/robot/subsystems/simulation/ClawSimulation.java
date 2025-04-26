@@ -238,15 +238,22 @@ public class ClawSimulation {
         if (lowestPiece.objectReference instanceof GamePieceOnFieldSimulation) {
             // If its a field piece it remove notify it that it is being intaked then remove it
             GamePieceOnFieldSimulation gamePiece = (GamePieceOnFieldSimulation) lowestPiece.objectReference;
-            gamePiece.onIntake(this.targetedGamePieceType);
-            arena.removeGamePiece(gamePiece);
-            this.gamePieceCount++;
+
+            if (gamePiece.type == "Coral") {
+                gamePiece.onIntake(this.targetedGamePieceType);
+                arena.removeGamePiece(gamePiece);
+                this.gamePieceCount++;
+            }
+            
 
         } else if (lowestPiece.objectReference instanceof GamePieceProjectile) {
             // If its a projectile just remove it from the field
             GamePieceProjectile gamePiece = (GamePieceProjectile) lowestPiece.objectReference;
-            arena.removeProjectile(gamePiece);
-            this.gamePieceCount++;
+
+            if (gamePiece.gamePieceType == "Coral") {
+                arena.removeProjectile(gamePiece);
+                this.gamePieceCount++;
+            }
         }
     }
 
