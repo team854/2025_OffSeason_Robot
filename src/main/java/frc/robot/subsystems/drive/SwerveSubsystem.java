@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.objects.VisionEstimate;
+import frc.robot.utilities.field.FieldUtilities;
 import frc.robot.utilities.files.FileUtilities;
 import frc.robot.utilities.files.JsonUtilities;
 import swervelib.SwerveDrive;
@@ -49,6 +50,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
         Pose2d startingPose = new Pose2d(
                 new Translation2d(Constants.Starting.X.in(Meter), Constants.Starting.Y.in(Meter)), new Rotation2d());
+
+        startingPose = FieldUtilities.mirrorPoseIfRed(startingPose);
 
         try {
             System.out.println("Initalizing swerveDrive");
@@ -114,11 +117,9 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public boolean isStopped() {
-        return Math.abs(RobotContainer.swerveSubsystem
-                .getRobotVelocity().omegaRadiansPerSecond) < Constants.SwerveConstants.ROTATION_ZERO_THRESHOLD
+        return Math.abs(getRobotVelocity().omegaRadiansPerSecond) < Constants.SwerveConstants.ROTATION_ZERO_THRESHOLD
                         .in(RadiansPerSecond)
-                && RobotContainer.swerveSubsystem.convertChassisSpeed(RobotContainer.swerveSubsystem
-                        .getRobotVelocity())
+                && getAbsoluteChassisSpeed(getRobotVelocity())
                         .in(MetersPerSecond) < Constants.SwerveConstants.TRANSLATION_ZERO_THRESHOLD.in(MetersPerSecond);
     }
 
@@ -139,7 +140,7 @@ public class SwerveSubsystem extends SubsystemBase {
         return swerveDrive.getPose();
     }
 
-    public LinearVelocity convertChassisSpeed(ChassisSpeeds chassisSpeeds) {
+    public LinearVelocity getAbsoluteChassisSpeed(ChassisSpeeds chassisSpeeds) {
         return MetersPerSecond.of(Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond));
     }
 

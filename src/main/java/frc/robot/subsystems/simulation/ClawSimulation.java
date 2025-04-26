@@ -23,6 +23,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -51,6 +52,9 @@ public class ClawSimulation {
 
     private final String targetedGamePieceType;
     private final RectangularPrism pickupVolume;
+
+    private Translation3d pickupVolumeVelocity = new Translation3d();
+    private double lastVolumeUpdateTime = Timer.getFPGATimestamp();
     
     public ClawSimulation(RectangularPrism pickupVolume, int gamePieceCapacity) {
         this.targetedGamePieceType = "Coral";
@@ -72,6 +76,11 @@ public class ClawSimulation {
     }
 
     public void setPickupVolumeCenterPose(Pose3d centerPose) {
+
+        double callTime = Timer.getFPGATimestamp();
+        this.pickupVolumeVelocity = centerPose.getTranslation().minus(this.pickupVolume.getCenterPose().getTranslation()).div(callTime - this.lastVolumeUpdateTime);
+        this.lastVolumeUpdateTime = callTime;
+
         this.pickupVolume.changeCenterPose(centerPose);
     }
 
@@ -94,6 +103,8 @@ public class ClawSimulation {
 
             // Calculate the direction to shoot the coral at the specified speed
             Translation3d shootTranslation = new Translation3d(0, -Constants.ArmConstants.Intake.Simulation.OUTTAKE_VELOCITY.in(MetersPerSecond), 0).rotateBy(coralPose.getRotation());
+
+            shootTranslation = shootTranslation.plus(this.pickupVolumeVelocity);
 
             SimulatedArena.getInstance()
                     .addGamePieceProjectile(new CoralFlightSim(ReefscapeCoralOnField.REEFSCAPE_CORAL_INFO,

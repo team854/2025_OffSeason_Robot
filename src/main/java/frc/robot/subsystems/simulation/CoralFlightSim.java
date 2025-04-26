@@ -11,8 +11,11 @@ import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
 import org.ironmaple.simulation.gamepieces.GamePieceProjectile;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnField;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
+import org.ironmaple.utils.FieldMirroringUtils;
+import org.ironmaple.utils.LegacyFieldMirroringUtils2024;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -20,6 +23,8 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utilities.math.PoseUtilities;
 
 /**
  * 
@@ -80,10 +85,24 @@ public class CoralFlightSim extends ReefscapeCoralOnFly {
 			throw new RuntimeException("Failed to set fields via reflection", e); 
 		}
 
+		
         super.enableBecomesGamePieceOnFieldAfterTouchGround();
         super.withTouchGroundHeight(0.2);
+    }
+	
+	@Override
+	public boolean hasGoneOutOfField() {
+        return isOutOfField(launchedTimer.get());
+    }
 
-        // MAKE IT USE calculateInitialProjectileVelocityMPS TO ACCOUNT FOR THE ARMS / ROBOT SPEED
+	// Fix of the built in isOutOfField to make it work with the new field dimensions
+	private boolean isOutOfField(double time) {
+        final Translation3d position = getPositionAtTime(time);
+        final double EDGE_TOLERANCE = 0.5;
+        return position.getX() < -EDGE_TOLERANCE
+                || position.getX() > FieldMirroringUtils.FIELD_WIDTH + EDGE_TOLERANCE
+                || position.getY() < -EDGE_TOLERANCE
+                || position.getY() > FieldMirroringUtils.FIELD_HEIGHT + EDGE_TOLERANCE;
     }
 
     @Override

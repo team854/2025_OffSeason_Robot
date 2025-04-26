@@ -331,12 +331,11 @@ public final class Constants {
 			public static final int ID = 5;
 			public static final double MAX_VELOCITY = 120; // Not sure the unit
 			public static final double MAX_ACCELERATION = 200; // Not sure the unit
-			public static final double P = 0.5;
+			public static final double P = 0.75;
 			public static final double I = 0;
 			public static final double D = 0.05;
 			public static final Voltage S = Volt.of(0.05); // Volts
-			public static final Voltage G = Volt.of(3.48); // Volts
-			public static final Voltage V = Volt.of(0.01); // Volts/(Degrees/Second)
+			public static final Voltage V = Volt.of(0.05); // Volts/(Degrees/Second)
 			public static final Voltage A = Volt.of(0.02); // Volts/(Degrees/Second^2)
 			public static final Mass MASS = Pound.of(15.0); // Pounds
 			public static final double MOI = 0.05; // Moment of innertia jKgMetersSquared
@@ -486,7 +485,7 @@ public final class Constants {
 		  public static final Distance HEIGHT = Feet.of(0.7); // Feet
 		  public static final Angle RAMP_ANGLE = Degree.of(35.0); // Degree
 		  public static final LinearVelocity SPAWN_VELOCITY = FeetPerSecond.of(3);
-		  public static final double ANGLE_DIFFERENCE_THRESHOLD = 0.05;
+		  public static final double ANGLE_DIFFERENCE_THRESHOLD = 0.019;
 		  public static final Angle WRIST_DIFFERENCE_THRESHOLD = Degree.of(20); // Degree
 		  public static final Time IN_ZONE_TIME = Second.of(0.5); // Second
 		}
@@ -516,7 +515,7 @@ public final class Constants {
 		public static boolean SHOULDER_TELEMETRY = true;
 		public static boolean WRIST_TELEMETRY = true;
 		public static boolean END_EFFECTOR_TELEMETRY = true;
-		public static boolean SIMULATION_TELEMETRY = false;
+		public static boolean SIMULATION_TELEMETRY = true;
 		public static boolean PATHFINDING_TELEMETRY = true;
 		public static boolean DEBUG = true;
 		public static boolean ANIMATIONS = true;

@@ -92,7 +92,6 @@ public class WristSubsystem extends SubsystemBase {
         // Initalize the wrist motor feed foward
         wristFeedFoward = new SimpleMotorFeedforward(
                 Constants.ArmConstants.Wrist.S.in(Volt),
-                Constants.ArmConstants.Wrist.G.in(Volt),
                 Constants.ArmConstants.Wrist.V.in(Volt),
                 Constants.ArmConstants.Wrist.A.in(Volt));
 
