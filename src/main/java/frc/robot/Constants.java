@@ -422,7 +422,7 @@ public final class Constants {
 		}
 	
 		public static final Distance RIGHT_OFFSET = Feet.of(-2.0); // Feet (For the right alliance coral station)
-		public static final Distance FOWARD_OFFSET = Feet.of(-0.15); // Feet
+		public static final Distance FOWARD_OFFSET = Feet.of(-0.19); // Feet
 		public static final Distance VERTICAL_OFFSET = Feet.of(3.25); // Feet (From the carpet)
 		public static final Angle PICK_UP_ANGLE = Degree.of(45.0); // Degrees
 	  }
@@ -485,7 +485,7 @@ public final class Constants {
 		  public static final Distance HEIGHT = Feet.of(0.7); // Feet
 		  public static final Angle RAMP_ANGLE = Degree.of(35.0); // Degree
 		  public static final LinearVelocity SPAWN_VELOCITY = FeetPerSecond.of(3);
-		  public static final double ANGLE_DIFFERENCE_THRESHOLD = 0.019;
+		  public static final double ANGLE_DIFFERENCE_THRESHOLD = 0.05;
 		  public static final Angle WRIST_DIFFERENCE_THRESHOLD = Degree.of(20); // Degree
 		  public static final Time IN_ZONE_TIME = Second.of(0.5); // Second
 		}
@@ -515,7 +515,7 @@ public final class Constants {
 		public static boolean SHOULDER_TELEMETRY = true;
 		public static boolean WRIST_TELEMETRY = true;
 		public static boolean END_EFFECTOR_TELEMETRY = true;
-		public static boolean SIMULATION_TELEMETRY = true;
+		public static boolean SIMULATION_TELEMETRY = false;
 		public static boolean PATHFINDING_TELEMETRY = true;
 		public static boolean DEBUG = true;
 		public static boolean ANIMATIONS = true;

@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -106,9 +107,14 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 		SmartDashboard.putNumberArray("Arm/Wrist/Position", PoseUtilities.convertPoseToNumbers(wristPose));
 
 		/*
+		 * Climb
+		 */
+		Pose3d climbPose = new Pose3d(-0.3628, 0, 0.205338, new Rotation3d(0,Units.degreesToRadians(-60),0));
+        SmartDashboard.putNumberArray("Climb/Position", PoseUtilities.convertPoseToNumbers(climbPose));
+
+		/*
 		 * Coral
 		 */
-
 		if (RobotContainer.endEffectorSubsystem.hasCoral()) {
 			Pose3d coralPose = RobotContainer.endEffectorSubsystem.calculateCoralPose(robotPose);
 

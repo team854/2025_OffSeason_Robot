@@ -122,6 +122,7 @@ public class VisionCamera {
 
         for (PhotonPipelineResult result : photonResults) {
 
+            // Get the estimated robot pose based on the result
             Optional<EstimatedRobotPose> tempRobotEstimate = photonPoseEstimator.update(result, Optional.empty(),
                     Optional.empty(), this.solveParams);
 
@@ -129,6 +130,7 @@ public class VisionCamera {
                 continue;
             }
 
+            // Convert the estimated robot pose into a vision estimate
             VisionEstimate foundRobotEstimate = new VisionEstimate(tempRobotEstimate.get());
 
             // Update the most recent estimated pose

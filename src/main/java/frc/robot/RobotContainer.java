@@ -11,7 +11,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.commands.auto.AutoPickupCoralStation;
+import frc.robot.commands.auto.AutoCalibrateCommand;
+import frc.robot.commands.auto.AutoPickupCoralStationCommand;
 import frc.robot.commands.auto.AutoScoreCoralCommand;
 import frc.robot.commands.elevator.ControlElevatorBothStagesCommand;
 import frc.robot.commands.setpoints.GroundPickupConfigurationCommand;
@@ -80,6 +81,8 @@ public class RobotContainer {
 	private void configureAutoChooser() {
 		autoChooser = AutoBuilder.buildAutoChooser();
 
+		autoChooser.addOption("Calibrate", new AutoCalibrateCommand());
+
 		System.out.println("Setup auto chooser");
 	}
 
@@ -127,7 +130,7 @@ public class RobotContainer {
 		/*
 		* Auto coral station pickup
 		*/
-		driverController.button(10).onTrue(new AutoPickupCoralStation(true));
+		driverController.button(10).onTrue(new AutoPickupCoralStationCommand(true));
 
 		/*
 		* Climb commands

@@ -58,6 +58,13 @@ public class Robot extends LoggedRobot  {
 
 	@Override
 	public void autonomousInit() {
+		// Set the elevator stages to their current height
+		RobotContainer.elevatorSubsystem.resetStage1Setpoint();
+		RobotContainer.elevatorSubsystem.resetStage2Setpoint();
+
+		// Set the shoulder to its current angle
+		RobotContainer.shoulderSubsystem.resetShoulderSetpoint();
+
 		autonomousCommand = robotContainer.getAutonomousCommand();
 
 		if (autonomousCommand != null) {

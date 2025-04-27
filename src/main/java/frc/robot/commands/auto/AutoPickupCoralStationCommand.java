@@ -24,11 +24,11 @@ import frc.robot.utilities.field.CoralStationUtilities;
 import frc.robot.utilities.field.FieldUtilities;
 import frc.robot.utilities.field.TagUtilities;
 
-public class AutoPickupCoralStation extends Command{
+public class AutoPickupCoralStationCommand extends Command{
 	private final boolean canCancel;
 	private SequentialCommandGroup commands;
 
-    public AutoPickupCoralStation(boolean canCancel) {
+    public AutoPickupCoralStationCommand(boolean canCancel) {
         this.canCancel = canCancel;
 
         // Set the entire robot as a requirement
@@ -90,7 +90,11 @@ public class AutoPickupCoralStation extends Command{
                 .plus(new Transform2d(-0.3, 0, Rotation2d.fromDegrees(0)));
 
         this.commands.addCommands(
-            new ParallelCommandGroup(new PathfindToPoseCommand(intermediatePose, 0), RobotContainer.shoulderSubsystem.gotoShoulderAngleCommand(robotTargetState.shoulderAngle()), RobotContainer.wristSubsystem.gotoWristAngleCommand(Degree.of(0)), RobotContainer.elevatorSubsystem.gotoOverallHeightCommand(robotTargetState.elevatorHeight())),
+            new ParallelCommandGroup(
+                new PathfindToPoseCommand(intermediatePose, 0),
+                RobotContainer.shoulderSubsystem.gotoShoulderAngleCommand(robotTargetState.shoulderAngle()),
+                RobotContainer.wristSubsystem.gotoWristAngleCommand(Degree.of(0)),
+                RobotContainer.elevatorSubsystem.gotoOverallHeightCommand(robotTargetState.elevatorHeight())),
             new MoveToPoseCommand(robotTargetState.chassisPose(), false).withDeadline(RobotContainer.endEffectorSubsystem.intakeUntil(Constants.DriverConstants.INTAKE_SPEED, true, 6))
         );
     }
@@ -111,6 +115,7 @@ public class AutoPickupCoralStation extends Command{
 
 	@Override
 	public void end(boolean interrupted) {
+        this.commands.end(interrupted);
 		System.out.println("Pickup command finished");
         if (!interrupted) {
             RumbleUtilities.rumbleCommandFullControlGiven();

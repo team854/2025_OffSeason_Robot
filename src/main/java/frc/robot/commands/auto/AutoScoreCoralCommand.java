@@ -151,6 +151,7 @@ public class AutoScoreCoralCommand extends Command {
 
 	@Override
 	public void end(boolean interrupted) {
+		this.commands.end(interrupted);
 		System.out.println("Scoring command finished");
 		if (!interrupted) {
 			RumbleUtilities.rumbleCommandFullControlGiven();

@@ -10,6 +10,10 @@ import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volt;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkAbsoluteEncoderSim;
@@ -41,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.utilities.math.EncoderUtilities;
 
 public class ShoulderSubsystem extends SubsystemBase {
 	/*
@@ -66,6 +71,11 @@ public class ShoulderSubsystem extends SubsystemBase {
 	private final ArmFeedforward shoulderFeedFoward;
 
 	/*
+	 * Calibration
+	 */
+	private boolean calibrationEnabled = false;
+
+	/*
 	 * Simulation
 	 */
 	private final DCMotor shoulderGearbox = DCMotor.getNEO(1);
@@ -84,18 +94,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 		shoulderMotorConfig.inverted(false);
 		shoulderMotorConfig.absoluteEncoder.inverted(false);
 
-		// This calculates the zero offset of the absolute encoder
-		// It first converts the rotation from arm space to encoder space then adds a push back angle
-		// Adding a push back angle prevents the code from having to deal with the posibility of the encoder going over it zero point
-		// This does assume that the arm is zeroed so the intake is facing down
-		double realOffset = ((Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_OFFSET.in(Rotation)
-				* Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_GEAR_RATIO)
-				+ Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_PUSH_BACK.in(Rotation)) % 1;
-
-		// The absolute encoder only takes in values from 0 to 1 so if its less then 0 it needs to be brought back into the 0 to 1 range
-		if (realOffset < 0) {
-			realOffset = 1 + realOffset;
-		}
+		
 
 		// This sets all the conversions of the encoders so they automaticly convert from motor space to arm space
 		// It needs to be the reciprocal because the factors are multiplied with the encoder value
@@ -105,7 +104,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 				.positionConversionFactor(1 / Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_GEAR_RATIO);
 		shoulderMotorConfig.absoluteEncoder
 				.velocityConversionFactor(1 / Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_GEAR_RATIO);
-		shoulderMotorConfig.absoluteEncoder.zeroOffset(realOffset);
+		shoulderMotorConfig.absoluteEncoder.zeroOffset(getZeroOffset(false));
 
 		shoulderMotor.configure(shoulderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -150,6 +149,23 @@ public class ShoulderSubsystem extends SubsystemBase {
 		}
 
 		System.out.println("Created ShoulderSubsystem");
+	}
+
+	private double getZeroOffset(boolean armSpace) {
+		// This calculates the zero offset of the absolute encoder
+		// It gets the offset from the config and adds a push back angle onto that
+		// Adding a push back angle prevents the code from having to deal with the posibility of the encoder going over it's zero point
+		// This does assume that the arm is zeroed so the claw is facing down
+		double realOffset = Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_OFFSET.in(Rotation) + (shoulderPushBackHorizontal / 360);
+
+		if (!armSpace) {
+			realOffset *= Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_GEAR_RATIO;
+		}
+
+		// The absolute encoder only takes in values from 0 to 1 so if its less then 0 it needs to be brought back into the 0 to 1 range
+		realOffset = EncoderUtilities.clampAbsoluteEncoder(Rotation.of(realOffset)).in(Rotation);
+		
+		return realOffset;
 	}
 
 	/**
@@ -229,6 +245,64 @@ public class ShoulderSubsystem extends SubsystemBase {
 				getShoulderSetpoint().plus(Degree.of(shoulderSpeed.in(DegreesPerSecond) / 50))), this);
 	}
 
+	/**
+	 * Sets if the calibration mode is enabled for the shoulder. The calibration mode disables the pid.
+	 * 
+	 * @param state The target state of the calibration mode
+	 */
+	public void setCalibrationEnabled(boolean state) {
+		this.calibrationEnabled = state;
+
+		if (this.calibrationEnabled == true) {
+			setShoulderMotorVoltage(Volt.of(0));
+		} else {
+			resetShoulderSetpoint();
+		}
+	}
+
+	public void setShoulderMotorVoltage(Voltage voltage) {
+		this.shoulderMotorTargetVoltage = voltage.in(Volt);
+		shoulderMotor.setVoltage(MathUtil.clamp(voltage.in(Volt), -10, 10));
+	}
+
+	public Command calibrateShoulderCommand(Consumer<Double> zeroOffsetConsumer) {
+		List<Double> encoderVelocityHistory = new ArrayList<>();
+		return new FunctionalCommand(() -> {
+			// Add some values to the encoder history so it has time to accelerate
+			for (int i = 0; i < 5; i++) {
+				encoderVelocityHistory.add(1.0);
+			}
+			
+			// Enable calibration mode and start the motor moving
+			setCalibrationEnabled(true);
+			setShoulderMotorVoltage(Volt.of(0.8));
+		}, () -> {
+			// Remove the oldest velocity from the start and add the current velocity to the end
+			encoderVelocityHistory.remove(0);
+			encoderVelocityHistory.add(getShoulderVelocity().in(DegreesPerSecond));
+		}, (interrupted) -> {
+			// Calculate the zero offset
+			Angle outputZeroOffset = EncoderUtilities.calculateZeroOffset(getShoulderAngle(), Constants.ArmConstants.Shoulder.MIN_ANGLE, Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_OFFSET);
+
+			// Update the consumer with the zero offset
+			zeroOffsetConsumer.accept(outputZeroOffset.in(Degree));
+
+			// Disable calibration mode
+			setCalibrationEnabled(false);
+		}, () -> {
+			// Get the average velocity
+			double velocityAverage = 0;
+			for (double velocity : encoderVelocityHistory) {
+				velocityAverage+=velocity;
+			}
+			velocityAverage /= encoderVelocityHistory.size();
+
+			// If it is bellow 0.25 degrees per second finish the command
+			return Math.abs(velocityAverage) < 0.25;
+		}, this);
+	}
+
+
 	@Override
 	public void simulationPeriodic() {
 		// Simulate shoulder
@@ -243,8 +317,10 @@ public class ShoulderSubsystem extends SubsystemBase {
 		// The motor sim can't update both the absolute encoder and the relative encoder
 		// To get around this the code just updates the absolute encoder for it
 		SparkAbsoluteEncoderSim absoluteEncoderSim = shoulderMotorSim.getAbsoluteEncoderSim();
+		
+		// Set the position to the simulated position plus the zero offset in arm space
 		absoluteEncoderSim
-				.setPosition(shoulderMotorSim.getPosition() + Units.degreesToRotations(shoulderPushBackHorizontal));
+				.setPosition(shoulderMotorSim.getPosition() + getZeroOffset(true));
 		absoluteEncoderSim.setVelocity(shoulderMotorSim.getVelocity());
 
 		// Add the current voltage as a load to the battery
@@ -254,16 +330,18 @@ public class ShoulderSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+		if (calibrationEnabled) {
+			return;
+		}
+
 		// Run the pid and feed foward for the shoulder
-		double shoulderVoltsOutput = MathUtil
-				.clamp(shoulderController.calculate(getShoulderAngle().in(Degree))
+		double shoulderVoltsOutput = shoulderController.calculate(getShoulderAngle().in(Degree))
 						+ shoulderFeedFoward.calculateWithVelocities(
 								getShoulderAngle().in(Radian),
 								getShoulderVelocity().in(RadiansPerSecond),
-								Units.degreesToRadians(shoulderController.getGoal().velocity)),
-						-10, 10);
+								Units.degreesToRadians(shoulderController.getGoal().velocity));
 		
-		this.shoulderMotorTargetVoltage = shoulderVoltsOutput;
-		shoulderMotor.setVoltage(shoulderVoltsOutput);
+		
+		setShoulderMotorVoltage(Volt.of(shoulderVoltsOutput));
 	}
 }

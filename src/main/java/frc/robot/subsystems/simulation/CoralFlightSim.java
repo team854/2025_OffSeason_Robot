@@ -113,8 +113,7 @@ public class CoralFlightSim extends ReefscapeCoralOnFly {
                 () -> Math.max(
                         ReefscapeCoralOnField.REEFSCAPE_CORAL_INFO
                                         .gamePieceHeight()
-                                        .in(Meters) / 2
-                                ,
+                                        .in(Meters) / 2,
                         getPositionAtTime(super.launchedTimer.get()).getZ()),
                 new Pose2d(
                         getPositionAtTime(launchedTimer.get()).toTranslation2d(), Rotation2d.fromRadians(gamePieceRotation.getZ())),

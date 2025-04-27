@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.Constants.RobotKinematicConstants;
 import frc.robot.utilities.math.PoseUtilities;
 
 public final class ArmSafteyUtilities {
@@ -29,6 +28,7 @@ public final class ArmSafteyUtilities {
         // Calculate the bumper width and add an offset to it
         double halfBumperWidth = (Constants.RobotKinematicConstants.LENGTH.in(Meter) / 2) + Constants.ArmConstants.OUT_BUMPER_OFFSET.in(Meter);
 
+        // If the end effector is over the bumper map the min height to a diagonal line instead
         if (meterX > halfBumperWidth) {
             double angleHeight = (meterX - halfBumperWidth) * Math.tan(Constants.ArmConstants.OUT_BUMPER_ANGLE.in(Radian));
             return Meter.of(Constants.ArmConstants.MINIMUM_HEIGHT_IN_BUMPER.in(Meter) + angleHeight);
