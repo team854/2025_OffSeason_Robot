@@ -74,7 +74,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
     public Pose3d calculateEndEffectorPose(Pose3d robotPose, Distance elevatorOverallHeight, Angle shoulderAngle, Angle wristAngle) {
         // Calculate where the end effector of the arm is
         Pose3d endEffectorPose = robotPose
-                .plus(new Transform3d(Constants.ArmConstants.Shoulder.CENTER_OFFSET_FOWARD.in(Meter), 0,
+                .plus(new Transform3d(Constants.ArmConstants.Shoulder.CENTER_OFFSET_FORWARD.in(Meter), 0,
                         elevatorOverallHeight.in(Meter),
                         new Rotation3d(wristAngle.in(Radian),
                                 -shoulderAngle.in(Radian), 0)));
@@ -163,14 +163,14 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     private Distance calculateHorizontalDistance(Angle angle, Distance armLength) {
         return Meter.of(Math.cos(angle.in(Radian)) * armLength.in(Meter))
-                .plus(Constants.ArmConstants.Shoulder.CENTER_OFFSET_FOWARD);
+                .plus(Constants.ArmConstants.Shoulder.CENTER_OFFSET_FORWARD);
     }
 
 
     private Angle constrainedDistanceAngle(Distance minimumRobotDistance, Angle angle, Distance armLength) {
         // The minimum distance does not account for the offset of the shoulder joint so it is subtracted to get the minimum distance bettween the shoulder and the target
         double horizontalRobotArmDistance = minimumRobotDistance.in(Meter)
-                - Constants.ArmConstants.Shoulder.CENTER_OFFSET_FOWARD.in(Meter);
+                - Constants.ArmConstants.Shoulder.CENTER_OFFSET_FORWARD.in(Meter);
 
         // Compute the angle to reach the point while taking into account the minimum distance
         double newTargetAngle = Math.acos(horizontalRobotArmDistance / armLength.in(Meter));

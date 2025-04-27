@@ -236,7 +236,7 @@ public final class Constants {
 		public static final Distance TRANSLATION_ACCEPTABLE_ERROR = Feet.of(0.1); // Feet
 		public static final Angle ROTATION_ACCEPTABLE_ERROR = Degree.of(2); // Degrees
 
-		public static final boolean ENABLE_FEED_FOWARD = false; // Controls if feed foward should be enabled in the auto
+		public static final boolean ENABLE_FEED_FORWARD = false; // Controls if feed forward should be enabled in the auto
 
 		public static final double ANGLE_JOYSTICK_RADIUS_DEADBAND = 0.5;
 		public static final List<String> MODULE_FILES = List.of("frontleft.json", "frontright.json", "backleft.json", "backright.json");
@@ -322,7 +322,7 @@ public final class Constants {
 			public static final double GEAR_RATIO = 50;
 			public static final double ABSOLUTE_ENCODER_GEAR_RATIO = 1.85714;
 			public static final Angle ABSOLUTE_ENCODER_PUSH_BACK = Degree.of(25.0); // Degrees
-			public static final Distance CENTER_OFFSET_FOWARD = Feet.of(0.492126); // Feet
+			public static final Distance CENTER_OFFSET_FORWARD = Feet.of(0.492126); // Feet
 			public static final Distance STAGE_OFFSET_UP = Feet.of(0.958); // Feet
 			public static final Angle TOLLERANCE = Degree.of(3.0); // Degrees
 		}
@@ -407,7 +407,7 @@ public final class Constants {
 			}
 
 			public static final Distance BRANCH_LEFT_OFFSET = Feet.of(0.563040616798); // Feet
-			public static final Distance BRANCH_FOWARD_OFFSET = Feet.of(0.21141732); // Feet
+			public static final Distance BRANCH_FORWARD_OFFSET = Feet.of(0.21141732); // Feet
 		}
 
 		public static final Angle LIFT_ANGLE = Degree.of(25.0);
@@ -422,7 +422,7 @@ public final class Constants {
 		}
 	
 		public static final Distance RIGHT_OFFSET = Feet.of(-2.0); // Feet (For the right alliance coral station)
-		public static final Distance FOWARD_OFFSET = Feet.of(-0.19); // Feet
+		public static final Distance FORWARD_OFFSET = Feet.of(-0.19); // Feet
 		public static final Distance VERTICAL_OFFSET = Feet.of(3.25); // Feet (From the carpet)
 		public static final Angle PICK_UP_ANGLE = Degree.of(45.0); // Degrees
 	  }
@@ -432,8 +432,8 @@ public final class Constants {
 		public static final LinearAcceleration TRANSLATION_MAX_ACCELERATION = FeetPerSecondPerSecond.of(7.0);
 		public static final AngularVelocity ROTATION_MAX_VELOCITY = DegreesPerSecond.of(180.0);
 		public static final AngularAcceleration ROTATION_MAX_ACCELERATION = DegreesPerSecondPerSecond.of(180.0);
-		public static final double TRANSLATION_FEEDFOWARD_DIVISOR = 2;
-		public static final double ROTATION_FEEDFOWARD_DIVISOR = 4;
+		public static final double TRANSLATION_FEEDFORWARD_DIVISOR = 2;
+		public static final double ROTATION_FEEDFORWARD_DIVISOR = 4;
 	}
 
 	public static class VisionConstants {
@@ -478,7 +478,7 @@ public final class Constants {
 	
 		public static class CoralStations {
 		  public static final boolean ENABLED = true;
-		  public static final Distance FOWARD_OFFSET = Feet.of(-0.2); // Feet
+		  public static final Distance FORWARD_OFFSET = Feet.of(-0.2); // Feet
 		  public static final Distance VERTICAL_OFFSET = Feet.of(-1.49); // Feet
 		  public static final Distance WIDTH = Feet.of(6.354); // Feet
 		  public static final Distance LENGTH = Feet.of(0.5); // Feet

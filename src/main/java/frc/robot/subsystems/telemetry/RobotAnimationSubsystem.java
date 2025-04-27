@@ -78,7 +78,7 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 				0);
 		
         Pose3d shoulderPose = new Pose3d(
-				Constants.ArmConstants.Shoulder.CENTER_OFFSET_FOWARD.in(Meter),
+				Constants.ArmConstants.Shoulder.CENTER_OFFSET_FORWARD.in(Meter),
         		0,
 				elevatorGroundHeight, shoulderRotation);
 
@@ -99,7 +99,7 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 				0);
 		
         Pose3d wristPose = new Pose3d(
-				Constants.ArmConstants.Shoulder.CENTER_OFFSET_FOWARD.in(Meter),
+				Constants.ArmConstants.Shoulder.CENTER_OFFSET_FORWARD.in(Meter),
         		0.0023,
 				elevatorGroundHeight, wristRotation);
 				

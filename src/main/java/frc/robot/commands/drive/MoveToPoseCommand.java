@@ -125,10 +125,10 @@ public class MoveToPoseCommand extends Command {
                 .calculate(RobotContainer.swerveSubsystem.swerveDrive.getOdometryHeading().getRadians());
 
         // Calculate the delta bettween the previous input and the current input
-        // This acts sort of like a feed foward controller as if the speed goes up we know more power will be needed
+        // This acts sort of like a feed forward controller as if the speed goes up we know more power will be needed
         // and this helps the control system react a little bit quicker
-        double translationDelta = (targetTranslation - this.oldTranslationSpeed) / Constants.AutoConstants.TRANSLATION_FEEDFOWARD_DIVISOR;
-        double headingDelta = (heading - this.oldHeadingSpeed) / Constants.AutoConstants.ROTATION_FEEDFOWARD_DIVISOR;
+        double translationDelta = (targetTranslation - this.oldTranslationSpeed) / Constants.AutoConstants.TRANSLATION_FEEDFORWARD_DIVISOR;
+        double headingDelta = (heading - this.oldHeadingSpeed) / Constants.AutoConstants.ROTATION_FEEDFORWARD_DIVISOR;
 
         // Ge the final target speeds
         Translation2d finalTranslation = translationDifference.times(targetTranslation + translationDelta);

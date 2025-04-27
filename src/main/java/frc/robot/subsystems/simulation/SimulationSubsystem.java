@@ -85,7 +85,7 @@ public class SimulationSubsystem extends SubsystemBase {
 
             // Offset the pose of the tag to get the pose of the coral station
             Pose3d coralStationPose = tagPose
-                    .transformBy(new Transform3d(Constants.SimulationConstants.CoralStations.FOWARD_OFFSET.in(Meter), 0,
+                    .transformBy(new Transform3d(Constants.SimulationConstants.CoralStations.FORWARD_OFFSET.in(Meter), 0,
                             Constants.SimulationConstants.CoralStations.VERTICAL_OFFSET.in(Meter), new Rotation3d()));
 
             // Offset the pose of the tag to get the pose that coral should be spawned at

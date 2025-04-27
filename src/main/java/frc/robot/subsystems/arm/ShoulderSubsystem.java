@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.dyn4j.geometry.Vector2;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkAbsoluteEncoderSim;
@@ -29,6 +31,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -72,7 +78,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 	 * Control
 	 */
 	private final ProfiledPIDController shoulderController;
-	private final ArmFeedforward shoulderFeedFoward;
+	private final ArmFeedforward shoulderFeedForward;
 
 	/*
 	 * Calibration
@@ -85,9 +91,8 @@ public class ShoulderSubsystem extends SubsystemBase {
 	private final DCMotor shoulderGearbox = DCMotor.getNEO(1);
 	private final SparkMaxSim shoulderMotorSim = new SparkMaxSim(shoulderMotor, shoulderGearbox);
 	private ShoulderSimulation shoulderArmSim = null;
-	private ElevatorSim stage1ElevatorSim = null;
-	private ElevatorSim stage2ElevatorSim = null;
 	private double lastElevatorVelocity = 0;
+	private double lastForwardVelocity = 0;
 
 	public ShoulderSubsystem() {
 		/*
@@ -129,8 +134,8 @@ public class ShoulderSubsystem extends SubsystemBase {
 				Constants.ArmConstants.Shoulder.I,
 				Constants.ArmConstants.Shoulder.D,
 				shoulderConstraints);
-		// Initalize the shoulder motor feed foward
-		shoulderFeedFoward = new ArmFeedforward(
+		// Initalize the shoulder motor feed forward
+		shoulderFeedForward = new ArmFeedforward(
 				Constants.ArmConstants.Shoulder.S.in(Volt),
 				Constants.ArmConstants.Shoulder.G.in(Volt),
 				Constants.ArmConstants.Shoulder.V.in(Volt),
@@ -153,9 +158,6 @@ public class ShoulderSubsystem extends SubsystemBase {
 					0.0,
 					0.02,
 					0.0);
-
-			this.stage1ElevatorSim = RobotContainer.elevatorSubsystem.getStage1ElevatorSim();
-			this.stage2ElevatorSim = RobotContainer.elevatorSubsystem.getStage2ElevatorSim();
 		}
 
 		System.out.println("Created ShoulderSubsystem");
@@ -316,14 +318,21 @@ public class ShoulderSubsystem extends SubsystemBase {
 	@Override
 	public void simulationPeriodic() {
 
-		double elevatorVelocity = this.stage1ElevatorSim.getVelocityMetersPerSecond() + this.stage2ElevatorSim.getVelocityMetersPerSecond();
-
-		double elevatorAcceleration = elevatorVelocity - this.lastElevatorVelocity;
-
+		// Calculate the elevator velocity and acceleration
+		double elevatorVelocity = RobotContainer.elevatorSubsystem.getStage1ElevatorSim().getVelocityMetersPerSecond() + RobotContainer.elevatorSubsystem.getStage2ElevatorSim().getVelocityMetersPerSecond();
+		double elevatorAcceleration = (elevatorVelocity - this.lastElevatorVelocity) / 0.02;
 		this.lastElevatorVelocity = elevatorVelocity;
+
+		// Calculate the forward swerve velocity and acceleration
+		Vector2 velocityVector = RobotContainer.swerveSubsystem.swerveDrive.getMapleSimDrive().get().getLinearVelocity();
+		Pose2d roboPose = RobotContainer.swerveSubsystem.swerveDrive.getSimulationDriveTrainPose().get();
+		double forwardVelocity = new Translation2d(velocityVector.x, velocityVector.y).rotateBy(roboPose.getRotation().unaryMinus()).getX();
+		double forwardAcceleration = (forwardVelocity - this.lastForwardVelocity) / 0.02;
+		this.lastForwardVelocity = forwardVelocity;
 
 		// Simulate shoulder
 		shoulderArmSim.updatePivotVerticalAcceleration(MetersPerSecondPerSecond.of(elevatorAcceleration));
+		shoulderArmSim.updatePivotForwardAcceleration(MetersPerSecondPerSecond.of(forwardAcceleration));
 
 		shoulderArmSim.setInput(shoulderMotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
 
@@ -353,9 +362,9 @@ public class ShoulderSubsystem extends SubsystemBase {
 			return;
 		}
 
-		// Run the pid and feed foward for the shoulder
+		// Run the pid and feed forward for the shoulder
 		double shoulderVoltsOutput = shoulderController.calculate(getShoulderAngle().in(Degree))
-						+ shoulderFeedFoward.calculateWithVelocities(
+						+ shoulderFeedForward.calculateWithVelocities(
 								getShoulderAngle().in(Radian),
 								getShoulderVelocity().in(RadiansPerSecond),
 								Units.degreesToRadians(shoulderController.getGoal().velocity));

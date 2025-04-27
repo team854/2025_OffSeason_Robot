@@ -71,10 +71,10 @@ public class ElevatorSubsystem extends SubsystemBase {
      * Control
      */
     private final ProfiledPIDController stage1Controller;
-    private final ElevatorFeedforward stage1FeedFoward;
+    private final ElevatorFeedforward stage1FeedForward;
 
     private final ProfiledPIDController stage2Controller;
-    private final ElevatorFeedforward stage2FeedFoward;
+    private final ElevatorFeedforward stage2FeedForward;
 
     /*
      * Simulation
@@ -142,13 +142,13 @@ public class ElevatorSubsystem extends SubsystemBase {
                 Constants.ElevatorConstants.Stage2.D,
                 stage2Constraints);
 
-        // Configure feed foward
-        stage1FeedFoward = new ElevatorFeedforward(
+        // Configure feed forward
+        stage1FeedForward = new ElevatorFeedforward(
                 Constants.ElevatorConstants.Stage1.S.in(Volt),
                 Constants.ElevatorConstants.Stage1.G.in(Volt),
                 Constants.ElevatorConstants.Stage1.V.in(Volt),
                 Constants.ElevatorConstants.Stage1.A.in(Volt));
-        stage2FeedFoward = new ElevatorFeedforward(
+        stage2FeedForward = new ElevatorFeedforward(
                 Constants.ElevatorConstants.Stage2.S.in(Volt),
                 Constants.ElevatorConstants.Stage2.G.in(Volt),
                 Constants.ElevatorConstants.Stage2.V.in(Volt),
@@ -416,7 +416,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
 
         double stage1VoltsOutput = MathUtil.clamp(
-                stage1Controller.calculate(getStage1Height().in(Meter)) + stage1FeedFoward
+                stage1Controller.calculate(getStage1Height().in(Meter)) + stage1FeedForward
                         .calculateWithVelocities(getStage1HeightVelocity().in(MetersPerSecond),
                                 stage1Controller.getGoal().velocity),
                 -10, 10);
@@ -425,7 +425,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         stage1Motor.setVoltage(stage1VoltsOutput);
 
         double stage2VoltsOutput = MathUtil.clamp(
-                stage2Controller.calculate(getStage2Height().in(Meter)) + stage2FeedFoward
+                stage2Controller.calculate(getStage2Height().in(Meter)) + stage2FeedForward
                         .calculateWithVelocities(getStage2HeightVelocity().in(MetersPerSecond),
                                 stage2Controller.getGoal().velocity),
                 -10, 10);

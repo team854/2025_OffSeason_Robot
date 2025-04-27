@@ -20,6 +20,7 @@ public class ShoulderSimulation extends SingleJointedArmSim {
     private double armLenMeters;
 
     private double pivotVerticalAcceleration = 0;
+    private double pivotForwardAcceleration = 0;
 
     /**
      * Creates a simulated arm mechanism.https://www.youtube.com/watch?v=h3TD3qKDO0U
@@ -59,6 +60,10 @@ public class ShoulderSimulation extends SingleJointedArmSim {
         this.pivotVerticalAcceleration = verticalAcceleration.in(MetersPerSecondPerSecond);
     }
 
+    public void updatePivotForwardAcceleration(LinearAcceleration forwardAcceleration) {
+        this.pivotForwardAcceleration = forwardAcceleration.in(MetersPerSecondPerSecond);
+    }
+
     /**
     * Updates the state of the arm.
     *
@@ -96,13 +101,18 @@ public class ShoulderSimulation extends SingleJointedArmSim {
                 (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
                     Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
                     if (simulateGravity) {
-                        double alphaGrav = 3.0 / 2.0 * -9.8 * Math.cos(x.get(0, 0)) / armLenMeters;
+                        double alphaGrav = (3.0 / 2.0) * -9.8 * Math.cos(x.get(0, 0)) / armLenMeters;
                         xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));
                     }
 
-                    double alphaForce = 3.0 / 2.0 * -this.pivotVerticalAcceleration * Math.cos(x.get(0, 0)) / armLenMeters;
-                    xdot = xdot.plus(VecBuilder.fill(0, alphaForce));
+                    // Handle verticle movement from the elevator
+                    double vertForce = (3.0 / 2.0) * -this.pivotVerticalAcceleration * Math.cos(x.get(0, 0)) / armLenMeters;
+                    xdot = xdot.plus(VecBuilder.fill(0, vertForce));
                     
+                    // Handle forward movement from the swerve base
+                    double fwdForce = (3.0 / 2.0) * this.pivotForwardAcceleration * Math.sin(x.get(0, 0)) / armLenMeters;
+                    xdot = xdot.plus(VecBuilder.fill(0, fwdForce));
+
                     return xdot;
                 },
                 currentXhat,

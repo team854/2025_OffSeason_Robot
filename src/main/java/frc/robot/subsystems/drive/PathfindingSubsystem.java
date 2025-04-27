@@ -64,7 +64,7 @@ public class PathfindingSubsystem extends SubsystemBase {
                 // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 () -> RobotContainer.swerveSubsystem.getRobotVelocity(),
                 (speedsRobotRelative, moduleFeedForwards) -> {
-                    if (Constants.SwerveConstants.ENABLE_FEED_FOWARD) {
+                    if (Constants.SwerveConstants.ENABLE_FEED_FORWARD) {
                         RobotContainer.swerveSubsystem.swerveDrive.drive(
                                 speedsRobotRelative,
                                 RobotContainer.swerveSubsystem.swerveDrive.kinematics

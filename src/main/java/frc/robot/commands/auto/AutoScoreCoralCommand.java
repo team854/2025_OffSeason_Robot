@@ -87,7 +87,7 @@ public class AutoScoreCoralCommand extends Command {
 
 		// Calculate the minium distance bettween the robot center and the branch
 		Distance minimumRobotDistance = (Constants.RobotKinematicConstants.LENGTH.div(2))
-				.plus(Constants.ReefConstants.FieldConstants.BRANCH_FOWARD_OFFSET);
+				.plus(Constants.ReefConstants.FieldConstants.BRANCH_FORWARD_OFFSET);
 
 		// Using inverse kinematics compute the robots pose
 		InverseKinematicState robotTargetState = RobotContainer.endEffectorSubsystem

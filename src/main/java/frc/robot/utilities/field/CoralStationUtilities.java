@@ -54,7 +54,7 @@ public final class CoralStationUtilities {
      */
     public static Pose2d getPickupPose(Pose2d tagPose, boolean right) {
         Transform2d pickupTransform = new Transform2d(
-                Constants.CoralStationConstants.FOWARD_OFFSET.in(Meter),
+                Constants.CoralStationConstants.FORWARD_OFFSET.in(Meter),
                 Constants.CoralStationConstants.RIGHT_OFFSET.in(Meter) * ((right) ? -1 : 1),
                 Rotation2d.fromDegrees(0));
         return tagPose.transformBy(pickupTransform);

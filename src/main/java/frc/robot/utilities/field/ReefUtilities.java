@@ -57,7 +57,7 @@ public final class ReefUtilities {
      */
     public static Pose2d getBranchPose(Pose2d tagPose, boolean right) {
         Transform2d branchTransform = new Transform2d(
-                Constants.ReefConstants.FieldConstants.BRANCH_FOWARD_OFFSET.in(Meter),
+                Constants.ReefConstants.FieldConstants.BRANCH_FORWARD_OFFSET.in(Meter),
                 Constants.ReefConstants.FieldConstants.BRANCH_LEFT_OFFSET.in(Meter) * ((right) ? -1 : 1),
                 Rotation2d.fromDegrees(0));
         return tagPose.transformBy(branchTransform);

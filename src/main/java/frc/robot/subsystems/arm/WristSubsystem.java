@@ -47,7 +47,7 @@ public class WristSubsystem extends SubsystemBase {
      * Control
      */
     private final ProfiledPIDController wristController;
-    private final SimpleMotorFeedforward wristFeedFoward;
+    private final SimpleMotorFeedforward wristFeedForward;
 
     /*
      * Simulation
@@ -89,8 +89,8 @@ public class WristSubsystem extends SubsystemBase {
                 Constants.ArmConstants.Wrist.D,
                 wristConstraints);
         wristController.enableContinuousInput(-180, 180);
-        // Initalize the wrist motor feed foward
-        wristFeedFoward = new SimpleMotorFeedforward(
+        // Initalize the wrist motor feed forward
+        wristFeedForward = new SimpleMotorFeedforward(
                 Constants.ArmConstants.Wrist.S.in(Volt),
                 Constants.ArmConstants.Wrist.V.in(Volt),
                 Constants.ArmConstants.Wrist.A.in(Volt));
@@ -190,10 +190,10 @@ public class WristSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Run the pid and feed foward for the wrist
+        // Run the pid and feed forward for the wrist
         double wristVoltsOutput = MathUtil
                 .clamp(wristController.calculate(getWristAngle().in(Degree))
-                        + wristFeedFoward.calculateWithVelocities(
+                        + wristFeedForward.calculateWithVelocities(
                             getWristVelocity().in(RadiansPerSecond),
                             Units.degreesToRadians(wristController.getSetpoint().velocity)),
                     -10, 10);
