@@ -116,13 +116,13 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 		 * Coral
 		 */
 		if (RobotContainer.endEffectorSubsystem.hasCoral()) {
-			Pose3d coralPose = RobotContainer.endEffectorSubsystem.calculateCoralPose(robotPose);
+			Pose3d coralPose = RobotContainer.endEffectorSubsystem.calculateCoralPose(new Pose3d());
 
 			// If its in simulation the left right offset should be displayed
 			if (isSimulation) {
 				coralPose = coralPose.transformBy(new Transform3d(RobotContainer.endEffectorSubsystem.getClawSimulation().getCoralOffset().in(Meter), 0, 0, new Rotation3d()));
 			}
-
+			
 			SmartDashboard.putNumberArray("Arm/Intake/Coral/Position", PoseUtilities.convertPoseToNumbers(coralPose));
 		} else {
 			SmartDashboard.putNumberArray("Arm/Intake/Coral/Position", PoseUtilities.convertPoseToNumbers(new Pose3d(5, 5, -5, new Rotation3d())));

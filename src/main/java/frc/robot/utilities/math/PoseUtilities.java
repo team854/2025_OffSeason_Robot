@@ -7,6 +7,7 @@ import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.measure.Distance;
 
 public final class PoseUtilities {
@@ -50,6 +51,10 @@ public final class PoseUtilities {
 			}
 		}
 		return outputArray.toArray(new Double[0]);
+    }
+
+    public static Pose3d convertTransformToPose(Transform3d transform) {
+        return new Pose3d(transform.getTranslation(), transform.getRotation());
     }
 
     public static Distance calculatePoseDistance(Pose3d pose1, Pose3d pose2) {
