@@ -1,7 +1,6 @@
 package frc.robot.commands.auto;
 
 import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.Meter;
 
 import java.util.function.Consumer;
 

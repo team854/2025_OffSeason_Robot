@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotation;
@@ -36,6 +37,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,6 +47,8 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.simulation.ShoulderSimulation;
 import frc.robot.utilities.math.EncoderUtilities;
 
 public class ShoulderSubsystem extends SubsystemBase {
@@ -80,7 +84,10 @@ public class ShoulderSubsystem extends SubsystemBase {
 	 */
 	private final DCMotor shoulderGearbox = DCMotor.getNEO(1);
 	private final SparkMaxSim shoulderMotorSim = new SparkMaxSim(shoulderMotor, shoulderGearbox);
-	private SingleJointedArmSim shoulderArmSim = null;
+	private ShoulderSimulation shoulderArmSim = null;
+	private ElevatorSim stage1ElevatorSim = null;
+	private ElevatorSim stage2ElevatorSim = null;
+	private double lastElevatorVelocity = 0;
 
 	public ShoulderSubsystem() {
 		/*
@@ -135,7 +142,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 		if (Robot.isSimulation()) {
 			System.out.println("Creating shoulder simulation");
 
-			shoulderArmSim = new SingleJointedArmSim(shoulderGearbox, Constants.ArmConstants.Shoulder.GEAR_RATIO,
+			shoulderArmSim = new ShoulderSimulation(shoulderGearbox, Constants.ArmConstants.Shoulder.GEAR_RATIO,
 					SingleJointedArmSim.estimateMOI(
 							Constants.ArmConstants.LENGTH.in(Meter),
 							Constants.ArmConstants.Shoulder.MASS.in(Kilogram)),
@@ -143,9 +150,12 @@ public class ShoulderSubsystem extends SubsystemBase {
 					Constants.ArmConstants.Shoulder.MIN_ANGLE.in(Radian),
 					Constants.ArmConstants.Shoulder.MAX_ANGLE.in(Radian),
 					true,
-					0,
+					0.0,
 					0.02,
-					0);
+					0.0);
+
+			this.stage1ElevatorSim = RobotContainer.elevatorSubsystem.getStage1ElevatorSim();
+			this.stage2ElevatorSim = RobotContainer.elevatorSubsystem.getStage2ElevatorSim();
 		}
 
 		System.out.println("Created ShoulderSubsystem");
@@ -305,7 +315,16 @@ public class ShoulderSubsystem extends SubsystemBase {
 
 	@Override
 	public void simulationPeriodic() {
+
+		double elevatorVelocity = this.stage1ElevatorSim.getVelocityMetersPerSecond() + this.stage2ElevatorSim.getVelocityMetersPerSecond();
+
+		double elevatorAcceleration = elevatorVelocity - this.lastElevatorVelocity;
+
+		this.lastElevatorVelocity = elevatorVelocity;
+
 		// Simulate shoulder
+		shoulderArmSim.updatePivotVerticalAcceleration(MetersPerSecondPerSecond.of(elevatorAcceleration));
+
 		shoulderArmSim.setInput(shoulderMotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
 
 		shoulderArmSim.update(0.02);

@@ -345,6 +345,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 		return Volt.of(this.stage2MotorTargetVoltage);
 	}
 
+    public ElevatorSim getStage1ElevatorSim() {
+        return this.stage1ElevatorSim;
+    }
+
+    public ElevatorSim getStage2ElevatorSim() {
+        return this.stage2ElevatorSim;
+    }
+
     @Override
     public void simulationPeriodic() {
         stage1ElevatorSim.setInput(stage1MotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
