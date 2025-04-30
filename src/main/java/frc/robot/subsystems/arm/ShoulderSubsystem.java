@@ -1,5 +1,6 @@
 package frc.robot.subsystems.arm;
 
+import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Kilogram;
@@ -32,24 +33,19 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
@@ -148,14 +144,12 @@ public class ShoulderSubsystem extends SubsystemBase {
 			System.out.println("Creating shoulder simulation");
 
 			shoulderArmSim = new ShoulderSimulation(shoulderGearbox, Constants.ArmConstants.Shoulder.GEAR_RATIO,
-					SingleJointedArmSim.estimateMOI(
-							Constants.ArmConstants.LENGTH.in(Meter),
-							Constants.ArmConstants.Shoulder.MASS.in(Kilogram)),
-					Constants.ArmConstants.LENGTH.in(Meter),
-					Constants.ArmConstants.Shoulder.MIN_ANGLE.in(Radian),
-					Constants.ArmConstants.Shoulder.MAX_ANGLE.in(Radian),
+					Constants.ArmConstants.Shoulder.MASS,
+					Constants.ArmConstants.LENGTH,
+					Constants.ArmConstants.Shoulder.MIN_ANGLE,
+					Constants.ArmConstants.Shoulder.MAX_ANGLE,
 					true,
-					0.0,
+					Radian.of(0.0),
 					0.02,
 					0.0);
 		}
@@ -334,12 +328,16 @@ public class ShoulderSubsystem extends SubsystemBase {
 		shoulderArmSim.updatePivotVerticalAcceleration(MetersPerSecondPerSecond.of(elevatorAcceleration));
 		shoulderArmSim.updatePivotForwardAcceleration(MetersPerSecondPerSecond.of(forwardAcceleration));
 
-		shoulderArmSim.setInput(shoulderMotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
+		// Update the weight of the shoulder depending on whether it has coral
+		Mass offset_weight = RobotContainer.endEffectorSubsystem.hasCoral() ? Constants.SimulationConstants.CORAL_WEIGHT : Kilogram.of(0);
+		shoulderArmSim.setWeight(Constants.ArmConstants.Shoulder.MASS.plus(offset_weight));
+
+		shoulderArmSim.setInputVoltage(Volt.of(shoulderMotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage()));
 
 		shoulderArmSim.update(0.02);
 
 		// Iterate in the shoulder motor simulation
-		shoulderMotorSim.iterate(Units.radiansToRotations(shoulderArmSim.getVelocityRadPerSec()) * 60,
+		shoulderMotorSim.iterate(shoulderArmSim.getVelocity().in(RotationsPerSecond) * 60,
 				RoboRioSim.getVInVoltage(), 0.02);
 
 		// The motor sim can't update both the absolute encoder and the relative encoder
@@ -350,10 +348,10 @@ public class ShoulderSubsystem extends SubsystemBase {
 		absoluteEncoderSim
 				.setPosition(shoulderMotorSim.getPosition() + getZeroOffset(true));
 		absoluteEncoderSim.setVelocity(shoulderMotorSim.getVelocity());
-
+		
 		// Add the current voltage as a load to the battery
 		RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(
-				shoulderArmSim.getCurrentDrawAmps()));
+				shoulderArmSim.getCurrentDrawAmps().in(Amp))); // MAKE THE WEGIHT DYNAMIC AND FIGURE OUT HOW / WHAT FORCES SHOULD BE APPLIED TO THE ELEVATOR WHEN THE ARM MOVES
 	}
 
 	@Override

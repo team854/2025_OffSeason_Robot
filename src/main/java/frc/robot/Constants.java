@@ -490,6 +490,7 @@ public final class Constants {
 		  public static final Time IN_ZONE_TIME = Second.of(0.5); // Second
 		}
 	
+		public static final Mass CORAL_WEIGHT = Pound.of(1.4); // Pound
 		public static final boolean ASSUME_START_WITH_CORAL = true;
 	  }
 

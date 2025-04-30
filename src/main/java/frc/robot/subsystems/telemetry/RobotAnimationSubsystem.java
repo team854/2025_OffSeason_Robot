@@ -99,7 +99,7 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 				0);
 		
         Pose3d wristPose = new Pose3d(
-				Constants.ArmConstants.Shoulder.CENTER_OFFSET_FORWARD.in(Meter),
+				Constants.ArmConstants.Shoulder.CENTER_OFFSET_FORWARD.in(Meter), 
         		0.0023,
 				elevatorGroundHeight, wristRotation);
 				
@@ -125,7 +125,7 @@ public class RobotAnimationSubsystem extends SubsystemBase {
 			
 			SmartDashboard.putNumberArray("Arm/Intake/Coral/Position", PoseUtilities.convertPoseToNumbers(coralPose));
 		} else {
-			SmartDashboard.putNumberArray("Arm/Intake/Coral/Position", PoseUtilities.convertPoseToNumbers(new Pose3d(5, 5, -5, new Rotation3d())));
+			SmartDashboard.putNumberArray("Arm/Intake/Coral/Position", PoseUtilities.convertPoseToNumbers(new Pose3d(0, 0, -7, new Rotation3d())));
 		}
     }
 }
