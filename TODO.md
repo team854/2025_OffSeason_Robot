@@ -12,4 +12,7 @@
 - Figureout how / if the zero system works cause its a lkittle wokny
   - Then write up a zero procedure in a file
 - Figure out why it seems like the acceleration applied to the arm from the elevator isn't really doing much  DONE
-- Make the elevator also affected by the corals weight
+- Make the elevator also affected by the corals weight  DONE
+- Make the arm calculation more realistic as the coral being far out would exert more force
+- Add higher width deadband for the right joystick
+- Improve the arm weight aproximation based on the distance from the pivot

@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -313,7 +314,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 	public void simulationPeriodic() {
 
 		// Calculate the elevator velocity and acceleration
-		double elevatorVelocity = RobotContainer.elevatorSubsystem.getStage1ElevatorSim().getVelocityMetersPerSecond() + RobotContainer.elevatorSubsystem.getStage2ElevatorSim().getVelocityMetersPerSecond();
+		double elevatorVelocity = RobotContainer.elevatorSubsystem.getStage1ElevatorSim().getVelocity().in(MetersPerSecond) + RobotContainer.elevatorSubsystem.getStage2ElevatorSim().getVelocity().in(MetersPerSecond);
 		double elevatorAcceleration = (elevatorVelocity - this.lastElevatorVelocity) / 0.02;
 		this.lastElevatorVelocity = elevatorVelocity;
 
@@ -329,7 +330,8 @@ public class ShoulderSubsystem extends SubsystemBase {
 		shoulderArmSim.updatePivotForwardAcceleration(MetersPerSecondPerSecond.of(forwardAcceleration));
 
 		// Update the weight of the shoulder depending on whether it has coral
-		Mass offset_weight = RobotContainer.endEffectorSubsystem.hasCoral() ? Constants.SimulationConstants.CORAL_WEIGHT : Kilogram.of(0);
+		// Multiply it by two because the weight is far out on the arm so it helps to aproximate that
+		Mass offset_weight = RobotContainer.endEffectorSubsystem.hasCoral() ? Constants.SimulationConstants.CORAL_WEIGHT.times(2) : Kilogram.of(0);
 		shoulderArmSim.setWeight(Constants.ArmConstants.Shoulder.MASS.plus(offset_weight));
 
 		shoulderArmSim.setInputVoltage(Volt.of(shoulderMotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage()));

@@ -35,7 +35,7 @@ import frc.robot.Constants;
 
 public class ShoulderSimulation {
     /** The plant that represents the linear system. */
-    protected LinearSystem<N2, N1, N2> system;
+    protected LinearSystem<N2, N1, N2> systemMatrix;
 
     /** State vector. */
     protected Matrix<N2, N1> stateVector;
@@ -49,29 +49,29 @@ public class ShoulderSimulation {
     /** The standard deviations of measurements, used for adding noise to the measurements. */
     protected final Matrix<N2, N1> measurementStdDevs;
 
-    // The gearbox for the arm.
+    /** The gearbox for the arm. */
     private final DCMotor gearbox;
 
-    // The gearing between the motors and the output.
+    /** The gearing between the motors and the output. */
     private final double gearRatio;
 
-    // The mass of the arm.
-    private double mass;
-
-    // The length of the arm.
+    /** The length of the arm. */
     private final double armLength;
 
-    // The minimum angle that the arm is capable of.
+    /** The minimum angle that the arm is capable of. */
     private final double minAngle;
 
-    // The maximum angle that the arm is capable of.
+    /** The maximum angle that the arm is capable of. */
     private final double maxAngle;
 
-    // Whether the simulator should simulate gravity.
+    /** Whether the simulator should simulate gravity. */
     private final boolean simulateGravity;
 
     private double pivotVerticalAcceleration = 0;
     private double pivotForwardAcceleration = 0;
+
+    /** The mass of the arm. */
+    private double mass;
 
     public ShoulderSimulation(
         DCMotor gearbox,
@@ -91,22 +91,22 @@ public class ShoulderSimulation {
         this.maxAngle = maxAngle.in(Radian);
         this.simulateGravity = simulateGravity;
 
-        this.system = LinearSystemId.createSingleJointedArmSystem(this.gearbox, estimateMOI(armLength, mass), this.gearRatio);
+        this.systemMatrix = LinearSystemId.createSingleJointedArmSystem(this.gearbox, estimateMOI(armLength, mass), this.gearRatio);
         this.mass = mass.in(Kilogram);
 
-        this.stateVector = new Matrix<>(new SimpleMatrix(this.system.getA().getNumRows(), 1));
-        this.inputVector = new Matrix<>(new SimpleMatrix(this.system.getB().getNumCols(), 1));
-        this.outputVector = new Matrix<>(new SimpleMatrix(this.system.getC().getNumRows(), 1));
+        this.stateVector = new Matrix<>(new SimpleMatrix(this.systemMatrix.getA().getNumRows(), 1));
+        this.inputVector = new Matrix<>(new SimpleMatrix(this.systemMatrix.getB().getNumCols(), 1));
+        this.outputVector = new Matrix<>(new SimpleMatrix(this.systemMatrix.getC().getNumRows(), 1));
 
         if (measurementStdDevs.length == 0) {
-            this.measurementStdDevs = new Matrix<>(new SimpleMatrix(this.system.getC().getNumRows(), 1));
+            this.measurementStdDevs = new Matrix<>(new SimpleMatrix(this.systemMatrix.getC().getNumRows(), 1));
         } else {
-            if (measurementStdDevs.length != this.system.getC().getNumRows()) {
+            if (measurementStdDevs.length != this.systemMatrix.getC().getNumRows()) {
                 throw new MatrixDimensionException(
                     "Malformed measurementStdDevs! Got "
                         + measurementStdDevs.length
                         + " elements instead of "
-                        + this.system.getC().getNumRows());
+                        + this.systemMatrix.getC().getNumRows());
             }
 
             this.measurementStdDevs = new Matrix<>(new SimpleMatrix(measurementStdDevs));
@@ -121,10 +121,8 @@ public class ShoulderSimulation {
             return;
         }
 
-        System.out.println("Updating weight to " + weight.in(Kilogram) + "kg");
-
-        this.system = LinearSystemId.createSingleJointedArmSystem(this.gearbox, estimateMOI(Meter.of(this.armLength), weight), this.gearRatio);
-        this.outputVector = this.system.calculateY(this.stateVector, this.inputVector);
+        this.systemMatrix = LinearSystemId.createSingleJointedArmSystem(this.gearbox, estimateMOI(Meter.of(this.armLength), weight), this.gearRatio);
+        this.outputVector = this.systemMatrix.calculateY(this.stateVector, this.inputVector);
 
         this.mass = weight.in(Kilogram);
     }
@@ -139,7 +137,7 @@ public class ShoulderSimulation {
         this.stateVector = updateX(this.stateVector, this.inputVector, dtSeconds);
 
         // yₖ = Cxₖ + Duₖ
-        this.outputVector = this.system.calculateY(this.stateVector, this.inputVector);
+        this.outputVector = this.systemMatrix.calculateY(this.stateVector, this.inputVector);
 
         // Add measurement noise.
         if (measurementStdDevs != null) {
@@ -241,8 +239,7 @@ public class ShoulderSimulation {
         // Update the output to reflect the new state.
         //
         //   yₖ = Cxₖ + Duₖ
-        this.outputVector = this.system.calculateY(this.stateVector, this.inputVector);
-
+        this.outputVector = this.systemMatrix.calculateY(this.stateVector, this.inputVector);
     }
 
     public void updatePivotVerticalAcceleration(LinearAcceleration verticalAcceleration) {
@@ -287,7 +284,7 @@ public class ShoulderSimulation {
 
         Matrix<N2, N1> updatedXhat = NumericalIntegration.rkdp(
                 (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
-                    Matrix<N2, N1> xdot = this.system.getA().times(x).plus(this.system.getB().times(_u));
+                    Matrix<N2, N1> xdot = this.systemMatrix.getA().times(x).plus(this.systemMatrix.getB().times(_u));
                     if (this.simulateGravity) {
                         double alphaGrav = (3.0 / 2.0) * -9.8 * Math.cos(x.get(0, 0)) / this.armLength;
                         xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));

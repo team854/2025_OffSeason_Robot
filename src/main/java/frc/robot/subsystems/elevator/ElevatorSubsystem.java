@@ -1,5 +1,6 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Kilogram;
@@ -31,6 +32,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -43,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.simulation.ElevatorSimulation;
 import frc.robot.utilities.math.PoseUtilities;
 import frc.robot.utilities.saftey.ArmSafteyUtilities;
 
@@ -81,11 +84,11 @@ public class ElevatorSubsystem extends SubsystemBase {
      */
     private final DCMotor stage1Gearbox = DCMotor.getNEO(1);
     private final SparkMaxSim stage1MotorSim = new SparkMaxSim(stage1Motor, stage1Gearbox);
-    private ElevatorSim stage1ElevatorSim = null;
+    private ElevatorSimulation stage1ElevatorSim = null;
 
     private final DCMotor stage2Gearbox = DCMotor.getNEO(1);
     private final SparkMaxSim stage2MotorSim = new SparkMaxSim(stage2Motor, stage2Gearbox);
-    private ElevatorSim stage2ElevatorSim = null;
+    private ElevatorSimulation stage2ElevatorSim = null;
 
     public ElevatorSubsystem() {
 
@@ -159,27 +162,27 @@ public class ElevatorSubsystem extends SubsystemBase {
          */
         if (Robot.isSimulation()) {
             System.out.println("Creating elevator simulations");
-            stage1ElevatorSim = new ElevatorSim(
+            stage1ElevatorSim = new ElevatorSimulation(
                     stage1Gearbox,
                     Constants.ElevatorConstants.Stage1.GEAR_RATIO,
-                    Constants.ElevatorConstants.Stage1.MASS.in(Kilogram),
-                    Constants.ElevatorConstants.Stage1.DRUM_RADIUS.in(Meter),
-                    0,
-                    this.stage1MaxHeight,
+                    Constants.ElevatorConstants.Stage1.MASS,
+                    Constants.ElevatorConstants.Stage1.DRUM_RADIUS,
+                    Meter.of(0),
+                    Meter.of(this.stage1MaxHeight),
                     true,
-                    0,
+                    Meter.of(0),
                     0.02,
                     0);
 
-            stage2ElevatorSim = new ElevatorSim(
+            stage2ElevatorSim = new ElevatorSimulation(
                     stage2Gearbox,
                     Constants.ElevatorConstants.Stage2.GEAR_RATIO,
-                    Constants.ElevatorConstants.Stage2.MASS.in(Kilogram),
-                    Constants.ElevatorConstants.Stage2.DRUM_RADIUS.in(Meter),
-                    0,
-                    this.stage2MaxHeight,
+                    Constants.ElevatorConstants.Stage2.MASS,
+                    Constants.ElevatorConstants.Stage2.DRUM_RADIUS,
+                    Meter.of(0),
+                    Meter.of(this.stage2MaxHeight),
                     true,
-                    0,
+                    Meter.of(0),
                     0.02,
                     0);
         }
@@ -345,33 +348,43 @@ public class ElevatorSubsystem extends SubsystemBase {
 		return Volt.of(this.stage2MotorTargetVoltage);
 	}
 
-    public ElevatorSim getStage1ElevatorSim() {
+    public ElevatorSimulation getStage1ElevatorSim() {
         return this.stage1ElevatorSim;
     }
 
-    public ElevatorSim getStage2ElevatorSim() {
+    public ElevatorSimulation getStage2ElevatorSim() {
         return this.stage2ElevatorSim;
     }
 
     @Override
     public void simulationPeriodic() {
-        stage1ElevatorSim.setInput(stage1MotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
-        stage2ElevatorSim.setInput(stage2MotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage());
+
+        // Update the weight of stage 1 depending on whether it has coral
+		Mass stage1_offset_weight = RobotContainer.endEffectorSubsystem.hasCoral() ? Constants.SimulationConstants.CORAL_WEIGHT : Kilogram.of(0);
+		stage1ElevatorSim.setWeight(Constants.ElevatorConstants.Stage1.MASS.plus(stage1_offset_weight));
+
+        // Update the weight of stage 2 depending on whether it has coral
+		Mass stage2_offset_weight = RobotContainer.endEffectorSubsystem.hasCoral() ? Constants.SimulationConstants.CORAL_WEIGHT : Kilogram.of(0);
+		stage2ElevatorSim.setWeight(Constants.ElevatorConstants.Stage2.MASS.plus(stage2_offset_weight));
+
+        // Update the voltage of the motor
+        stage1ElevatorSim.setInputVoltage(Volt.of(stage1MotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage()));
+        stage2ElevatorSim.setInputVoltage(Volt.of(stage2MotorSim.getAppliedOutput() * RoboRioSim.getVInVoltage()));
 
         // Update every 20 miliseconds
         stage1ElevatorSim.update(0.02);
         stage2ElevatorSim.update(0.02);
 
         // Iterate the simulation of both motors
-        stage1MotorSim.iterate(stage1ElevatorSim.getVelocityMetersPerSecond() * 60,
+        stage1MotorSim.iterate(stage1ElevatorSim.getVelocity().in(MetersPerSecond) * 60,
                 RoboRioSim.getVInVoltage(), 0.02);
 
-        stage2MotorSim.iterate(stage2ElevatorSim.getVelocityMetersPerSecond() * 60,
+        stage2MotorSim.iterate(stage2ElevatorSim.getVelocity().in(MetersPerSecond) * 60,
                 RoboRioSim.getVInVoltage(), 0.02);
-
+        
         // Add the current voltage as a load to the battery
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(
-                stage1ElevatorSim.getCurrentDrawAmps() + stage2ElevatorSim.getCurrentDrawAmps()));
+                stage1ElevatorSim.getCurrentDrawAmps().in(Amp) + stage2ElevatorSim.getCurrentDrawAmps().in(Amp)));
 
     }
 
