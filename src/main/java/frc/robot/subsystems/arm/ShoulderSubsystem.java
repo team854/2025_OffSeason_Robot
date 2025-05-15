@@ -76,6 +76,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 	 */
 	private final ProfiledPIDController shoulderController;
 	private final ArmFeedforward shoulderFeedForward;
+	private double maxControlAngularVelocity = 10000;
 
 	/*
 	 * Calibration
@@ -199,7 +200,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 	 */
 	public AngularVelocity getShoulderSetpointVelocity() {
 		// Gets the goal of the shoulder controller (goal behaves better then setpoint for some reason)
-		return DegreesPerSecond.of(shoulderController.getGoal().velocity);
+		return DegreesPerSecond.of(shoulderController.getSetpoint().velocity);
 	}
 
 	/**
@@ -248,8 +249,19 @@ public class ShoulderSubsystem extends SubsystemBase {
 	}
 
 	public Command setShoulderSpeedCommand(AngularVelocity shoulderSpeed) {
-		return new RunCommand(() -> setShoulderSetpoint(
-				getShoulderSetpoint().plus(Degree.of(shoulderSpeed.in(DegreesPerSecond) / 50))), this);
+		
+
+		return new RunCommand(() -> {
+			// Limit the max commanded rotational speed
+			double shoulderDegreesPerSecond = MathUtil.clamp(shoulderSpeed.in(DegreesPerSecond), -this.maxControlAngularVelocity, this.maxControlAngularVelocity);
+			setShoulderSetpoint(
+				getShoulderSetpoint().plus(Degree.of(shoulderDegreesPerSecond / 50)));
+			
+			}, this);
+	}
+
+	public void setMaxControlAngularVelocity(AngularVelocity angularVelocity) {
+		this.maxControlAngularVelocity = angularVelocity.in(DegreesPerSecond);
 	}
 
 	/**
@@ -367,7 +379,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 						+ shoulderFeedForward.calculateWithVelocities(
 								getShoulderAngle().in(Radian),
 								getShoulderVelocity().in(RadiansPerSecond),
-								Units.degreesToRadians(shoulderController.getGoal().velocity));
+								Units.degreesToRadians(shoulderController.getSetpoint().velocity));
 		
 		
 		setShoulderMotorVoltage(Volt.of(shoulderVoltsOutput));

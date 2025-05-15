@@ -414,7 +414,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         // Look ahead 1 second to help compensate for the time required to move the elevator
         AngularVelocity currentShoulderSetpointVelocity = RobotContainer.shoulderSubsystem.getShoulderSetpointVelocity();
         Angle currentShoulderSetpoint = RobotContainer.shoulderSubsystem.getShoulderSetpoint();
-        Angle currentShoulderSetpointLookAhead = currentShoulderSetpoint.plus(Degree.of(currentShoulderSetpointVelocity.in(DegreesPerSecond))).times(1.1);
+        Angle currentShoulderSetpointLookAhead = currentShoulderSetpoint.plus(Degree.of(currentShoulderSetpointVelocity.in(DegreesPerSecond))).times(0.2);
         
         // Get the overall hieght of the elevator setpoint
         Distance currentOverallSetpoint = getOverallSetpoint();
@@ -423,15 +423,18 @@ public class ElevatorSubsystem extends SubsystemBase {
         double eleavtorMinimumHeight = Math.max(getElevatorMinimumHeight(robotPose, currentShoulderSetpoint, currentOverallSetpoint).in(Meter), 
                                                 getElevatorMinimumHeight(robotPose, currentShoulderSetpointLookAhead, currentOverallSetpoint).in(Meter));
 
+        // If the shoulder is pitching up then lower the threshold a bit to prevent sticking
+        double minHeightOffset = (currentShoulderSetpointVelocity.in(DegreesPerSecond) > 0.5) ? 0.05 : 0;
+
         // If the overall height of the elevator is less then the calculated minimum elevator height then override the overall height
-        if (currentOverallSetpoint.in(Meter) < eleavtorMinimumHeight) {
+        if (currentOverallSetpoint.in(Meter) < (eleavtorMinimumHeight - minHeightOffset)) {
             setOverallHeight(Meter.of(eleavtorMinimumHeight));
         }
 
         double stage1VoltsOutput = MathUtil.clamp(
                 stage1Controller.calculate(getStage1Height().in(Meter)) + stage1FeedForward
                         .calculateWithVelocities(getStage1HeightVelocity().in(MetersPerSecond),
-                                stage1Controller.getGoal().velocity),
+                                stage1Controller.getSetpoint().velocity),
                 -10, 10);
 
         this.stage1MotorTargetVoltage = stage1VoltsOutput;
@@ -440,7 +443,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         double stage2VoltsOutput = MathUtil.clamp(
                 stage2Controller.calculate(getStage2Height().in(Meter)) + stage2FeedForward
                         .calculateWithVelocities(getStage2HeightVelocity().in(MetersPerSecond),
-                                stage2Controller.getGoal().velocity),
+                                stage2Controller.getSetpoint().velocity),
                 -10, 10);
 
         this.stage2MotorTargetVoltage = stage2VoltsOutput;

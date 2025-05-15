@@ -16,3 +16,4 @@
 - Make the arm calculation more realistic as the coral being far out would exert more force
 - Add higher width deadband for the right joystick
 - Improve the arm weight aproximation based on the distance from the pivot
+- Look into using the IMU for pose estimation

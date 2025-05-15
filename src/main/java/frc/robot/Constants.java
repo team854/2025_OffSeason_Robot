@@ -504,7 +504,9 @@ public final class Constants {
 		public static final double TRIGGER_EXPONENT = 1;
 		public static final LinearVelocity CONTROL_ELEVATOR_SPEED = FeetPerSecond.of(1); // Feet/Second
 		public static final AngularVelocity CONTROL_SHOULDER_SPEED = DegreesPerSecond.of(50); // Degrees/Second
+		public static final AngularVelocity BABY_CONTROL_SHOULDER_LIMIT_SPEED = DegreesPerSecond.of(5); // Degrees/Second
 		public static final AngularVelocity CONTROL_WRIST_SPEED = DegreesPerSecond.of(60); // Degrees/Second
+		public static final AngularVelocity BABY_CONTROL_WRIST_LIMIT_SPEED = DegreesPerSecond.of(5); // Degrees/Second
 		public static final double INTAKE_SPEED = -0.9; // Percent
 		public static final double OUTTAKE_SPEED = 0.9; // Percent
 		public static final double CLIMB_UP_SPEED = -1; // Percent

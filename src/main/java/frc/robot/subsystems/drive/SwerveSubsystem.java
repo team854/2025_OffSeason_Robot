@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.objects.DriveControlMode;
 import frc.robot.objects.VisionEstimate;
 import frc.robot.utilities.field.FieldUtilities;
 import frc.robot.utilities.files.FileUtilities;
@@ -99,16 +100,24 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void driveFieldOriented(ChassisSpeeds velocity) {
+        if (RobotContainer.driveControlMode != DriveControlMode.NORMAL) {
+            return;
+        }
+
         swerveDrive.driveFieldOriented(velocity);
     }
 
     public Command driveFieldOrientedSupplier(Supplier<ChassisSpeeds> velocity) {
         return run(() -> {
-            swerveDrive.driveFieldOriented(velocity.get());
+            driveFieldOriented(velocity.get());
         });
     }
 
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        if (RobotContainer.driveControlMode != DriveControlMode.NORMAL) {
+            return;
+        }
+
         swerveDrive.setChassisSpeeds(chassisSpeeds);
     }
 

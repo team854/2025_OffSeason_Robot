@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+
 import java.lang.reflect.Field;
 
 import org.littletonrobotics.junction.LoggedRobot;
@@ -90,6 +92,10 @@ public class Robot extends LoggedRobot  {
 
 		// Set the shoulder to its current angle
 		RobotContainer.shoulderSubsystem.resetShoulderSetpoint();
+
+		RobotContainer.driveControlMode = RobotContainer.modeChooser.getSelected();
+		RobotContainer.shoulderSubsystem.setMaxControlAngularVelocity(RobotContainer.isNormalMode() ? DegreesPerSecond.of(10000) : Constants.DriverConstants.BABY_CONTROL_SHOULDER_LIMIT_SPEED);
+		RobotContainer.wristSubsystem.setMaxControlAngularVelocity(RobotContainer.isNormalMode() ? DegreesPerSecond.of(10000) : Constants.DriverConstants.BABY_CONTROL_WRIST_LIMIT_SPEED);
 
 		if (autonomousCommand != null) {
 			autonomousCommand.cancel();

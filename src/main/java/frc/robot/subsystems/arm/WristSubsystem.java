@@ -48,6 +48,7 @@ public class WristSubsystem extends SubsystemBase {
      */
     private final ProfiledPIDController wristController;
     private final SimpleMotorFeedforward wristFeedForward;
+    private double maxControlAngularVelocity = 10000;
 
     /*
      * Simulation
@@ -171,8 +172,16 @@ public class WristSubsystem extends SubsystemBase {
 
     public Command setWristSpeedCommand(AngularVelocity wristSpeed) {
         return new RunCommand(
-                () -> setWristSetpoint(getWristSetpoint().plus(Degree.of(wristSpeed.in(DegreesPerSecond) / 50))), this);
+                () -> {
+                    // Limit the max commanded rotational speed
+		            double wristDegreesPerSecond = MathUtil.clamp(wristSpeed.in(DegreesPerSecond), -this.maxControlAngularVelocity, this.maxControlAngularVelocity);
+                    setWristSetpoint(getWristSetpoint().plus(Degree.of(wristDegreesPerSecond / 50)));
+                }, this);
     }
+
+    public void setMaxControlAngularVelocity(AngularVelocity angularVelocity) {
+		this.maxControlAngularVelocity = angularVelocity.in(DegreesPerSecond);
+	}
 
     @Override
     public void simulationPeriodic() {

@@ -4,10 +4,13 @@
 
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -17,6 +20,7 @@ import frc.robot.commands.auto.AutoScoreCoralCommand;
 import frc.robot.commands.elevator.ControlElevatorBothStagesCommand;
 import frc.robot.commands.setpoints.GroundPickupConfigurationCommand;
 import frc.robot.commands.testing.DemoEndEffector;
+import frc.robot.objects.DriveControlMode;
 import frc.robot.subsystems.arm.EndEffectorSubsystem;
 import frc.robot.subsystems.arm.ShoulderSubsystem;
 import frc.robot.subsystems.arm.WristSubsystem;
@@ -33,6 +37,9 @@ import frc.robot.utilities.controls.RumbleUtilities;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
+
+	// Robot control mode
+	public static DriveControlMode driveControlMode = DriveControlMode.NORMAL;
 
 	// Initalize public subsystems
 	public static final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
@@ -60,9 +67,11 @@ public class RobotContainer {
 			.deadband(0)
 			.scaleTranslation(Constants.DriverConstants.TRANSLATION_SCALE)
 			.allianceRelativeControl(true);
+	
 
-	// Auto chooser
+	// Choosers
 	public static SendableChooser<Command> autoChooser;
+	public static SendableChooser<DriveControlMode> modeChooser;
 
 	public RobotContainer() {
 		System.out.println("Configuring robot container");
@@ -71,19 +80,37 @@ public class RobotContainer {
 			simulationSubsystem = new SimulationSubsystem();
 		}
 
-		configureAutoChooser();
+		configureChoosers();
 
 		configureBindings();
 
 		smartDashboardSubsystem.initalize();
 	}
 
-	private void configureAutoChooser() {
+	private void configureChoosers() {
 		autoChooser = AutoBuilder.buildAutoChooser();
 
 		autoChooser.addOption("Calibrate", new AutoCalibrateCommand());
 
-		System.out.println("Setup auto chooser");
+		modeChooser = new SendableChooser<>();
+		modeChooser.setDefaultOption("Normal", DriveControlMode.NORMAL);
+		modeChooser.addOption("Baby", DriveControlMode.BABY);
+		SmartDashboard.putData("Drive Control Mode", modeChooser);
+
+		System.out.println("Setup choosers");
+	}
+
+	public static BooleanSupplier isNormalModeSupplier() {
+		return new BooleanSupplier() {
+			@Override
+			public boolean getAsBoolean() {
+				return RobotContainer.driveControlMode == DriveControlMode.NORMAL;
+			}
+		};
+	}
+
+	public static boolean isNormalMode() {
+		return RobotContainer.driveControlMode == DriveControlMode.NORMAL;
 	}
 
 	private void configureBindings() {
@@ -103,8 +130,8 @@ public class RobotContainer {
 		/*
 		* Intake coral
 		*/
-		driverController.rightTrigger(0.25).whileTrue(endEffectorSubsystem.setIntakeSpeedCommand(Constants.DriverConstants.INTAKE_SPEED));
-		driverController.leftTrigger(0.25).whileTrue(endEffectorSubsystem.setIntakeSpeedCommand(Constants.DriverConstants.OUTTAKE_SPEED));
+		driverController.rightTrigger(0.25).and(isNormalModeSupplier()).whileTrue(endEffectorSubsystem.setIntakeSpeedCommand(Constants.DriverConstants.INTAKE_SPEED));
+		driverController.leftTrigger(0.25).and(isNormalModeSupplier()).whileTrue(endEffectorSubsystem.setIntakeSpeedCommand(Constants.DriverConstants.OUTTAKE_SPEED));
 
 
 		// driverController.button(7).onTrue(new DemoEndEffector());
@@ -112,35 +139,35 @@ public class RobotContainer {
 		/* 
 		* Auto score coral on the reef
 		*/
-		driverController.multiButtonTrigger(4, 5).onTrue(new AutoScoreCoralCommand(false, 0, true));
-		driverController.multiButtonTrigger(2, 5).onTrue(new AutoScoreCoralCommand(false, 1, true));
-		driverController.multiButtonTrigger(1, 5).onTrue(new AutoScoreCoralCommand(false, 2, true));
-		driverController.multiButtonTrigger(3, 5).onTrue(new AutoScoreCoralCommand(false, 3, true));
+		driverController.multiButtonTrigger(4, 5).and(isNormalModeSupplier()).onTrue(new AutoScoreCoralCommand(false, 0, true));
+		driverController.multiButtonTrigger(2, 5).and(isNormalModeSupplier()).onTrue(new AutoScoreCoralCommand(false, 1, true));
+		driverController.multiButtonTrigger(1, 5).and(isNormalModeSupplier()).onTrue(new AutoScoreCoralCommand(false, 2, true));
+		driverController.multiButtonTrigger(3, 5).and(isNormalModeSupplier()).onTrue(new AutoScoreCoralCommand(false, 3, true));
 
-		driverController.multiButtonTrigger(4, 6).onTrue(new AutoScoreCoralCommand(true, 0, true));
-		driverController.multiButtonTrigger(2, 6).onTrue(new AutoScoreCoralCommand(true, 1, true));
-		driverController.multiButtonTrigger(1, 6).onTrue(new AutoScoreCoralCommand(true, 2, true));
-		driverController.multiButtonTrigger(3, 6).onTrue(new AutoScoreCoralCommand(true, 3, true));
+		driverController.multiButtonTrigger(4, 6).and(isNormalModeSupplier()).onTrue(new AutoScoreCoralCommand(true, 0, true));
+		driverController.multiButtonTrigger(2, 6).and(isNormalModeSupplier()).onTrue(new AutoScoreCoralCommand(true, 1, true));
+		driverController.multiButtonTrigger(1, 6).and(isNormalModeSupplier()).onTrue(new AutoScoreCoralCommand(true, 2, true));
+		driverController.multiButtonTrigger(3, 6).and(isNormalModeSupplier()).onTrue(new AutoScoreCoralCommand(true, 3, true));
 
 		/*
 		* Ground pickup setpoint
 		*/
-		driverController.button(9).onTrue(new GroundPickupConfigurationCommand());
+		driverController.button(9).and(isNormalModeSupplier()).onTrue(new GroundPickupConfigurationCommand());
 
 		/*
 		* Auto coral station pickup
 		*/
-		driverController.button(10).onTrue(new AutoPickupCoralStationCommand(true));
+		driverController.button(10).and(isNormalModeSupplier()).onTrue(new AutoPickupCoralStationCommand(true));
 
 		/*
 		* Climb commands
 		*/
-		driverController.button(7).whileTrue(RobotContainer.climbSubsystem.climbUp(Constants.DriverConstants.CLIMB_UP_SPEED));
+		driverController.button(7).and(isNormalModeSupplier()).whileTrue(RobotContainer.climbSubsystem.climbUp(Constants.DriverConstants.CLIMB_UP_SPEED));
 
 		/*
 		* Zero gyro
 		*/
-		driverController.button(8).onTrue(new InstantCommand(() -> RobotContainer.swerveSubsystem.zeroGyro(), RobotContainer.swerveSubsystem));
+		driverController.button(8).and(isNormalModeSupplier()).onTrue(new InstantCommand(() -> RobotContainer.swerveSubsystem.zeroGyro(), RobotContainer.swerveSubsystem));
 
 		/*
 		* Default commands
@@ -149,8 +176,6 @@ public class RobotContainer {
 		swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
 		elevatorSubsystem.setDefaultCommand(new ControlElevatorBothStagesCommand(() -> -driverController.getRightY()));
-
-
 
 		System.out.println("Configured bindings");
 	}
