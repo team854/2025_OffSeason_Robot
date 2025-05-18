@@ -14,7 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.commands.auto.AutoCalibrateCommand;
+import frc.robot.commands.auto.AutoCalibrateElevatorCommand;
+import frc.robot.commands.auto.AutoCalibrateShoulderCommand;
 import frc.robot.commands.auto.AutoPickupCoralStationCommand;
 import frc.robot.commands.auto.AutoScoreCoralCommand;
 import frc.robot.commands.elevator.ControlElevatorBothStagesCommand;
@@ -56,9 +57,11 @@ public class RobotContainer {
 
 	// Initalize driver controller
 	public static final CustomCommandXboxController driverController = new CustomCommandXboxController(
-			Constants.DriverConstants.PORT, Constants.DriverConstants.DEADBAND,
+			Constants.DriverConstants.PORT,
+			Constants.DriverConstants.DEADBAND,
 			Constants.DriverConstants.LEFT_JOYSTICK_EXPONENT,
-			Constants.DriverConstants.RIGHT_JOYSTICK_EXPONENT, Constants.DriverConstants.TRIGGER_EXPONENT);
+			Constants.DriverConstants.RIGHT_JOYSTICK_EXPONENT,
+			Constants.DriverConstants.TRIGGER_EXPONENT);
 
 	public static final SwerveInputStream driveAngularVelocity = SwerveInputStream.of(swerveSubsystem.swerveDrive,
 			() -> -driverController.getLeftY(),
@@ -90,7 +93,9 @@ public class RobotContainer {
 	private void configureChoosers() {
 		autoChooser = AutoBuilder.buildAutoChooser();
 
-		autoChooser.addOption("Calibrate", new AutoCalibrateCommand());
+		// Manually add the two calibrations to the auto chooser
+		autoChooser.addOption("Calibrate Shoulder", new AutoCalibrateShoulderCommand());
+		autoChooser.addOption("Calibrate Elevator", new AutoCalibrateElevatorCommand());
 
 		modeChooser = new SendableChooser<>();
 		modeChooser.setDefaultOption("Normal", DriveControlMode.NORMAL);

@@ -114,7 +114,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 				.positionConversionFactor(1 / Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_GEAR_RATIO);
 		shoulderMotorConfig.absoluteEncoder
 				.velocityConversionFactor(1 / Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_GEAR_RATIO);
-		shoulderMotorConfig.absoluteEncoder.zeroOffset(getZeroOffset(false));
+		shoulderMotorConfig.absoluteEncoder.zeroOffset(getZeroOffset(false, true));
 
 		shoulderMotor.configure(shoulderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -159,12 +159,12 @@ public class ShoulderSubsystem extends SubsystemBase {
 		System.out.println("Created ShoulderSubsystem");
 	}
 
-	private double getZeroOffset(boolean armSpace) {
+	private double getZeroOffset(boolean armSpace, boolean applyEncoderOffset) {
 		// This calculates the zero offset of the absolute encoder
 		// It gets the offset from the config and adds a push back angle onto that
 		// Adding a push back angle prevents the code from having to deal with the posibility of the encoder going over it's zero point
 		// This does assume that the arm is zeroed so the claw is facing down
-		double realOffset = Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_OFFSET.in(Rotation) + (shoulderPushBackHorizontal / 360);
+		double realOffset = (applyEncoderOffset ? Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_OFFSET.in(Rotation) : 0) + (shoulderPushBackHorizontal / 360);
 
 		if (!armSpace) {
 			realOffset *= Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_GEAR_RATIO;
@@ -271,10 +271,9 @@ public class ShoulderSubsystem extends SubsystemBase {
 	 */
 	public void setCalibrationEnabled(boolean state) {
 		this.calibrationEnabled = state;
+		setShoulderMotorVoltage(Volt.of(0));
 
-		if (this.calibrationEnabled == true) {
-			setShoulderMotorVoltage(Volt.of(0));
-		} else {
+		if (this.calibrationEnabled == false) {
 			resetShoulderSetpoint();
 		}
 	}
@@ -360,7 +359,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 		
 		// Set the position to the simulated position plus the zero offset in arm space
 		absoluteEncoderSim
-				.setPosition(shoulderMotorSim.getPosition() + getZeroOffset(true));
+				.setPosition(shoulderMotorSim.getPosition() + getZeroOffset(true, Constants.SimulationConstants.SIMULATE_SHOULDER_OFFSET));
 		absoluteEncoderSim.setVelocity(shoulderMotorSim.getVelocity());
 		
 		// Add the current voltage as a load to the battery

@@ -9,6 +9,10 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.Volt;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
@@ -46,6 +50,7 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.simulation.ElevatorSimulation;
+import frc.robot.utilities.math.EncoderUtilities;
 import frc.robot.utilities.math.PoseUtilities;
 import frc.robot.utilities.saftey.ArmSafteyUtilities;
 
@@ -80,6 +85,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final ElevatorFeedforward stage2FeedForward;
 
     /*
+	 * Calibration
+	 */
+	private boolean calibrationEnabled = false;
+    private double stage2Offset = (Constants.SimulationConstants.SIMULATE_ELEVATOR_OFFSET || Robot.isReal()) ? Constants.ElevatorConstants.Stage2.HEIGHT_OFFSET.in(Meter) : 0;
+
+    /*
      * Simulation
      */
     private final DCMotor stage1Gearbox = DCMotor.getNEO(1);
@@ -110,6 +121,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         stage1Config.encoder.velocityConversionFactor(stage1Conversion);
         stage1Motor.configure(stage1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+        // Automaticly set the offset of the relative encoder
+        stage2Encoder.setPosition(stage2Motor.getAbsoluteEncoder().getPosition() * (Constants.ElevatorConstants.Stage2.GEAR_RATIO - Constants.ElevatorConstants.Stage2.ABSOLUATE_ENCODER_GEAR_RATIO));
+
         // Configure stage 2 and save it to the motor
         SparkMaxConfig stage2Config = new SparkMaxConfig();
         stage2Config.idleMode(IdleMode.kBrake); // Brake so the stage doesn't fall
@@ -129,9 +143,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         // Define the trapizoid profile for the pids
         TrapezoidProfile.Constraints stage1Constraints = new TrapezoidProfile.Constraints(
-                Constants.ElevatorConstants.Stage1.MAX_VELOCITY, Constants.ElevatorConstants.Stage1.MAX_ACCELERATION);
+                Constants.ElevatorConstants.Stage1.MAX_VELOCITY,
+                Constants.ElevatorConstants.Stage1.MAX_ACCELERATION);
         TrapezoidProfile.Constraints stage2Constraints = new TrapezoidProfile.Constraints(
-                Constants.ElevatorConstants.Stage2.MAX_VELOCITY, Constants.ElevatorConstants.Stage2.MAX_ACCELERATION);
+                Constants.ElevatorConstants.Stage2.MAX_VELOCITY,
+                Constants.ElevatorConstants.Stage2.MAX_ACCELERATION);
 
         // Initalize the motor pids
         stage1Controller = new ProfiledPIDController(
@@ -225,7 +241,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * @return The current height of stage 2 relative to its lowest position
      */
     public Distance getStage2Height() {
-        return Meter.of(stage2Encoder.getPosition());
+        return Meter.of(stage2Encoder.getPosition()).plus(Meter.of(stage2Offset));
     }
 
     public LinearVelocity getStage1HeightVelocity() {
@@ -340,6 +356,75 @@ public class ElevatorSubsystem extends SubsystemBase {
         return getMaxHeight().plus(getPivotPointOffset(true));
     }
 
+    /**
+	 * Sets if the calibration mode is enabled for the elevator. The calibration mode disables the pid.
+	 * 
+	 * @param state The target state of the calibration mode
+	 */
+	public void setCalibrationEnabled(boolean state) {
+		this.calibrationEnabled = state;
+
+        setStage1MotorVoltage(Volt.of(0));
+        setStage2MotorVoltage(Volt.of(0));
+		if (this.calibrationEnabled == false) {
+			resetStage1Setpoint();
+            resetStage2Setpoint();
+		}
+	}
+
+    public Command calibrateElevatorCommand(Consumer<Double> zeroOffsetConsumer) {
+		List<Double> elevatorVelocityHistory = new ArrayList<>();
+		return new FunctionalCommand(() -> {
+			// Add some values to the encoder history so it has time to accelerate
+			for (int i = 0; i < 5; i++) {
+				elevatorVelocityHistory.add(1.0);
+			}
+			
+			// Enable calibration mode and start the motor moving
+			setCalibrationEnabled(true);
+			setStage2MotorVoltage(Volt.of(2.5));
+		}, () -> {
+			// Remove the oldest velocity from the start and add the current velocity to the end
+			elevatorVelocityHistory.remove(0);
+			elevatorVelocityHistory.add(getStage2HeightVelocity().in(MetersPerSecond));
+		}, (interrupted) -> {
+			// Calculate the zero offset
+			Distance outputZeroOffset = Constants.ElevatorConstants.Stage2.HARD_MAX_HEIGHT.minus(getStage2Height()).minus(Constants.ElevatorConstants.Stage2.HEIGHT_OFFSET);
+
+			// Update the consumer with the zero offset
+			zeroOffsetConsumer.accept(outputZeroOffset.in(Meter));
+
+            // Only update the offset if offsets should be appled in simulation or its a real robot
+            if (Constants.SimulationConstants.SIMULATE_ELEVATOR_OFFSET || Robot.isReal()) {
+                // Update the local offset until it can be manually updated in the constants file
+                this.stage2Offset = outputZeroOffset.in(Meter);
+            }
+
+			// Disable calibration mode
+			setCalibrationEnabled(false);
+		}, () -> {
+			// Get the average velocity
+			double velocityAverage = 0;
+			for (double velocity : elevatorVelocityHistory) {
+				velocityAverage+=velocity;
+			}
+			velocityAverage /= elevatorVelocityHistory.size();
+
+			// If it is bellow 0.01 meter per second finish the command
+			return Math.abs(velocityAverage) < 0.01;
+		}, this);
+	}
+
+    public void setStage1MotorVoltage(Voltage voltage) {
+		this.stage1MotorTargetVoltage = voltage.in(Volt);
+		stage1Motor.setVoltage(MathUtil.clamp(voltage.in(Volt), -10, 10));
+	}
+
+    public void setStage2MotorVoltage(Voltage voltage) {
+		this.stage2MotorTargetVoltage = voltage.in(Volt);
+		stage2Motor.setVoltage(MathUtil.clamp(voltage.in(Volt), -10, 10));
+	}
+
     public Voltage getStage1MotorVoltage() {
 		return Volt.of(this.stage1MotorTargetVoltage);
 	}
@@ -408,6 +493,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (this.calibrationEnabled) {
+			return;
+		}
+
         // Get the robot pose, overall elevator height, and shoulder angle
         Pose3d robotPose = new Pose3d(RobotContainer.swerveSubsystem.getPose());
         
@@ -437,8 +526,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                                 stage1Controller.getSetpoint().velocity),
                 -10, 10);
 
-        this.stage1MotorTargetVoltage = stage1VoltsOutput;
-        stage1Motor.setVoltage(stage1VoltsOutput);
+        setStage1MotorVoltage(Volt.of(stage1VoltsOutput));
 
         double stage2VoltsOutput = MathUtil.clamp(
                 stage2Controller.calculate(getStage2Height().in(Meter)) + stage2FeedForward
@@ -446,7 +534,6 @@ public class ElevatorSubsystem extends SubsystemBase {
                                 stage2Controller.getSetpoint().velocity),
                 -10, 10);
 
-        this.stage2MotorTargetVoltage = stage2VoltsOutput;
-        stage2Motor.setVoltage(stage2VoltsOutput);
+        setStage2MotorVoltage(Volt.of(stage2VoltsOutput));
     }
 }

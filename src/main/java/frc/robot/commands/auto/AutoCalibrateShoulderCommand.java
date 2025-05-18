@@ -5,17 +5,18 @@ import static edu.wpi.first.units.Units.Degree;
 import java.util.function.Consumer;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.utilities.controls.RumbleUtilities;
 
-public class AutoCalibrateCommand extends Command {
+public class AutoCalibrateShoulderCommand extends Command {
     private double shoulderZeroOffset;
     private SequentialCommandGroup commands;
 
-    public AutoCalibrateCommand() {
+    public AutoCalibrateShoulderCommand() {
         addRequirements(
                 RobotContainer.elevatorSubsystem,
                 RobotContainer.shoulderSubsystem,
@@ -72,7 +73,8 @@ public class AutoCalibrateCommand extends Command {
             RumbleUtilities.rumbleCommandFullControlGiven();
             System.out.println("Shoulder zero offset: " + this.shoulderZeroOffset);
 
-            System.out.println("Calibration command finished");
+
+            System.out.println("Shoulder calibration command finished");
         }
     }
 }

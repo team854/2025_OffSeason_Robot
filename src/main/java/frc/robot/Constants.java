@@ -297,6 +297,7 @@ public final class Constants {
 			public static final double GEAR_RATIO = 15.7143;
 			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.12); // Feet
 			public static final double ABSOLUATE_ENCODER_GEAR_RATIO = 1.57143;
+			public static final Distance HEIGHT_OFFSET = Meter.of(0);
 
 		}
 		public static final Distance TOLLERANCE = Feet.of(0.2); // Feet
@@ -445,7 +446,7 @@ public final class Constants {
 
 		public static class Limelight_4 {
 			public static final String NAME = "Limelight 4";
-			public static final boolean ENABLED = true;
+			public static final boolean ENABLED = false;
 			public static final Distance FRONT_OFFSET = Feet.of(0.0); // Feet
 			public static final Distance LEFT_OFFSET = Feet.of(-1.31234); // Feet
 			public static final Distance HEIGHT_OFFSET = Feet.of(0.95276); // Feet
@@ -489,7 +490,9 @@ public final class Constants {
 		  public static final Angle WRIST_DIFFERENCE_THRESHOLD = Degree.of(20); // Degree
 		  public static final Time IN_ZONE_TIME = Second.of(0.5); // Second
 		}
-	
+		
+		public static final boolean SIMULATE_SHOULDER_OFFSET = false;
+		public static final boolean SIMULATE_ELEVATOR_OFFSET = false;
 		public static final Mass CORAL_WEIGHT = Pound.of(1.4); // Pound
 		public static final boolean ASSUME_START_WITH_CORAL = true;
 	  }
