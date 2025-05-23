@@ -309,11 +309,11 @@ public final class Constants {
 			public static final int ID = 4;
 			public static final double MAX_VELOCITY = 120; // Not sure the unit
 			public static final double MAX_ACCELERATION = 200; // Not sure the unit
-			public static final double P = 0;//0.7;
+			public static final double P = 0.7;
 			public static final double I = 0;
 			public static final double D = 0.08;
 			public static final Voltage S = Volt.of(0.05); // Volts
-			public static final Voltage G = Volt.of(0); //3.55); // Volts
+			public static final Voltage G = Volt.of(3.55); // Volts
 			public static final Voltage V = Volt.of(0.015); // Volts/(Degrees/Second)
 			public static final Voltage A = Volt.of(0.03); // Volts/(Degrees/Second^2)
 			public static final Mass MASS = Pound.of(35); // Pounds (Including the wrist)

@@ -49,8 +49,6 @@ public class RobotAnimationSubsystem extends SubsystemBase {
             return;
         }
 
-		Pose3d robotPose = new Pose3d(RobotContainer.swerveSubsystem.swerveDrive.getSimulationDriveTrainPose().get());
-        
 		/*
 		 * Elevator
 		 */
