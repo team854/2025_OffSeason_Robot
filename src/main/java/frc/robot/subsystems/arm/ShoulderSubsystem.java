@@ -373,6 +373,10 @@ public class ShoulderSubsystem extends SubsystemBase {
 			return;
 		}
 
+		if (!Constants.ArmConstants.Shoulder.ENABLED) {
+			return;
+		}
+
 		// Run the pid and feed forward for the shoulder
 		double shoulderVoltsOutput = shoulderController.calculate(getShoulderAngle().in(Degree))
 						+ shoulderFeedForward.calculateWithVelocities(

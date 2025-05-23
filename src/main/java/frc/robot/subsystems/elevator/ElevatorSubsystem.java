@@ -497,6 +497,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 			return;
 		}
 
+        if (!Constants.ElevatorConstants.ENABLED) {
+            return;
+        }
+
         // Get the robot pose, overall elevator height, and shoulder angle
         Pose3d robotPose = new Pose3d(RobotContainer.swerveSubsystem.getPose());
         

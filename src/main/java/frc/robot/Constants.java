@@ -263,6 +263,8 @@ public final class Constants {
 	}
 
 	public static class ElevatorConstants {
+		public static final boolean ENABLED = true;
+		
 		public static class Stage1 {
 			public static final int ID = 3;
 			public static final double MAX_VELOCITY = 120; // Not sure the unit
@@ -306,6 +308,7 @@ public final class Constants {
 
 	public static class ArmConstants {
 		public static class Shoulder {
+			public static final boolean ENABLED = true;
 			public static final int ID = 4;
 			public static final double MAX_VELOCITY = 120; // Not sure the unit
 			public static final double MAX_ACCELERATION = 200; // Not sure the unit
