@@ -382,7 +382,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 			
 			// Enable calibration mode and start the motor moving
 			setCalibrationEnabled(true);
-			setStage2MotorVoltage(Volt.of(2.5));
+			setStage2MotorVoltage(Volt.of(1.5));
 		}, () -> {
 			// Remove the oldest velocity from the start and add the current velocity to the end
 			elevatorVelocityHistory.remove(0);

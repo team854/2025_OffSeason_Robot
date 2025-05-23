@@ -297,7 +297,7 @@ public final class Constants {
 			public static final double GEAR_RATIO = 15.7143;
 			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.12); // Feet
 			public static final double ABSOLUATE_ENCODER_GEAR_RATIO = 1.57143;
-			public static final Distance HEIGHT_OFFSET = Meter.of(0);
+			public static final Distance HEIGHT_OFFSET = Meter.of(-12);
 
 		}
 		public static final Distance TOLLERANCE = Feet.of(0.2); // Feet
@@ -309,19 +309,19 @@ public final class Constants {
 			public static final int ID = 4;
 			public static final double MAX_VELOCITY = 120; // Not sure the unit
 			public static final double MAX_ACCELERATION = 200; // Not sure the unit
-			public static final double P = 0.7;
+			public static final double P = 0;//0.7;
 			public static final double I = 0;
 			public static final double D = 0.08;
 			public static final Voltage S = Volt.of(0.05); // Volts
-			public static final Voltage G = Volt.of(3.55); // Volts
+			public static final Voltage G = Volt.of(0); //3.55); // Volts
 			public static final Voltage V = Volt.of(0.015); // Volts/(Degrees/Second)
 			public static final Voltage A = Volt.of(0.03); // Volts/(Degrees/Second^2)
 			public static final Mass MASS = Pound.of(35); // Pounds (Including the wrist)
 			public static final Angle MIN_ANGLE = Degree.of(-80.0); // Degrees
 			public static final Angle MAX_ANGLE = Degree.of(80.0); // Degrees
 			public static final Angle ABSOLUTE_ENCODER_OFFSET = Degree.of(0); // Degrees
-			public static final double GEAR_RATIO = 50;
-			public static final double ABSOLUTE_ENCODER_GEAR_RATIO = 1.85714;
+			public static final double GEAR_RATIO = 48;
+			public static final double ABSOLUTE_ENCODER_GEAR_RATIO = 1;
 			public static final Angle ABSOLUTE_ENCODER_PUSH_BACK = Degree.of(25.0); // Degrees
 			public static final Distance CENTER_OFFSET_FORWARD = Feet.of(0.492126); // Feet
 			public static final Distance STAGE_OFFSET_UP = Feet.of(0.958); // Feet
@@ -523,7 +523,7 @@ public final class Constants {
 		public static boolean END_EFFECTOR_TELEMETRY = true;
 		public static boolean SIMULATION_TELEMETRY = false;
 		public static boolean PATHFINDING_TELEMETRY = true;
-		public static boolean DEBUG = true;
-		public static boolean ANIMATIONS = true;
+		public static boolean DEBUG = false;
+		public static boolean ANIMATIONS = false;
 	}
 }
