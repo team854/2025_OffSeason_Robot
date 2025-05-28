@@ -116,7 +116,7 @@ public final class Constants {
 					public static final Distance LEFT = Inch.of(9.875); // Inches
 				}
 
-				public static final Angle ABSOLUTE_ENCODER_OFFSET = Degree.of(19.47493551); // Degrees
+				public static final Angle ABSOLUTE_ENCODER_OFFSET = Degree.of(45.1); // Degrees
 
 				public static class DriveMotor {
 					public static final String TYPE = "sparkmax_neo";
@@ -263,7 +263,7 @@ public final class Constants {
 	}
 
 	public static class ElevatorConstants {
-		public static final boolean ENABLED = true;
+		public static final boolean ENABLED = false;
 		
 		public static class Stage1 {
 			public static final int ID = 3;
@@ -299,7 +299,7 @@ public final class Constants {
 			public static final double GEAR_RATIO = 15.7143;
 			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.12); // Feet
 			public static final double ABSOLUATE_ENCODER_GEAR_RATIO = 1.57143;
-			public static final Distance HEIGHT_OFFSET = Meter.of(-12);
+			public static final Distance HEIGHT_OFFSET = Meter.of(0.5);
 
 		}
 		public static final Distance TOLLERANCE = Feet.of(0.2); // Feet
@@ -310,18 +310,18 @@ public final class Constants {
 		public static class Shoulder {
 			public static final boolean ENABLED = true;
 			public static final int ID = 4;
-			public static final double MAX_VELOCITY = 120; // Not sure the unit
-			public static final double MAX_ACCELERATION = 200; // Not sure the unit
-			public static final double P = 0.7;
+			public static final double MAX_VELOCITY = 100;//120; // Not sure the unit
+			public static final double MAX_ACCELERATION = 70;//200; // Not sure the unit
+			public static final double P = 0.13; //0.7;
 			public static final double I = 0;
-			public static final double D = 0.08;
+			public static final double D = 0.0017;
 			public static final Voltage S = Volt.of(0.05); // Volts
-			public static final Voltage G = Volt.of(3.55); // Volts
-			public static final Voltage V = Volt.of(0.015); // Volts/(Degrees/Second)
+			public static final Voltage G = Volt.of(0.552);//3.55); // Volts
+			public static final Voltage V = Volt.of(0.13); // Volts/(Degrees/Second)
 			public static final Voltage A = Volt.of(0.03); // Volts/(Degrees/Second^2)
 			public static final Mass MASS = Pound.of(35); // Pounds (Including the wrist)
 			public static final Angle MIN_ANGLE = Degree.of(-80.0); // Degrees
-			public static final Angle MAX_ANGLE = Degree.of(80.0); // Degrees
+			public static final Angle MAX_ANGLE = Degree.of(70.0); // Degrees
 			public static final Angle ABSOLUTE_ENCODER_OFFSET = Degree.of(0); // Degrees
 			public static final double GEAR_RATIO = 48;
 			public static final double ABSOLUTE_ENCODER_GEAR_RATIO = 1;
@@ -334,8 +334,8 @@ public final class Constants {
 		public static class Wrist {
 			public static final int ID = 5;
 			public static final double MAX_VELOCITY = 120; // Not sure the unit
-			public static final double MAX_ACCELERATION = 200; // Not sure the unit
-			public static final double P = 0.75;
+			public static final double MAX_ACCELERATION = 100; // Not sure the unit
+			public static final double P = 0.7;
 			public static final double I = 0;
 			public static final double D = 0.05;
 			public static final Voltage S = Volt.of(0.05); // Volts

@@ -127,8 +127,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         // Configure stage 2 and save it to the motor
         SparkMaxConfig stage2Config = new SparkMaxConfig();
         stage2Config.idleMode(IdleMode.kBrake); // Brake so the stage doesn't fall
-        stage2Config.inverted(false);
-        stage2Config.absoluteEncoder.inverted(false);
+        stage2Config.inverted(true);
+        stage2Config.absoluteEncoder.inverted(true);
 
         // Configure the encoder so they automaticlly convert the motors rotation to meters
         double stage2Conversion = (Constants.ElevatorConstants.Stage2.DRUM_RADIUS.in(Meter) * 2 * Math.PI)

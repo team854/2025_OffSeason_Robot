@@ -279,8 +279,8 @@ public class ShoulderSubsystem extends SubsystemBase {
 	}
 
 	public void setShoulderMotorVoltage(Voltage voltage) {
-		this.shoulderMotorTargetVoltage = voltage.in(Volt);
-		shoulderMotor.setVoltage(MathUtil.clamp(voltage.in(Volt), -10, 10));
+		this.shoulderMotorTargetVoltage = MathUtil.clamp(voltage.in(Volt), -4, 4);
+		shoulderMotor.setVoltage(this.shoulderMotorTargetVoltage);
 	}
 
 	public Command calibrateShoulderCommand(Consumer<Double> zeroOffsetConsumer) {
