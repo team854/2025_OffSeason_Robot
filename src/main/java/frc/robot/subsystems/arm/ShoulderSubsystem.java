@@ -69,6 +69,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 	private final SparkMax shoulderMotor = new SparkMax(Constants.ArmConstants.Shoulder.ID, MotorType.kBrushless);
 	private final RelativeEncoder shoulderMotorEncoder = shoulderMotor.getEncoder();
 	private final AbsoluteEncoder shoulderMotorAbsoluteEncoder = shoulderMotor.getAbsoluteEncoder();
+	private SparkMaxConfig shoulderMotorConfig = new SparkMaxConfig();
 	private double shoulderMotorTargetVoltage = 0;
 
 	/*
@@ -99,24 +100,21 @@ public class ShoulderSubsystem extends SubsystemBase {
 
 		System.out.println("Configuring shoulder motor");
 
-		SparkMaxConfig shoulderMotorConfig = new SparkMaxConfig();
-		shoulderMotorConfig.idleMode(IdleMode.kBrake); // Brake so the arm doesn't fall
-		shoulderMotorConfig.inverted(false);
-		shoulderMotorConfig.absoluteEncoder.inverted(false);
-
-		
+		this.shoulderMotorConfig.idleMode(IdleMode.kBrake); // Brake so the arm doesn't fall
+		this.shoulderMotorConfig.inverted(false);
+		this.shoulderMotorConfig.absoluteEncoder.inverted(false);
 
 		// This sets all the conversions of the encoders so they automaticly convert from motor space to arm space
 		// It needs to be the reciprocal because the factors are multiplied with the encoder value
-		shoulderMotorConfig.encoder.positionConversionFactor(1 / Constants.ArmConstants.Shoulder.GEAR_RATIO);
-		shoulderMotorConfig.encoder.velocityConversionFactor(1 / Constants.ArmConstants.Shoulder.GEAR_RATIO);
-		shoulderMotorConfig.absoluteEncoder
+		this.shoulderMotorConfig.encoder.positionConversionFactor(1 / Constants.ArmConstants.Shoulder.GEAR_RATIO);
+		this.shoulderMotorConfig.encoder.velocityConversionFactor(1 / Constants.ArmConstants.Shoulder.GEAR_RATIO);
+		this.shoulderMotorConfig.absoluteEncoder
 				.positionConversionFactor(1 / Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_GEAR_RATIO);
-		shoulderMotorConfig.absoluteEncoder
+		this.shoulderMotorConfig.absoluteEncoder
 				.velocityConversionFactor(1 / Constants.ArmConstants.Shoulder.ABSOLUTE_ENCODER_GEAR_RATIO);
-		shoulderMotorConfig.absoluteEncoder.zeroOffset(getZeroOffset(false, true));
+		this.shoulderMotorConfig.absoluteEncoder.zeroOffset(getZeroOffset(false, true));
 
-		shoulderMotor.configure(shoulderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+		shoulderMotor.configure(this.shoulderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 		/*
 		 * Configure PIDS
@@ -174,6 +172,15 @@ public class ShoulderSubsystem extends SubsystemBase {
 		realOffset = EncoderUtilities.clampAbsoluteEncoder(Rotation.of(realOffset)).in(Rotation);
 		
 		return realOffset;
+	}
+
+	public SparkMaxConfig getCurrentShoulderConfig() {
+		return this.shoulderMotorConfig;
+	}
+
+	public void setShoulderMotorConfig(SparkMaxConfig sparkMaxConfig) {
+		this.shoulderMotorConfig = sparkMaxConfig;
+		this.shoulderMotor.configure(this.shoulderMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 	}
 
 	/**

@@ -69,10 +69,12 @@ public class ElevatorSubsystem extends SubsystemBase {
      */
     private final SparkMax stage1Motor = new SparkMax(Constants.ElevatorConstants.Stage1.ID, MotorType.kBrushless);
     private final RelativeEncoder stage1Encoder = stage1Motor.getEncoder();
+    private SparkMaxConfig stage1Config = new SparkMaxConfig();
     private double stage1MotorTargetVoltage = 0;
 
     private final SparkMax stage2Motor = new SparkMax(Constants.ElevatorConstants.Stage2.ID, MotorType.kBrushless);
     private final RelativeEncoder stage2Encoder = stage2Motor.getEncoder();
+    private SparkMaxConfig stage2Config = new SparkMaxConfig();
     private double stage2MotorTargetVoltage = 0;
 
     /*
@@ -110,32 +112,36 @@ public class ElevatorSubsystem extends SubsystemBase {
         System.out.println("Configuring elevator motors");
 
         // Configure stage 1 and save it to the motor
-        SparkMaxConfig stage1Config = new SparkMaxConfig();
-        stage1Config.idleMode(IdleMode.kBrake); // Brake so the stage doesn't fall
-        stage1Config.inverted(false);
+        this.stage1Config.idleMode(IdleMode.kBrake); // Brake so the stage doesn't fall
+        this.stage1Config.inverted(true);
 
         // Configure the encoder so they automaticlly convert the motors rotation to meters
         double stage1Conversion = (Constants.ElevatorConstants.Stage1.DRUM_RADIUS.in(Meter) * 2 * Math.PI)
                 / Constants.ElevatorConstants.Stage1.GEAR_RATIO;
-        stage1Config.encoder.positionConversionFactor(stage1Conversion);
-        stage1Config.encoder.velocityConversionFactor(stage1Conversion);
-        stage1Motor.configure(stage1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        this.stage1Config.encoder.positionConversionFactor(stage1Conversion);
+        this.stage1Config.encoder.velocityConversionFactor(stage1Conversion);
+        stage1Motor.configure(this.stage1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        // Automaticly set the offset of the relative encoder
-        stage2Encoder.setPosition(stage2Motor.getAbsoluteEncoder().getPosition() * (Constants.ElevatorConstants.Stage2.GEAR_RATIO - Constants.ElevatorConstants.Stage2.ABSOLUATE_ENCODER_GEAR_RATIO));
+        
 
         // Configure stage 2 and save it to the motor
-        SparkMaxConfig stage2Config = new SparkMaxConfig();
-        stage2Config.idleMode(IdleMode.kBrake); // Brake so the stage doesn't fall
-        stage2Config.inverted(true);
-        stage2Config.absoluteEncoder.inverted(true);
+        this.stage2Config.idleMode(IdleMode.kBrake); // Brake so the stage doesn't fall
+        this.stage2Config.inverted(true);
+        this.stage2Config.absoluteEncoder.inverted(true);
 
         // Configure the encoder so they automaticlly convert the motors rotation to meters
         double stage2Conversion = (Constants.ElevatorConstants.Stage2.DRUM_RADIUS.in(Meter) * 2 * Math.PI)
                 / Constants.ElevatorConstants.Stage2.GEAR_RATIO;
-        stage2Config.encoder.positionConversionFactor(stage2Conversion);
-        stage2Config.encoder.velocityConversionFactor(stage2Conversion);
-        stage2Motor.configure(stage2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        double stage2AbsoluteConversion = (Constants.ElevatorConstants.Stage2.DRUM_RADIUS.in(Meter) * 2 * Math.PI)
+                / Constants.ElevatorConstants.Stage2.ABSOLUTE_ENCODER_GEAR_RATIO;
+        this.stage2Config.encoder.positionConversionFactor(stage2Conversion);
+        this.stage2Config.encoder.velocityConversionFactor(stage2Conversion);
+        this.stage2Config.absoluteEncoder.positionConversionFactor(stage2AbsoluteConversion);
+        this.stage2Config.absoluteEncoder.velocityConversionFactor(stage2AbsoluteConversion);
+        stage2Motor.configure(this.stage2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        // Automaticly set the offset of the relative encoder
+        stage2Encoder.setPosition(stage2Motor.getAbsoluteEncoder().getPosition());
 
         /*
          * Configure PIDS
@@ -205,6 +211,24 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         System.out.println("Created ElevatorSubsystem");
     }
+
+    public SparkMaxConfig getCurrentStage1Config() {
+		return this.stage1Config;
+	}
+
+    public SparkMaxConfig getCurrentStage2Config() {
+		return this.stage2Config;
+	}
+
+	public void setStage1MotorConfig(SparkMaxConfig sparkMaxConfig) {
+		this.stage1Config = sparkMaxConfig;
+		this.stage1Motor.configure(this.stage1Config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+	}
+
+    public void setStage2MotorConfig(SparkMaxConfig sparkMaxConfig) {
+		this.stage2Config = sparkMaxConfig;
+		this.stage2Motor.configure(this.stage2Config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+	}
 
     public Distance getStage1Setpoint() {
         return Meter.of(stage1Controller.getGoal().position);
@@ -482,12 +506,13 @@ public class ElevatorSubsystem extends SubsystemBase {
         Translation3d effectorOffset = endEffectorPose.getTranslation().minus(robotPose.getTranslation()).rotateBy(robotPose.getRotation().unaryMinus());
 
         // Get the minimum elevator height at that offset on the arm
-        double minimumHeight = ArmSafteyUtilities.getMinimumEndEffecotrHeight(effectorOffset.getMeasureX()).in(Meter);
+        double minimumHeight = ArmSafteyUtilities.getMinimumEndEffectorHeight(effectorOffset.getMeasureX()).in(Meter);
 
         // Calculate the minium height of the elevator by calculating the height of the elevator when at the set angle then adding the minimum height if the end effector
-        double eleavtorMinimumHeight = (-Math.sin(shoulderSetpointAngle.in(Radian)) * Constants.ArmConstants.LENGTH.in(Meter)) + minimumHeight;
+        double elevatorMinimumHeight = (-Math.sin(shoulderSetpointAngle.in(Radian)) * Constants.ArmConstants.LENGTH.in(Meter)) + minimumHeight;
+        System.out.println((-Math.sin(shoulderSetpointAngle.in(Radian)) * Constants.ArmConstants.LENGTH.in(Meter)));
 
-        return Meter.of(eleavtorMinimumHeight);
+        return Meter.of(elevatorMinimumHeight);
     }
 
 
@@ -513,15 +538,16 @@ public class ElevatorSubsystem extends SubsystemBase {
         Distance currentOverallSetpoint = getOverallSetpoint();
 
         // Compute it twice with and without the look ahead and use which ever is higher so its safer
-        double eleavtorMinimumHeight = Math.max(getElevatorMinimumHeight(robotPose, currentShoulderSetpoint, currentOverallSetpoint).in(Meter), 
+        double elevatorMinimumHeight = Math.max(getElevatorMinimumHeight(robotPose, currentShoulderSetpoint, currentOverallSetpoint).in(Meter), 
                                                 getElevatorMinimumHeight(robotPose, currentShoulderSetpointLookAhead, currentOverallSetpoint).in(Meter));
 
         // If the shoulder is pitching up then lower the threshold a bit to prevent sticking
         double minHeightOffset = (currentShoulderSetpointVelocity.in(DegreesPerSecond) > 0.5) ? 0.05 : 0;
 
+        System.out.println(elevatorMinimumHeight + " , " + currentOverallSetpoint.in(Meter));
         // If the overall height of the elevator is less then the calculated minimum elevator height then override the overall height
-        if (currentOverallSetpoint.in(Meter) < (eleavtorMinimumHeight - minHeightOffset)) {
-            setOverallHeight(Meter.of(eleavtorMinimumHeight));
+        if (currentOverallSetpoint.in(Meter) < (elevatorMinimumHeight - minHeightOffset)) {
+            setOverallHeight(Meter.of(elevatorMinimumHeight));
         }
 
         double stage1VoltsOutput = MathUtil.clamp(

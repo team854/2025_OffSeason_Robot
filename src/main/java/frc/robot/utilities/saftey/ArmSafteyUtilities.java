@@ -21,7 +21,7 @@ public final class ArmSafteyUtilities {
      * @param X The horizontal distance from the center of the robot
      * @return The minimum distance from the ground that the end effector is allowed to be at
      */
-    public static Distance getMinimumEndEffecotrHeight(Distance X) {
+    public static Distance getMinimumEndEffectorHeight(Distance X) {
         double meterX = X.in(Meter);
 
         // Calculate the bumper width and add an offset to it
@@ -40,7 +40,7 @@ public final class ArmSafteyUtilities {
         List<Pose3d> outputPoses = new ArrayList<>();
 
         for (double offset = 0; offset < 1; offset+=0.025) {
-            outputPoses.add(robotPose.plus(new Transform3d(offset, 0.0, getMinimumEndEffecotrHeight(Meter.of(offset)).in(Meter), new Rotation3d())));
+            outputPoses.add(robotPose.plus(new Transform3d(offset, 0.0, getMinimumEndEffectorHeight(Meter.of(offset)).in(Meter), new Rotation3d())));
         }
 
         return PoseUtilities.convertPoseArrayToNumbers(outputPoses.toArray(new Pose3d[0]));

@@ -25,6 +25,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -42,6 +43,8 @@ public class WristSubsystem extends SubsystemBase {
      */
     private final SparkMax wristMotor = new SparkMax(Constants.ArmConstants.Wrist.ID, MotorType.kBrushless);
     private final RelativeEncoder wristMotorEncoder = wristMotor.getEncoder();
+    private SparkMaxConfig wristMotorConfig = new SparkMaxConfig();
+    private double wristMotorTargetVoltage = 0;
 
     /*
      * Control
@@ -49,6 +52,11 @@ public class WristSubsystem extends SubsystemBase {
     private final ProfiledPIDController wristController;
     private final SimpleMotorFeedforward wristFeedForward;
     private double maxControlAngularVelocity = 10000;
+
+    /*
+	 * Calibration
+	 */
+	private boolean calibrationEnabled = false;
 
     /*
      * Simulation
@@ -64,16 +72,15 @@ public class WristSubsystem extends SubsystemBase {
 
         System.out.println("Configuring wrist motor");
 
-        SparkMaxConfig wristMotorConfig = new SparkMaxConfig();
-        wristMotorConfig.idleMode(IdleMode.kBrake);
-        wristMotorConfig.inverted(false);
+        this.wristMotorConfig.idleMode(IdleMode.kBrake);
+        this.wristMotorConfig.inverted(false);
 
         // This sets all the conversions of the encoders so they automaticly convert from motor space to wrist space
         // It needs to be the reciprocal because the factors are multiplied with the encoder value
-        wristMotorConfig.encoder.positionConversionFactor(1 / Constants.ArmConstants.Wrist.GEAR_RATIO);
-        wristMotorConfig.encoder.velocityConversionFactor(1 / Constants.ArmConstants.Wrist.GEAR_RATIO);
+        this.wristMotorConfig.encoder.positionConversionFactor(1 / Constants.ArmConstants.Wrist.GEAR_RATIO);
+        this.wristMotorConfig.encoder.velocityConversionFactor(1 / Constants.ArmConstants.Wrist.GEAR_RATIO);
 
-        wristMotor.configure(wristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        wristMotor.configure(this.wristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         /*
          * Configure PIDS
@@ -114,6 +121,15 @@ public class WristSubsystem extends SubsystemBase {
         System.out.println("Created WristSubsystem");
     }
 
+    public SparkMaxConfig getCurrentWristConfig() {
+		return this.wristMotorConfig;
+	}
+
+	public void setWristMotorConfig(SparkMaxConfig sparkMaxConfig) {
+		this.wristMotorConfig = sparkMaxConfig;
+		this.wristMotor.configure(this.wristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+	}
+
     /**
      * 
      * @return The current rotation of the wrist
@@ -148,6 +164,25 @@ public class WristSubsystem extends SubsystemBase {
         // Gets the angular velocity in RPM and converts it to RPS
         return RotationsPerSecond.of(wristMotorEncoder.getVelocity() / 60);
     }
+
+    /**
+	 * Sets if the calibration mode is enabled for the shoulder. The calibration mode disables the pid.
+	 * 
+	 * @param state The target state of the calibration mode
+	 */
+	public void setCalibrationEnabled(boolean state) {
+		this.calibrationEnabled = state;
+		setWristMotorVoltage(Volt.of(0));
+
+		if (this.calibrationEnabled == false) {
+			resetWristSetpoint();
+		}
+	}
+
+    public void setWristMotorVoltage(Voltage voltage) {
+		this.wristMotorTargetVoltage = MathUtil.clamp(voltage.in(Volt), -4, 4);
+		wristMotor.setVoltage(this.wristMotorTargetVoltage);
+	}
 
     /**
      * Sets the wrist setpoint to the wrist's current angle
@@ -199,13 +234,15 @@ public class WristSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (this.calibrationEnabled) {
+            return;
+        }
+
         // Run the pid and feed forward for the wrist
-        double wristVoltsOutput = MathUtil
-                .clamp(wristController.calculate(getWristAngle().in(Degree))
+        double wristVoltsOutput = wristController.calculate(getWristAngle().in(Degree))
                         + wristFeedForward.calculateWithVelocities(
                             getWristVelocity().in(RadiansPerSecond),
-                            Units.degreesToRadians(wristController.getSetpoint().velocity)),
-                    -10, 10);
-        wristMotor.setVoltage(wristVoltsOutput);
+                            Units.degreesToRadians(wristController.getSetpoint().velocity));
+        setWristMotorVoltage(Volt.of(wristVoltsOutput));
     }
 }

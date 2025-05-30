@@ -56,7 +56,15 @@ public class Robot extends LoggedRobot  {
 	public void disabledPeriodic() {}
 
 	@Override
-	public void disabledExit() {}
+	public void disabledExit() {
+		RobotContainer.elevatorSubsystem.resetStage1Setpoint();
+		RobotContainer.elevatorSubsystem.resetStage2Setpoint();
+
+		// Set the shoulder to its current angle
+		RobotContainer.shoulderSubsystem.resetShoulderSetpoint();
+
+		RobotContainer.wristSubsystem.resetWristSetpoint();
+	}
 
 	@Override
 	public void autonomousInit() {
@@ -92,6 +100,8 @@ public class Robot extends LoggedRobot  {
 
 		// Set the shoulder to its current angle
 		RobotContainer.shoulderSubsystem.resetShoulderSetpoint();
+
+		RobotContainer.wristSubsystem.resetWristSetpoint();
 
 		RobotContainer.driveControlMode = RobotContainer.modeChooser.getSelected();
 		RobotContainer.shoulderSubsystem.setMaxControlAngularVelocity(RobotContainer.isNormalMode() ? DegreesPerSecond.of(10000) : Constants.DriverConstants.BABY_CONTROL_SHOULDER_LIMIT_SPEED);

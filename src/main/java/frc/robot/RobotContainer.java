@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.auto.AutoCalibrateElevatorCommand;
 import frc.robot.commands.auto.AutoCalibrateShoulderCommand;
+import frc.robot.commands.auto.AutoCoastCommand;
 import frc.robot.commands.auto.AutoPickupCoralStationCommand;
 import frc.robot.commands.auto.AutoScoreCoralCommand;
 import frc.robot.commands.elevator.ControlElevatorBothStagesCommand;
@@ -96,6 +97,7 @@ public class RobotContainer {
 		// Manually add the two calibrations to the auto chooser
 		autoChooser.addOption("Calibrate Shoulder", new AutoCalibrateShoulderCommand());
 		autoChooser.addOption("Calibrate Elevator", new AutoCalibrateElevatorCommand());
+		autoChooser.addOption("Motor Coast", new AutoCoastCommand());
 
 		modeChooser = new SendableChooser<>();
 		modeChooser.setDefaultOption("Normal", DriveControlMode.NORMAL);
