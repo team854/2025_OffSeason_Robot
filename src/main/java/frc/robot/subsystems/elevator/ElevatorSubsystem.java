@@ -121,7 +121,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         this.stage1Config.encoder.positionConversionFactor(stage1Conversion);
         this.stage1Config.encoder.velocityConversionFactor(stage1Conversion);
         stage1Motor.configure(this.stage1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
+        stage1Encoder.setPosition(0);
         
 
         // Configure stage 2 and save it to the motor
@@ -510,7 +510,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         // Calculate the minium height of the elevator by calculating the height of the elevator when at the set angle then adding the minimum height if the end effector
         double elevatorMinimumHeight = (-Math.sin(shoulderSetpointAngle.in(Radian)) * Constants.ArmConstants.LENGTH.in(Meter)) + minimumHeight;
-        System.out.println((-Math.sin(shoulderSetpointAngle.in(Radian)) * Constants.ArmConstants.LENGTH.in(Meter)));
+        
 
         return Meter.of(elevatorMinimumHeight);
     }
@@ -544,7 +544,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         // If the shoulder is pitching up then lower the threshold a bit to prevent sticking
         double minHeightOffset = (currentShoulderSetpointVelocity.in(DegreesPerSecond) > 0.5) ? 0.05 : 0;
 
-        System.out.println(elevatorMinimumHeight + " , " + currentOverallSetpoint.in(Meter));
         // If the overall height of the elevator is less then the calculated minimum elevator height then override the overall height
         if (currentOverallSetpoint.in(Meter) < (elevatorMinimumHeight - minHeightOffset)) {
             setOverallHeight(Meter.of(elevatorMinimumHeight));

@@ -122,7 +122,7 @@ public final class Constants {
 					public static final String TYPE = "sparkmax_neo";
 					public static final int ID = 20;
 					public static final Object CANBUS = null;
-					public static final boolean INVERTED = false;
+					public static final boolean INVERTED = true;
 				}
 
 				public static class AngleMotor {
@@ -188,9 +188,9 @@ public final class Constants {
 				public static final Current CURRENT_LIMIT = Amp.of(20.0); // Amps
 
 				public static class Pidf {
-					public static final double P = 0.055;
+					public static final double P = 0.035;
 					public static final double I = 0;
-					public static final double D = 0.02;
+					public static final double D = 0.05;
 					public static final double F = 0;
 					public static final double IZ = 0;
 				}
@@ -277,8 +277,8 @@ public final class Constants {
 			public static final Voltage V = Volt.of(5);//19.5); // Volts/(Meters/Second)
 			public static final Voltage A = Volt.of(0.2); // Volts/(Meters/Second^2)
 			public static final Mass MASS = Pound.of(70); // Pounds (Including stage 2 and the arm)
-			public static final Distance DRUM_RADIUS = Inch.of(0.98110236); // Inches
-			public static final double GEAR_RATIO = 18.5714;
+			public static final Distance DRUM_RADIUS = Inch.of(1.106);//0.98110236); // Inches
+			public static final double GEAR_RATIO = 45;
 			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.25); // Feet
 			
 		}
@@ -296,10 +296,10 @@ public final class Constants {
 			public static final Voltage A = Volt.of(0.04); // Volts/(Meters/Second^2)
 			public static final Mass MASS = Pound.of(45); // Pounds (Including the arm)
 			public static final Distance DRUM_RADIUS = Inch.of(0.98110236); // Inches
-			public static final double GEAR_RATIO = 15.7143;
+			public static final double GEAR_RATIO = 34;//15.7143;
 			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.12); // Feet
-			public static final double ABSOLUTE_ENCODER_GEAR_RATIO = 1.57143;
-			public static final Distance HEIGHT_OFFSET = Meter.of(0.5);
+			public static final double ABSOLUTE_ENCODER_GEAR_RATIO = 19.901;
+			public static final Distance HEIGHT_OFFSET = Meter.of(0.3);
 
 		}
 		public static final Distance TOLLERANCE = Feet.of(0.2); // Feet
@@ -310,9 +310,9 @@ public final class Constants {
 		public static class Shoulder {
 			public static final boolean ENABLED = true;
 			public static final int ID = 4;
-			public static final double MAX_VELOCITY = 100;//120; // Not sure the unit
-			public static final double MAX_ACCELERATION = 70;//200; // Not sure the unit
-			public static final double P = 0.13; //0.7;
+			public static final double MAX_VELOCITY = 130;//120; // Not sure the unit
+			public static final double MAX_ACCELERATION = 60;//200; // Not sure the unit
+			public static final double P = 0.135; //0.7;
 			public static final double I = 0;
 			public static final double D = 0.0017;
 			public static final Voltage S = Volt.of(0.05); // Volts
@@ -364,8 +364,8 @@ public final class Constants {
 
 		public static final Distance MINIMUM_HEIGHT_IN_BUMPER = Feet.of(0.7); // Feet
 		public static final Angle OUT_BUMPER_ANGLE = Degree.of(-37); // Degree
-		public static final Distance OUT_BUMPER_OFFSET = Feet.of(10);//0.050212598);
-		public static final Distance LENGTH = Feet.of(2.3); // Feet
+		public static final Distance OUT_BUMPER_OFFSET = Feet.of(0.050212598);
+		public static final Distance LENGTH = Feet.of(2.2); // Feet
 
 	}
 
