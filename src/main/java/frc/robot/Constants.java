@@ -182,22 +182,22 @@ public final class Constants {
 
 		public static class MotorConstants {
 			public static class Angle {
-				public static final Time RAMP_RATE = Second.of(0.1); // Seconds
+				public static final Time RAMP_RATE = Second.of(0.15); // Seconds
 				public static final double GEAR_RATIO = 21.4285714286;
 				public static final double FACTOR = 0;
 				public static final Current CURRENT_LIMIT = Amp.of(20.0); // Amps
 
 				public static class Pidf {
-					public static final double P = 0.025;
+					public static final double P = 0.01;
 					public static final double I = 0;
-					public static final double D = 0.05;
+					public static final double D = 0.1;
 					public static final double F = 0;
 					public static final double IZ = 0;
 				}
 			}
 
 			public static class Drive {
-				public static final Time RAMP_RATE = Second.of(0.1); // Seconds
+				public static final Time RAMP_RATE = Second.of(0.15); // Seconds
 				public static final double GEAR_RATIO = 6.75;
 				public static final double FACTOR = 0;
 				public static final Current CURRENT_LIMIT = Amp.of(40.0); // Amps
@@ -267,9 +267,9 @@ public final class Constants {
 		
 		public static class Stage1 {
 			public static final int ID = 3;
-			public static final double MAX_VELOCITY = 140; // Not sure the unit
+			public static final double MAX_VELOCITY = 150; // Not sure the unit
 			public static final double MAX_ACCELERATION = 100; // Not sure the unit
-			public static final double P = 75; // 75;
+			public static final double P = 76; // 75;
 			public static final double I = 0;
 			public static final double D = 0.5; // 1.1;
 			public static final Voltage S = Volt.of(0.05); // Volts
@@ -279,15 +279,15 @@ public final class Constants {
 			public static final Mass MASS = Pound.of(70); // Pounds (Including stage 2 and the arm)
 			public static final Distance DRUM_RADIUS = Inch.of(1.106);//0.98110236); // Inches
 			public static final double GEAR_RATIO = 45;
-			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.5); // Feet
+			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.75); // Feet
 			
 		}
 
 		public static class Stage2 {
 			public static final int ID = 2;
-			public static final double MAX_VELOCITY = 140; // Not sure the unit
+			public static final double MAX_VELOCITY = 150; // Not sure the unit
 			public static final double MAX_ACCELERATION = 100; // Not sure the unit
-			public static final double P = 34;//75;
+			public static final double P = 40;//75;
 			public static final double I = 0;
 			public static final double D = 0;//1.1;
 			public static final Voltage S = Volt.of(0.05); // Volts
@@ -297,7 +297,7 @@ public final class Constants {
 			public static final Mass MASS = Pound.of(45); // Pounds (Including the arm)
 			public static final Distance DRUM_RADIUS = Inch.of(0.98110236); // Inches
 			public static final double GEAR_RATIO = 34;//15.7143;
-			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.12); // Feet
+			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.25); // Feet
 			public static final double ABSOLUTE_ENCODER_GEAR_RATIO = 19.901;
 			public static final Distance HEIGHT_OFFSET = Meter.of(0.3);
 
@@ -310,11 +310,11 @@ public final class Constants {
 		public static class Shoulder {
 			public static final boolean ENABLED = true;
 			public static final int ID = 4;
-			public static final double MAX_VELOCITY = 140;//120; // Not sure the unit
+			public static final double MAX_VELOCITY = 150;//120; // Not sure the unit
 			public static final double MAX_ACCELERATION = 55;//200; // Not sure the unit
 			public static final double P = 0.135; //0.7;
 			public static final double I = 0;
-			public static final double D = 0.0017;
+			public static final double D = 0.002;
 			public static final Voltage S = Volt.of(0.05); // Volts
 			public static final Voltage G = Volt.of(0.552);//3.55); // Volts
 			public static final Voltage V = Volt.of(0.13); // Volts/(Degrees/Second)

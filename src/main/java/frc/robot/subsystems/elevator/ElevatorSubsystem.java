@@ -342,10 +342,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         double targetRatio = targetHeightMeters / maxHeight;
 
         double target1Height = MathUtil.clamp(
-                this.stage1MaxHeight * targetRatio, 0,
+                this.stage1MaxHeight * targetRatio, 0.05,
                 this.stage1MaxHeight);
         double target2Height = MathUtil.clamp(
-                this.stage2MaxHeight * targetRatio, 0,
+                this.stage2MaxHeight * targetRatio, 0.05,
                 this.stage2MaxHeight);
 
         // Set each elevators setpoint to the calculated heights in meters
