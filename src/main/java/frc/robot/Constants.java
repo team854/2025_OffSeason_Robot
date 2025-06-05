@@ -267,9 +267,9 @@ public final class Constants {
 		
 		public static class Stage1 {
 			public static final int ID = 3;
-			public static final double MAX_VELOCITY = 120; // Not sure the unit
+			public static final double MAX_VELOCITY = 140; // Not sure the unit
 			public static final double MAX_ACCELERATION = 100; // Not sure the unit
-			public static final double P = 70; // 75;
+			public static final double P = 75; // 75;
 			public static final double I = 0;
 			public static final double D = 0.5; // 1.1;
 			public static final Voltage S = Volt.of(0.05); // Volts
@@ -279,15 +279,15 @@ public final class Constants {
 			public static final Mass MASS = Pound.of(70); // Pounds (Including stage 2 and the arm)
 			public static final Distance DRUM_RADIUS = Inch.of(1.106);//0.98110236); // Inches
 			public static final double GEAR_RATIO = 45;
-			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.25); // Feet
+			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.5); // Feet
 			
 		}
 
 		public static class Stage2 {
 			public static final int ID = 2;
-			public static final double MAX_VELOCITY = 120; // Not sure the unit
+			public static final double MAX_VELOCITY = 140; // Not sure the unit
 			public static final double MAX_ACCELERATION = 100; // Not sure the unit
-			public static final double P = 30;//75;
+			public static final double P = 34;//75;
 			public static final double I = 0;
 			public static final double D = 0;//1.1;
 			public static final Voltage S = Volt.of(0.05); // Volts
@@ -310,8 +310,8 @@ public final class Constants {
 		public static class Shoulder {
 			public static final boolean ENABLED = true;
 			public static final int ID = 4;
-			public static final double MAX_VELOCITY = 130;//120; // Not sure the unit
-			public static final double MAX_ACCELERATION = 60;//200; // Not sure the unit
+			public static final double MAX_VELOCITY = 140;//120; // Not sure the unit
+			public static final double MAX_ACCELERATION = 55;//200; // Not sure the unit
 			public static final double P = 0.135; //0.7;
 			public static final double I = 0;
 			public static final double D = 0.0017;
