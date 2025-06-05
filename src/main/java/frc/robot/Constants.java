@@ -116,13 +116,13 @@ public final class Constants {
 					public static final Distance LEFT = Inch.of(9.875); // Inches
 				}
 
-				public static final Angle ABSOLUTE_ENCODER_OFFSET = Degree.of(45.1); // Degrees
+				public static final Angle ABSOLUTE_ENCODER_OFFSET = Degree.of(19.47493551); // Degrees
 
 				public static class DriveMotor {
 					public static final String TYPE = "sparkmax_neo";
 					public static final int ID = 20;
 					public static final Object CANBUS = null;
-					public static final boolean INVERTED = true;
+					public static final boolean INVERTED = false;
 				}
 
 				public static class AngleMotor {
@@ -182,13 +182,13 @@ public final class Constants {
 
 		public static class MotorConstants {
 			public static class Angle {
-				public static final Time RAMP_RATE = Second.of(0); // Seconds
+				public static final Time RAMP_RATE = Second.of(0.1); // Seconds
 				public static final double GEAR_RATIO = 21.4285714286;
 				public static final double FACTOR = 0;
 				public static final Current CURRENT_LIMIT = Amp.of(20.0); // Amps
 
 				public static class Pidf {
-					public static final double P = 0.035;
+					public static final double P = 0.025;
 					public static final double I = 0;
 					public static final double D = 0.05;
 					public static final double F = 0;
@@ -197,13 +197,13 @@ public final class Constants {
 			}
 
 			public static class Drive {
-				public static final Time RAMP_RATE = Second.of(0); // Seconds
+				public static final Time RAMP_RATE = Second.of(0.1); // Seconds
 				public static final double GEAR_RATIO = 6.75;
 				public static final double FACTOR = 0;
 				public static final Current CURRENT_LIMIT = Amp.of(40.0); // Amps
 
 				public static class Pidf {
-					public static final double P = 0.006;
+					public static final double P = 0.004;
 					public static final double I = 0;
 					public static final double D = 0;
 					public static final double F = 0;
@@ -221,7 +221,7 @@ public final class Constants {
 		}
 
 		public static class HeadingPID {
-			public static final double P = 7;
+			public static final double P = 5;
 			public static final double I = 0;
 			public static final double D = 0.04;
 		}
