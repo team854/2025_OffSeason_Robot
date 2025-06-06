@@ -271,7 +271,7 @@ public final class Constants {
 			public static final double MAX_ACCELERATION = 100; // Not sure the unit
 			public static final double P = 76; // 75;
 			public static final double I = 0;
-			public static final double D = 0.5; // 1.1;
+			public static final double D = 0.4; // 1.1;
 			public static final Voltage S = Volt.of(0.05); // Volts
 			public static final Voltage G = Volt.of(0.35);//2.1); // Volts
 			public static final Voltage V = Volt.of(0.1);//19.5); // Volts/(Meters/Second)
@@ -292,7 +292,7 @@ public final class Constants {
 			public static final double D = 0;//1.1;
 			public static final Voltage S = Volt.of(0.05); // Volts
 			public static final Voltage G = Volt.of(0.2);//1.2); // Volts
-			public static final Voltage V = Volt.of(0.1);//17.5); // Volts/(Meters/Second)
+			public static final Voltage V = Volt.of(0.05);//17.5); // Volts/(Meters/Second)
 			public static final Voltage A = Volt.of(0.0);//0.04); // Volts/(Meters/Second^2)
 			public static final Mass MASS = Pound.of(45); // Pounds (Including the arm)
 			public static final Distance DRUM_RADIUS = Inch.of(0.98110236); // Inches
