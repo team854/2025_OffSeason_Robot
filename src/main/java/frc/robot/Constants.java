@@ -274,8 +274,8 @@ public final class Constants {
 			public static final double D = 0.5; // 1.1;
 			public static final Voltage S = Volt.of(0.05); // Volts
 			public static final Voltage G = Volt.of(0.35);//2.1); // Volts
-			public static final Voltage V = Volt.of(5);//19.5); // Volts/(Meters/Second)
-			public static final Voltage A = Volt.of(0.2); // Volts/(Meters/Second^2)
+			public static final Voltage V = Volt.of(0.1);//19.5); // Volts/(Meters/Second)
+			public static final Voltage A = Volt.of(0.0);//0.2); // Volts/(Meters/Second^2)
 			public static final Mass MASS = Pound.of(70); // Pounds (Including stage 2 and the arm)
 			public static final Distance DRUM_RADIUS = Inch.of(1.106);//0.98110236); // Inches
 			public static final double GEAR_RATIO = 45;
@@ -292,12 +292,12 @@ public final class Constants {
 			public static final double D = 0;//1.1;
 			public static final Voltage S = Volt.of(0.05); // Volts
 			public static final Voltage G = Volt.of(0.2);//1.2); // Volts
-			public static final Voltage V = Volt.of(5);//17.5); // Volts/(Meters/Second)
-			public static final Voltage A = Volt.of(0.04); // Volts/(Meters/Second^2)
+			public static final Voltage V = Volt.of(0.1);//17.5); // Volts/(Meters/Second)
+			public static final Voltage A = Volt.of(0.0);//0.04); // Volts/(Meters/Second^2)
 			public static final Mass MASS = Pound.of(45); // Pounds (Including the arm)
 			public static final Distance DRUM_RADIUS = Inch.of(0.98110236); // Inches
 			public static final double GEAR_RATIO = 34;//15.7143;
-			public static final Distance HARD_MAX_HEIGHT = Feet.of(2.25); // Feet
+			public static final Distance HARD_MAX_HEIGHT = Feet.of(2); // Feet
 			public static final double ABSOLUTE_ENCODER_GEAR_RATIO = 19.901;
 			public static final Distance HEIGHT_OFFSET = Meter.of(0.3);
 
@@ -511,7 +511,7 @@ public final class Constants {
 		public static final LinearVelocity CONTROL_ELEVATOR_SPEED = FeetPerSecond.of(1); // Feet/Second
 		public static final AngularVelocity CONTROL_SHOULDER_SPEED = DegreesPerSecond.of(50); // Degrees/Second
 		public static final AngularVelocity BABY_CONTROL_SHOULDER_LIMIT_SPEED = DegreesPerSecond.of(10); // Degrees/Second
-		public static final AngularVelocity CONTROL_WRIST_SPEED = DegreesPerSecond.of(60); // Degrees/Second
+		public static final AngularVelocity CONTROL_WRIST_SPEED = DegreesPerSecond.of(50); // Degrees/Second
 		public static final AngularVelocity BABY_CONTROL_WRIST_LIMIT_SPEED = DegreesPerSecond.of(10); // Degrees/Second
 		public static final double INTAKE_SPEED = -0.9; // Percent
 		public static final double OUTTAKE_SPEED = 0.9; // Percent

@@ -342,10 +342,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         double targetRatio = targetHeightMeters / maxHeight;
 
         double target1Height = MathUtil.clamp(
-                this.stage1MaxHeight * targetRatio, 0.05,
+                this.stage1MaxHeight * targetRatio, 0.01,
                 this.stage1MaxHeight);
         double target2Height = MathUtil.clamp(
-                this.stage2MaxHeight * targetRatio, 0.05,
+                this.stage2MaxHeight * targetRatio, 0.01,
                 this.stage2MaxHeight);
 
         // Set each elevators setpoint to the calculated heights in meters
@@ -540,14 +540,17 @@ public class ElevatorSubsystem extends SubsystemBase {
         // Compute it twice with and without the look ahead and use which ever is higher so its safer
         double elevatorMinimumHeight = Math.max(getElevatorMinimumHeight(robotPose, currentShoulderSetpoint, currentOverallSetpoint).in(Meter), 
                                                 getElevatorMinimumHeight(robotPose, currentShoulderSetpointLookAhead, currentOverallSetpoint).in(Meter));
-
+        
+        elevatorMinimumHeight = 0.9;
         // If the shoulder is pitching up then lower the threshold a bit to prevent sticking
-        double minHeightOffset = (currentShoulderSetpointVelocity.in(DegreesPerSecond) > 0.5) ? 0.05 : 0;
+        double minHeightOffset = (currentShoulderSetpointVelocity.in(DegreesPerSecond) > 0.5) ? 0.05 : -0.01;
 
         // If the overall height of the elevator is less then the calculated minimum elevator height then override the overall height
-        if (currentOverallSetpoint.in(Meter) < (elevatorMinimumHeight - minHeightOffset)) {
-            setOverallHeight(Meter.of(elevatorMinimumHeight));
+        if (currentOverallSetpoint.in(Meter) <= (elevatorMinimumHeight - minHeightOffset)) {
+            setOverallHeight(Meter.of(elevatorMinimumHeight - 0.005));
         }
+
+        System.out.println("MIN" + elevatorMinimumHeight);
 
         double stage1VoltsOutput = MathUtil.clamp(
                 stage1Controller.calculate(getStage1Height().in(Meter)) + stage1FeedForward

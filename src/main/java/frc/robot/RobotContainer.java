@@ -131,8 +131,8 @@ public class RobotContainer {
 		/*
 		* Wrist controls
 		*/
-		driverController.povRightDirection().whileTrue(wristSubsystem.setWristSpeedCommand(Constants.DriverConstants.CONTROL_WRIST_SPEED));
-		driverController.povLeftDirection().whileTrue(wristSubsystem.setWristSpeedCommand(Constants.DriverConstants.CONTROL_WRIST_SPEED.unaryMinus()));
+		driverController.povRightDirection().whileTrue(wristSubsystem.setWristSpeedCommand(Constants.DriverConstants.CONTROL_WRIST_SPEED.unaryMinus()));
+		driverController.povLeftDirection().whileTrue(wristSubsystem.setWristSpeedCommand(Constants.DriverConstants.CONTROL_WRIST_SPEED));
 
 		/*
 		* Intake coral
