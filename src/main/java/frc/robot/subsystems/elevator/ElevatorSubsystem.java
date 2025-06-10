@@ -24,6 +24,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -82,9 +83,11 @@ public class ElevatorSubsystem extends SubsystemBase {
      */
     private final ProfiledPIDController stage1Controller;
     private final ElevatorFeedforward stage1FeedForward;
+    private Distance stage1MinHeight = Meter.of(0);
 
     private final ProfiledPIDController stage2Controller;
     private final ElevatorFeedforward stage2FeedForward;
+    private Distance stage2MinHeight = Meter.of(0);
 
     /*
 	 * Calibration
@@ -244,12 +247,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void setStage1Setpoint(Distance height) {
         stage1Controller.setGoal(
-                MathUtil.clamp(height.in(Meter), 0.01, this.stage1MaxHeight));
+                MathUtil.clamp(height.in(Meter), this.stage1MinHeight.in(Meter), this.stage1MaxHeight));
     }
 
     public void setStage2Setpoint(Distance height) {
         stage2Controller.setGoal(
-                MathUtil.clamp(height.in(Meter), 0.01, this.stage2MaxHeight));
+                MathUtil.clamp(height.in(Meter), this.stage2MinHeight.in(Meter), this.stage2MaxHeight));
     }
 
     /**
@@ -325,13 +328,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         return elevatorLocalHeight >= 0 && elevatorLocalHeight <= this.maxHeight;
     }
 
-    /**
-     * Sets the overall height of the elevator by moving both stages
-     * 
-     * @param targetHeight The target height of the elevator relative to the ground in meters
-     */
-    public void setOverallHeight(Distance targetHeight) {
-
+    private Pair<Distance, Distance> calculateOverallHeight(Distance targetHeight) {
         // Because the target height is based on the distance from the carpet it has to be converted to elevator height
         double targetHeightMeters = targetHeight.in(Meter) - getPivotPointOffset(true).in(Meter);
 
@@ -348,9 +345,21 @@ public class ElevatorSubsystem extends SubsystemBase {
                 this.stage2MaxHeight * targetRatio, 0.01,
                 this.stage2MaxHeight);
 
+        return new Pair<Distance, Distance>(Meter.of(target1Height), Meter.of(target2Height));
+    }
+
+    /**
+     * Sets the overall height of the elevator by moving both stages
+     * 
+     * @param targetHeight The target height of the elevator relative to the ground in meters
+     */
+    public void setOverallHeight(Distance targetHeight) {
+
+        Pair<Distance, Distance> stage_heights = calculateOverallHeight(targetHeight);
+
         // Set each elevators setpoint to the calculated heights in meters
-        setStage1Setpoint(Meter.of(target1Height));
-        setStage2Setpoint(Meter.of(target2Height));
+        setStage1Setpoint(stage_heights.getFirst());
+        setStage2Setpoint(stage_heights.getSecond());
     }
 
 	/**
@@ -543,6 +552,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         
         // If the shoulder is pitching up then lower the threshold a bit to prevent sticking
         double minHeightOffset = (currentShoulderSetpointVelocity.in(DegreesPerSecond) > 0.5) ? 0.05 : -0.001;
+
+        Pair<Distance, Distance> elevatorStagesMinimum = calculateOverallHeight(Meter.of(minHeightOffset));
+        this.stage1MinHeight = elevatorStagesMinimum.getFirst();
+        this.stage2MinHeight = elevatorStagesMinimum.getSecond();
 
         // If the overall height of the elevator is less then the calculated minimum elevator height then override the overall height
         if (currentOverallSetpoint.in(Meter) <= (elevatorMinimumHeight - minHeightOffset)) {

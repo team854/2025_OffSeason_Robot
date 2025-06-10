@@ -1,8 +1,8 @@
 {
   "robotMass" : 115.00000000000001,
   "rampRate" : {
-    "angle" : 0.0,
-    "drive" : 0.0
+    "angle" : 0.15,
+    "drive" : 0.15
   },
   "conversionFactors" : {
     "angle" : {
