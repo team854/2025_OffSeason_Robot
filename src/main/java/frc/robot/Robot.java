@@ -57,8 +57,7 @@ public class Robot extends LoggedRobot  {
 
 	@Override
 	public void disabledExit() {
-		RobotContainer.elevatorSubsystem.resetStage1Setpoint();
-		RobotContainer.elevatorSubsystem.resetStage2Setpoint();
+		RobotContainer.elevatorSubsystem.resetStagesSetpoint();
 
 		// Set the shoulder to its current angle
 		RobotContainer.shoulderSubsystem.resetShoulderSetpoint();
@@ -69,8 +68,7 @@ public class Robot extends LoggedRobot  {
 	@Override
 	public void autonomousInit() {
 		// Set the elevator stages to their current height
-		RobotContainer.elevatorSubsystem.resetStage1Setpoint();
-		RobotContainer.elevatorSubsystem.resetStage2Setpoint();
+		RobotContainer.elevatorSubsystem.resetStagesSetpoint();
 
 		// Set the shoulder to its current angle
 		RobotContainer.shoulderSubsystem.resetShoulderSetpoint();
@@ -95,8 +93,7 @@ public class Robot extends LoggedRobot  {
 	@Override
 	public void teleopInit() {
 		// Set the elevator stages to their current height
-		RobotContainer.elevatorSubsystem.resetStage1Setpoint();
-		RobotContainer.elevatorSubsystem.resetStage2Setpoint();
+		RobotContainer.elevatorSubsystem.resetStagesSetpoint();
 
 		// Set the shoulder to its current angle
 		RobotContainer.shoulderSubsystem.resetShoulderSetpoint();

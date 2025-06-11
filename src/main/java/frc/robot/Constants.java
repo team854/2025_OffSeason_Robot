@@ -246,7 +246,7 @@ public final class Constants {
 	public static class RobotKinematicConstants {
 		public static final Mass MASS = Pound.of(115.0); // Pounds
 		public static final Distance WIDTH = Feet.of(2.58333333); // Feet
-		public static final Distance LENGTH = Feet.of(3.41666667); // Feet
+		public static final Distance LENGTH = Feet.of(3.42666667); // Feet
 		public static final Distance HEIGHT_OFF_GROUND = Feet.of(0.033); // Feet
 		public static final LinearVelocity MAX_SPEED = FeetPerSecond.of(16.0); // Feet/Second
 		public static final LinearVelocity MAX_ACHIEVABLE_SPEED = FeetPerSecond.of(14.5); // Feet/Second
@@ -267,15 +267,15 @@ public final class Constants {
 		
 		public static class Stage1 {
 			public static final int ID = 3;
-			public static final double MAX_VELOCITY = 150; // Not sure the unit
-			public static final double MAX_ACCELERATION = 100; // Not sure the unit
-			public static final double P = 76; // 75;
+			public static final double MAX_VELOCITY = 220; // Not sure the unit
+			public static final double MAX_ACCELERATION = 150; // Not sure the unit
+			public static final double P = 100; // 75;
 			public static final double I = 0;
-			public static final double D = 0.4; // 1.1;
+			public static final double D = 0.5; // 1.1;
 			public static final Voltage S = Volt.of(0.05); // Volts
-			public static final Voltage G = Volt.of(0.35);//2.1); // Volts
+			public static final Voltage G = Volt.of(0.2);//2.1); // Volts
 			public static final Voltage V = Volt.of(0.1);//19.5); // Volts/(Meters/Second)
-			public static final Voltage A = Volt.of(0.0);//0.2); // Volts/(Meters/Second^2)
+			public static final Voltage A = Volt.of(0.001);//0.2); // Volts/(Meters/Second^2)
 			public static final Mass MASS = Pound.of(70); // Pounds (Including stage 2 and the arm)
 			public static final Distance DRUM_RADIUS = Inch.of(1.106);//0.98110236); // Inches
 			public static final double GEAR_RATIO = 45;
@@ -285,15 +285,15 @@ public final class Constants {
 
 		public static class Stage2 {
 			public static final int ID = 2;
-			public static final double MAX_VELOCITY = 150; // Not sure the unit
-			public static final double MAX_ACCELERATION = 100; // Not sure the unit
-			public static final double P = 40;//75;
+			public static final double MAX_VELOCITY = 220; // Not sure the unit
+			public static final double MAX_ACCELERATION = 150; // Not sure the unit
+			public static final double P = 100;//75;
 			public static final double I = 0;
 			public static final double D = 0;//1.1;
 			public static final Voltage S = Volt.of(0.05); // Volts
 			public static final Voltage G = Volt.of(0.2);//1.2); // Volts
 			public static final Voltage V = Volt.of(0.05);//17.5); // Volts/(Meters/Second)
-			public static final Voltage A = Volt.of(0.0);//0.04); // Volts/(Meters/Second^2)
+			public static final Voltage A = Volt.of(0.001);//0.04); // Volts/(Meters/Second^2)
 			public static final Mass MASS = Pound.of(45); // Pounds (Including the arm)
 			public static final Distance DRUM_RADIUS = Inch.of(0.98110236); // Inches
 			public static final double GEAR_RATIO = 34;//15.7143;
@@ -363,8 +363,8 @@ public final class Constants {
 		}
 
 		public static final Distance MINIMUM_HEIGHT_IN_BUMPER = Feet.of(0.7); // Feet
-		public static final Angle OUT_BUMPER_ANGLE = Degree.of(-37); // Degree
-		public static final Distance OUT_BUMPER_OFFSET = Feet.of(0.050212598);
+		public static final Angle OUT_BUMPER_ANGLE = Degree.of(-60); // Degree
+		public static final Distance OUT_BUMPER_OFFSET = Feet.of(0.01);
 		public static final Distance LENGTH = Feet.of(2.2); // Feet
 
 	}
@@ -377,7 +377,7 @@ public final class Constants {
 		public static class GroundIntake {
 			public static final Distance ELEVATOR_GROUND_HEIGHT = Meter.of(0); // Feet
 			public static final Angle WRIST_ANGLE = Degree.of(0.0); // Degrees
-			public static final Angle SHOULDER_ANGLE = Degree.of(-34.0); // Degrees
+			public static final Angle SHOULDER_ANGLE = Degree.of(-40.0); // Degrees
 		}
 	}
 

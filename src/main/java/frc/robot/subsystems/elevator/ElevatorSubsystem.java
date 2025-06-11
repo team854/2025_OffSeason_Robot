@@ -84,10 +84,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final ProfiledPIDController stage1Controller;
     private final ElevatorFeedforward stage1FeedForward;
     private Distance stage1MinHeight = Meter.of(0);
+    private Distance stage1TargetHeight = Meter.of(0);
 
     private final ProfiledPIDController stage2Controller;
     private final ElevatorFeedforward stage2FeedForward;
     private Distance stage2MinHeight = Meter.of(0);
+    private Distance stage2TargetHeight = Meter.of(0);
 
     /*
 	 * Calibration
@@ -246,13 +248,15 @@ public class ElevatorSubsystem extends SubsystemBase {
 	}
 
     public void setStage1Setpoint(Distance height) {
-        stage1Controller.setGoal(
-                MathUtil.clamp(height.in(Meter), this.stage1MinHeight.in(Meter), this.stage1MaxHeight));
+        this.stage1TargetHeight = height.copy();
+        // stage1Controller.setGoal(
+        //        MathUtil.clamp(height.in(Meter), Math.max(this.stage1MinHeight.in(Meter), 0.02), this.stage1MaxHeight));
     }
 
     public void setStage2Setpoint(Distance height) {
-        stage2Controller.setGoal(
-                MathUtil.clamp(height.in(Meter), this.stage2MinHeight.in(Meter), this.stage2MaxHeight));
+        this.stage2TargetHeight = height.copy();
+        // stage2Controller.setGoal(
+        //        MathUtil.clamp(height.in(Meter), Math.max(this.stage2MinHeight.in(Meter), 0.02), this.stage2MaxHeight));
     }
 
     /**
@@ -280,17 +284,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets the setpoint for stage 1 to the stages current height
+     * Sets the target overall height to the stages current overall height
      */
-    public void resetStage1Setpoint() {
-        setStage1Setpoint(getStage1Height());
-    }
-
-    /**
-     * Sets the setpoint for stage 2 to the stages current height
-     */
-    public void resetStage2Setpoint() {
-        setStage2Setpoint(getStage2Height());
+    public void resetStagesSetpoint() {
+        setOverallHeight(getOverallHeight());
     }
 
     /**
@@ -400,8 +397,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         setStage1MotorVoltage(Volt.of(0));
         setStage2MotorVoltage(Volt.of(0));
 		if (this.calibrationEnabled == false) {
-			resetStage1Setpoint();
-            resetStage2Setpoint();
+			RobotContainer.elevatorSubsystem.resetStagesSetpoint();
 		}
 	}
 
@@ -543,24 +539,27 @@ public class ElevatorSubsystem extends SubsystemBase {
         Angle currentShoulderSetpoint = RobotContainer.shoulderSubsystem.getShoulderSetpoint();
         Angle currentShoulderSetpointLookAhead = currentShoulderSetpoint.plus(Degree.of(currentShoulderSetpointVelocity.in(DegreesPerSecond))).times(0.2);
         
+        Angle currentShoulderAngle = RobotContainer.shoulderSubsystem.getShoulderAngle();
+
         // Get the overall hieght of the elevator setpoint
         Distance currentOverallSetpoint = getOverallSetpoint();
 
         // Compute it twice with and without the look ahead and use which ever is higher so its safer
-        double elevatorMinimumHeight = Math.max(getElevatorMinimumHeight(robotPose, currentShoulderSetpoint, currentOverallSetpoint).in(Meter), 
+        double elevatorMinimumHeight = Math.max(Math.max(getElevatorMinimumHeight(robotPose, currentShoulderSetpoint, currentOverallSetpoint).in(Meter), getElevatorMinimumHeight(robotPose, currentShoulderAngle, currentOverallSetpoint).in(Meter)), 
                                                 getElevatorMinimumHeight(robotPose, currentShoulderSetpointLookAhead, currentOverallSetpoint).in(Meter));
         
         // If the shoulder is pitching up then lower the threshold a bit to prevent sticking
-        double minHeightOffset = (currentShoulderSetpointVelocity.in(DegreesPerSecond) > 0.5) ? 0.05 : -0.001;
+        double minHeightOffset = (currentShoulderSetpointVelocity.in(DegreesPerSecond) > 0.05) ? 0.5 : 0; FIGNRE ME OUT OK BYE
 
-        Pair<Distance, Distance> elevatorStagesMinimum = calculateOverallHeight(Meter.of(minHeightOffset));
+        Pair<Distance, Distance> elevatorStagesMinimum = calculateOverallHeight(Meter.of(elevatorMinimumHeight - minHeightOffset));
         this.stage1MinHeight = elevatorStagesMinimum.getFirst();
         this.stage2MinHeight = elevatorStagesMinimum.getSecond();
 
-        // If the overall height of the elevator is less then the calculated minimum elevator height then override the overall height
-        if (currentOverallSetpoint.in(Meter) <= (elevatorMinimumHeight - minHeightOffset)) {
-            setOverallHeight(Meter.of(elevatorMinimumHeight - 0.001));
-        }
+        stage1Controller.setGoal(
+                MathUtil.clamp(this.stage1TargetHeight.in(Meter), Math.max(this.stage1MinHeight.in(Meter), 0.02), this.stage1MaxHeight));
+
+        stage2Controller.setGoal(
+                MathUtil.clamp(this.stage2TargetHeight.in(Meter), Math.max(this.stage2MinHeight.in(Meter), 0.04), this.stage2MaxHeight));
 
         double stage1VoltsOutput = MathUtil.clamp(
                 stage1Controller.calculate(getStage1Height().in(Meter)) + stage1FeedForward

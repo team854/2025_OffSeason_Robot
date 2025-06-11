@@ -8,6 +8,7 @@ public class GroundPickupConfigurationCommand extends ParallelCommandGroup {
     public GroundPickupConfigurationCommand() {
         addCommands(
             RobotContainer.shoulderSubsystem.setShoulderAngleCommand(Constants.SetpointConstants.GroundIntake.SHOULDER_ANGLE),
+            
             RobotContainer.wristSubsystem.setWristAngleCommand(Constants.SetpointConstants.GroundIntake.WRIST_ANGLE),
             RobotContainer.elevatorSubsystem.setOverallHeightCommand(Constants.SetpointConstants.GroundIntake.ELEVATOR_GROUND_HEIGHT)
         );

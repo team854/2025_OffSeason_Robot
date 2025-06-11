@@ -30,6 +30,10 @@ public class ControlElevatorBothStagesCommand extends Command {
         if (RobotContainer.driveControlMode != DriveControlMode.NORMAL) {
             return;
         }
+
+        if (Math.abs(elevatorSpeed.get()) < 0.05) {
+            return;
+        }
         
         RobotContainer.elevatorSubsystem.setOverallHeight(Meter.of(RobotContainer.elevatorSubsystem.getStage1Setpoint().in(Meter) + RobotContainer.elevatorSubsystem.getStage2Setpoint().in(Meter) + ((elevatorSpeed.get() * Constants.DriverConstants.CONTROL_ELEVATOR_SPEED.in(MetersPerSecond)) / 50) + elevatorOffset));
     }
