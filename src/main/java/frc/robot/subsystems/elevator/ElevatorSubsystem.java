@@ -243,6 +243,18 @@ public class ElevatorSubsystem extends SubsystemBase {
         return Meter.of(stage2Controller.getGoal().position);
     }
 
+    public Distance getStage1Target() {
+        return this.stage1TargetHeight;
+    }
+
+    public Distance getStage2Target() {
+        return this.stage2TargetHeight;
+    }
+
+    public Distance getOverallTarget() {
+		return getStage1Target().plus(getStage2Target()).plus(getPivotPointOffset(true));
+	}
+
 	public Distance getOverallSetpoint() {
 		return getStage1Setpoint().plus(getStage2Height()).plus(getPivotPointOffset(true));
 	}
@@ -549,7 +561,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                                                 getElevatorMinimumHeight(robotPose, currentShoulderSetpointLookAhead, currentOverallSetpoint).in(Meter));
         
         // If the shoulder is pitching up then lower the threshold a bit to prevent sticking
-        double minHeightOffset = (currentShoulderSetpointVelocity.in(DegreesPerSecond) > 0.05) ? 0.5 : 0; FIGNRE ME OUT OK BYE
+        double minHeightOffset = (currentShoulderSetpointVelocity.in(DegreesPerSecond) > 0.05) ? 0.5 : 0;
 
         Pair<Distance, Distance> elevatorStagesMinimum = calculateOverallHeight(Meter.of(elevatorMinimumHeight - minHeightOffset));
         this.stage1MinHeight = elevatorStagesMinimum.getFirst();
