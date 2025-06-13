@@ -262,9 +262,11 @@ public class ShoulderSubsystem extends SubsystemBase {
 			// Limit the max commanded rotational speed
 			double shoulderDegreesPerSecond = MathUtil.clamp(shoulderSpeed.in(DegreesPerSecond), -this.maxControlAngularVelocity, this.maxControlAngularVelocity);
 
-			double elevatorMaxSpeed = ((Constants.DriverConstants.CONTROL_ELEVATOR_SPEED.in(MetersPerSecond)) / 50) + 0.001;
+			//double elevatorMaxSpeed = ((Constants.DriverConstants.CONTROL_ELEVATOR_SPEED.in(MetersPerSecond)) / 50) + 0.025;
+			double currentElevatorSpeed = ((RobotContainer.elevatorSubsystem.getStage1HeightVelocity().in(MetersPerSecond) + RobotContainer.elevatorSubsystem.getStage2HeightVelocity().in(MetersPerSecond)) / 50);
 
-			if (Math.abs(RobotContainer.elevatorSubsystem.getOverallTarget().in(Meter) - RobotContainer.elevatorSubsystem.getOverallSetpoint().in(Meter)) > elevatorMaxSpeed) {
+
+			if (Math.abs(RobotContainer.elevatorSubsystem.getOverallTarget().in(Meter) - RobotContainer.elevatorSubsystem.getOverallSetpoint().in(Meter)) > 0.02 && Math.abs(currentElevatorSpeed) < 0.02) {
 				RobotContainer.elevatorSubsystem.setOverallHeight(RobotContainer.elevatorSubsystem.getOverallSetpoint());
 			}
 

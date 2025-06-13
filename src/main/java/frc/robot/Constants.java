@@ -62,7 +62,7 @@ public final class Constants {
 					public static final String TYPE = "sparkmax_neo";
 					public static final int ID = 23;
 					public static final Object CANBUS = null;
-					public static final boolean INVERTED = false;
+					public static final boolean INVERTED = true;
 				}
 
 				public static class AngleMotor {
@@ -92,7 +92,7 @@ public final class Constants {
 					public static final String TYPE = "sparkmax_neo";
 					public static final int ID = 22;
 					public static final Object CANBUS = null;
-					public static final boolean INVERTED = false;
+					public static final boolean INVERTED = true;
 				}
 
 				public static class AngleMotor {
@@ -116,13 +116,13 @@ public final class Constants {
 					public static final Distance LEFT = Inch.of(9.875); // Inches
 				}
 
-				public static final Angle ABSOLUTE_ENCODER_OFFSET = Degree.of(19.47493551); // Degrees
+				public static final Angle ABSOLUTE_ENCODER_OFFSET = Degree.of(223); // Degrees
 
 				public static class DriveMotor {
 					public static final String TYPE = "sparkmax_neo";
 					public static final int ID = 20;
 					public static final Object CANBUS = null;
-					public static final boolean INVERTED = false;
+					public static final boolean INVERTED = true;
 				}
 
 				public static class AngleMotor {
@@ -152,7 +152,7 @@ public final class Constants {
 					public static final String TYPE = "sparkmax_neo";
 					public static final int ID = 21;
 					public static final Object CANBUS = null;
-					public static final boolean INVERTED = false;
+					public static final boolean INVERTED = true;
 				}
 
 				public static class AngleMotor {
@@ -314,9 +314,9 @@ public final class Constants {
 			public static final double MAX_ACCELERATION = 55;//200; // Not sure the unit
 			public static final double P = 0.135; //0.7;
 			public static final double I = 0;
-			public static final double D = 0.002;
+			public static final double D = 0.009;
 			public static final Voltage S = Volt.of(0.05); // Volts
-			public static final Voltage G = Volt.of(0.552);//3.55); // Volts
+			public static final Voltage G = Volt.of(0.5);//3.55); // Volts
 			public static final Voltage V = Volt.of(0.13); // Volts/(Degrees/Second)
 			public static final Voltage A = Volt.of(0.03); // Volts/(Degrees/Second^2)
 			public static final Mass MASS = Pound.of(35); // Pounds (Including the wrist)
@@ -377,7 +377,7 @@ public final class Constants {
 		public static class GroundIntake {
 			public static final Distance ELEVATOR_GROUND_HEIGHT = Meter.of(0); // Feet
 			public static final Angle WRIST_ANGLE = Degree.of(0.0); // Degrees
-			public static final Angle SHOULDER_ANGLE = Degree.of(-40.0); // Degrees
+			public static final Angle SHOULDER_ANGLE = Degree.of(-45.0); // Degrees
 		}
 	}
 
@@ -503,7 +503,7 @@ public final class Constants {
 	public static class DriverConstants {
 		public static final int PORT = 0;
 		public static final double DEADBAND = 0.12;
-		public static final double TRANSLATION_SCALE = 1;
+		public static final double TRANSLATION_SCALE = 0.5;
 		public static final double ROTATION_SCALE = 0.7;
 		public static final double LEFT_JOYSTICK_EXPONENT = 1.25;
 		public static final double RIGHT_JOYSTICK_EXPONENT = 1.25;

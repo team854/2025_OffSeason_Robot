@@ -65,8 +65,8 @@ public class RobotContainer {
 			Constants.DriverConstants.TRIGGER_EXPONENT);
 
 	public static final SwerveInputStream driveAngularVelocity = SwerveInputStream.of(swerveSubsystem.swerveDrive,
-			() -> -driverController.getLeftY(),
-			() -> -driverController.getLeftX())
+			() -> driverController.getLeftY(),
+			() -> driverController.getLeftX())
 			.withControllerRotationAxis(() -> -driverController.getRightX() * Constants.DriverConstants.ROTATION_SCALE)
 			.deadband(0)
 			.scaleTranslation(Constants.DriverConstants.TRANSLATION_SCALE)

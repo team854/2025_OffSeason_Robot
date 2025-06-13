@@ -561,7 +561,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                                                 getElevatorMinimumHeight(robotPose, currentShoulderSetpointLookAhead, currentOverallSetpoint).in(Meter));
         
         // If the shoulder is pitching up then lower the threshold a bit to prevent sticking
-        double minHeightOffset = (currentShoulderSetpointVelocity.in(DegreesPerSecond) > 0.05) ? 0.5 : 0;
+        double minHeightOffset = (currentShoulderSetpointVelocity.in(DegreesPerSecond) > 0.05) ? 0.01 : 0;
 
         Pair<Distance, Distance> elevatorStagesMinimum = calculateOverallHeight(Meter.of(elevatorMinimumHeight - minHeightOffset));
         this.stage1MinHeight = elevatorStagesMinimum.getFirst();
